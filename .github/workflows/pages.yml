@@ -1,0 +1,60 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Doxygen action for libimgdoc2
+        uses: mattnotmitt/doxygen-action@v1.9.5
+        with:
+           doxyfile-path: "./Doxyfile"         # Path to Doxyfile
+           working-directory: "libimgdoc2"     # Working directory
+      - name: Doxygen action for ImgDoc2Net
+        uses: mattnotmitt/doxygen-action@v1.9.5
+        with:
+           doxyfile-path: "./Doxyfile"               # Path to Doxyfile
+           working-directory: "dotnet/imgdoc2Net"    # Working directory
+      - name: Prepare doxygen-generated documentation for upload
+        run: |
+           mkdir ${{github.workspace}}/documentation
+           mkdir ${{github.workspace}}/documentation/libimgdoc2
+           mkdir ${{github.workspace}}/documentation/imgdoc2net
+           cp -r ${{github.workspace}}/libimgdoc2/doxygen/html/* ${{github.workspace}}/documentation/libimgdoc2
+           cp -r ${{github.workspace}}/dotnet/imgdoc2Net/doxygen/html/* ${{github.workspace}}/documentation/imgdoc2net
+           echo "<meta http-equiv=\"Refresh\" content=\"0; url='https://ZEISS.github.io/imgdoc2/libimgdoc2/'\" />" >> ${{github.workspace}}/documentation/index.html
+           
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './documentation'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1

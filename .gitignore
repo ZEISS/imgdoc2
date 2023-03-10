@@ -1,0 +1,53 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+out/
+build/
+wslbuild/
+.vs/
+dotnet/.idea
+dotnet/imgdoc2Net/bin
+dotnet/imgdoc2Net/obj
+dotnet/ImgDoc2Playground_Framework/bin
+dotnet/ImgDoc2Playground_Framework/obj
+dotnet/ImgDoc2Playground_NetCore/bin
+dotnet/ImgDoc2Playground_NetCore/obj
+dotnet/ImgDoc2Net_Unittests/bin
+dotnet/ImgDoc2Net_Unittests/obj
+dotnet/imgdoc2cmd/bin
+dotnet/imgdoc2cmd/obj
+dotnet/ImgDoc2Net/doxygen
+libimgdoc2/doxygen
+.idea
+cmake-build-debug/
+megalinter-reports/

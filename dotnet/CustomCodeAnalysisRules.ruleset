@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="StyleCop rules for imgdoc2Net" Description="Custom Rules" ToolsVersion="10.0">
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.ReadabilityRules">
+    <Rule Id="SA1028" Action="Hidden" />
+    <Rule Id="SA1124" Action="Hidden" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.CSharp.NetAnalyzers">
+    <Rule Id="CA1001" Action="Warning" />
+    <Rule Id="CA1032" Action="Warning" />
+    <Rule Id="CA1309" Action="Warning" />
+    <Rule Id="CA1805" Action="Warning" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
+    <Rule Id="CA1008" Action="Warning" />
+    <Rule Id="CA1063" Action="Warning" />
+  </Rules>
+</RuleSet>

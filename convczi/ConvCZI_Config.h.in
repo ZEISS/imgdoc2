@@ -1,0 +1,8 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
+#pragma once
+
+#define CONVCZI_UNIX_ENVIRONMENT @ConvCZI_UNIX_ENVIRONMENT@
+#define CONVCZI_WIN32_ENVIRONMENT @ConvCZI_WIN32_ENVIRONMENT@

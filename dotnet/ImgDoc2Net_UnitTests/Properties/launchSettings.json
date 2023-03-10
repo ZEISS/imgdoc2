@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ImgDoc2Net_UnitTests": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

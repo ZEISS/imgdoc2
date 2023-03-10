@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "imgdoc2cmd": {
+      "commandName": "Project",
+      "commandLineArgs": "--command QueryForTiles --source D:\\test.db",
+      "nativeDebugging": true
+    }
+  }
+}

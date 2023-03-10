@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <CodeAnalysisRuleSet>../CustomCodeAnalysisRules.ruleset</CodeAnalysisRuleSet>
+	  <EnableNETAnalyzers>True</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup Condition="Exists('..\native_dlls\imgdoc2API.dll')">
+    <None Include="..\native_dlls\imgdoc2API.dll" Link="imgdoc2API.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('..\native_dlls\libimgdoc2API.so')">
+    <None Include="..\native_dlls\libimgdoc2API.so" Link="libimgdoc2API.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

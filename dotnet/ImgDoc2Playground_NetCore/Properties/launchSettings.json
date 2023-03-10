@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ImgDoc2Playground_NetCore": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}
