@@ -16,7 +16,7 @@ DISABLE_LINTERS:
   - CSHARP_CSHARPIER
 DISABLE_ERRORS_LINTERS:
   - MARKDOWN_MARKDOWN_LINK_CHECK # Make non-blocking due to network timeouts etc.
-CPP_CPPLINT_ARGUMENTS: --verbose=2 --linelength=300 --filter=-whitespace/braces,-whitespace/indent,-whitespace/comments,-whitespace/newline,-build/c++11,-build/include_subdir,-build/namespaces,-build/include_order,-whitespace/end_of_line,-runtime/indentation_namespace,-runtime/references,-readability/namespace,-readability/nolint
+CPP_CPPLINT_ARGUMENTS: --verbose=2
 CPP_CPPLINT_FILTER_REGEX_EXCLUDE: (sqlite3/|imgdoc2cmd/)
 SHOW_ELAPSED_TIME: true
 FILEIO_REPORTER: false
