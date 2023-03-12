@@ -29,6 +29,12 @@ public:
     void Execute(IDbStatement* statement) override;
     std::int64_t ExecuteAndGetLastRowId(IDbStatement* statement) override;
     std::shared_ptr<IDbStatement> PrepareStatement(const std::string& sql_statement) override;
+
+    /// Evaluate the statement and retrieve one row of results. This method can be called multiple times in order to return
+    /// additional rows. The return value is true if a row was successfully retrieved and is available, and it is false
+    /// if there is no more data available. All other error conditions result in an exception. 
+    /// \param [in,out] statement The statement to evaluate and gather results.
+    /// \returns True if a row of results was successfully retrieve; false if there is no more data available.
     bool StepStatement(IDbStatement* statement) override;
 
     void BeginTransaction() override;

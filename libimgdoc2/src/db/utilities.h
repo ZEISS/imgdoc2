@@ -56,6 +56,7 @@ public:
     static void WriteStringIntoPropertyBag(IDbConnection* db_connection, const std::string& table_name, const std::string& key_column_name, const std::string& value_column_name, const std::string& key, const std::string& value);
 
     static void DeleteItemFromPropertyBag(IDbConnection* db_connection, const std::string& table_name, const std::string& key_column_name, const std::string& value_column_name, const std::string& key);
+
 private:
     static const char* ComparisonOperatorToString(imgdoc2::ComparisonOperation comparison_operator);
     static const char* LogicalOperatorToString(imgdoc2::LogicalOperator logical_operator);

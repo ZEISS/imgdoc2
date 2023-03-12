@@ -8,6 +8,7 @@
 #include <atomic>
 #include <utility>
 #include <string>
+#include <vector>
 #include "utilities.h"
 #include <imgdoc2.h>
 
@@ -47,11 +48,25 @@ static void FillOutErrorInformation(const exception& exception, ImgDoc2ErrorInfo
 {
     if (error_information != nullptr)
     {
-        auto error_message = exception.what();
+        const auto error_message = exception.what();
 
         // ensure that the string is always null-terminated, even in the case of truncation
-        strncpy(error_information->message, error_message, ImgDoc2ErrorInformation::kMaxMessageLength - 1);
-        error_information->message[ImgDoc2ErrorInformation::kMaxMessageLength - 1] = '\0';
+        Utilities::copy_string_to_fixed_size(error_message, error_information->message, ImgDoc2ErrorInformation::kMaxMessageLength);
+    }
+}
+
+static void FillOutErrorInformationForInvalidArgument(const char* argument_name, const char* text, ImgDoc2ErrorInformation* error_information)
+{
+    if (error_information != nullptr)
+    {
+        stringstream ss;
+        ss << "Argument '" << argument_name << "'";
+        if (text != nullptr)
+        {
+            ss << ": " << text;
+        }
+
+        Utilities::copy_string_to_fixed_size(ss.str().c_str(), error_information->message, ImgDoc2ErrorInformation::kMaxMessageLength);
     }
 }
 
@@ -652,7 +667,7 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileInfo(
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
 
-    auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     LogicalPositionInfo logical_position_info;
     TileCoordinate tile_coordinate;
@@ -689,6 +704,64 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileInfo(
     if (tile_blob_info_interop != nullptr)
     {
         *tile_blob_info_interop = Utilities::ConvertImgDoc2TileBlobInfoToInterop(tile_blob_info);
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocInfo_GetTileDimensions(
+    HandleDocRead2D handle,
+    imgdoc2::Dimension* dimensions,
+    std::uint32_t* count,
+    ImgDoc2ErrorInformation* error_information)
+{
+    if (count == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("count", "must not be null", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    if (*count > 0 && dimensions == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("dimensions", "must not be null (if a count > 0 was given)", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
+    reader2d->GetTileDimensions(dimensions, *count);
+    return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
+    HandleDocRead2D handle,
+    const imgdoc2::Dimension* dimensions,
+    std::uint32_t count,
+    MinMaxForTilePositionsInterop* result,
+    ImgDoc2ErrorInformation* error_information)
+{
+    if (dimensions == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("dimensions", "must not be null", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    if (result == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("result", "must not be null", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
+    const vector<Dimension> dimensions_array(dimensions, dimensions + count);
+    const auto min_max = reader2d->GetMinMaxForTileDimension(dimensions_array);
+
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        const auto& item = min_max.at(dimensions[i]);
+        (result + i)->minimum_value = item.minimum_value;
+        (result + i)->maximum_value = item.maximum_value;
     }
 
     return ImgDoc2_ErrorCode_OK;

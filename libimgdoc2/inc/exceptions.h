@@ -79,6 +79,17 @@ namespace imgdoc2
         {}
     };
 
+    /// Exception for signalling invalid arguments.
+    class invalid_argument_exception : public imgdoc2_exception
+    {
+    public:
+        /// Constructor.
+        /// \param error_message Message describing the error.
+        explicit invalid_argument_exception(const char* error_message)
+            : imgdoc2_exception(error_message)
+        {}
+    };
+
     /// Exception for signalling that an attempt was made to access an non existing tile.
     class non_existing_tile_exception : public imgdoc2_exception
     {
@@ -112,5 +123,15 @@ namespace imgdoc2
         /// this property is valid.
         /// \returns The index of the non existing tile which was attempted to be accessed.
         [[nodiscard]] imgdoc2::dbIndex GetIndex() const { return this->index_; }
+    };
+
+    class internal_error_exception : public imgdoc2_exception
+    {
+    public:
+        internal_error_exception() = delete;
+
+        explicit internal_error_exception(const std::string& error_message)
+            : imgdoc2_exception(error_message.c_str())
+        {}
     };
 }

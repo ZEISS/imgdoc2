@@ -71,6 +71,11 @@ public:
 
     bool IsDimensionIndexed(imgdoc2::Dimension) const;
 
+    /// Queries if the specified tile dimension is valid (for this document).
+    /// \param  dimension  The dimension to check.
+    /// \returns    True if the tile dimension is valid for this document, false if not.
+    bool IsTileDimensionValid(imgdoc2::Dimension dimension) const;
+
     void SetDimensionColumnPrefix(const char* prefix) { this->dimension_column_prefix_ = prefix; }
     void SetIndexForDimensionColumnPrefix(const char* prefix) { this->index_for_dimension_prefix_ = prefix; }
     const std::string& GetDimensionsColumnPrefix() const { return this->dimension_column_prefix_; }

@@ -4,11 +4,66 @@
 
 #include <variant>
 #include <sstream>
+#include <algorithm>
+#include <map>
+#include <vector>
 #include "documentRead2d.h"
 #include "../db/utilities.h"
 
 using namespace std;
 using namespace imgdoc2;
+
+/*virtual*/void DocumentRead2d::GetTileDimensions(imgdoc2::Dimension* dimensions, std::uint32_t& count)
+{
+    const auto& tile_dimensions = this->document_->GetDataBaseConfiguration2d()->GetTileDimensions();
+
+    if (dimensions != nullptr)
+    {
+        copy_n(tile_dimensions.cbegin(), min(count, static_cast<uint32_t>(tile_dimensions.size())), dimensions);
+    }
+
+    count = static_cast<uint32_t>(tile_dimensions.size());
+}
+
+/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
+{
+    for (auto dimension : dimensions_to_query_for)
+    {
+        bool is_valid = this->document_->GetDataBaseConfiguration2d()->IsTileDimensionValid(dimension);
+        if (!is_valid)
+        {
+            ostringstream string_stream;
+            string_stream << "The dimension '" << dimension << "' is not valid.";
+            throw invalid_argument_exception(string_stream.str().c_str());
+        }
+    }
+
+    if (dimensions_to_query_for.empty())
+    {
+        return {};
+    }
+
+    auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for);
+
+    map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> result;
+
+    // we expect exactly "2 * dimensions_to_query_for.size()" results
+    bool is_done = this->document_->GetDatabase_connection()->StepStatement(query_statement.get());
+    if (!is_done)
+    {
+        throw internal_error_exception("database-query gave no result, this is unexpected.");
+    }
+
+    for (size_t i = 0; i < dimensions_to_query_for.size(); ++i)
+    {
+        CoordinateBounds coordinate_bounds;
+        coordinate_bounds.minimum_value = query_statement->GetResultInt32(i * 2);
+        coordinate_bounds.maximum_value = query_statement->GetResultInt32(i * 2 + 1);
+        result[dimensions_to_query_for[i]] = coordinate_bounds;
+    }
+
+    return result;
+}
 
 /*virtual*/void DocumentRead2d::ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info)
 {
@@ -296,7 +351,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     string_stream << "SELECT spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk) << " FROM "
         << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " spatialindex "
         << "INNER JOIN " << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << " info ON "
-        << "spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk) 
+        << "spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk)
         << " = info." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_Pk)
         << " WHERE (" <<
         this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxX) << ">=? AND " <<
@@ -425,5 +480,31 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetReadDataQueryStatement(imgdoc2:
 
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     statement->BindInt64(1, idx);
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryMinMaxStatement(const std::vector<imgdoc2::Dimension>& dimensions)
+{
+    // preconditions:
+    // - the dimensions specified must be valid
+    // - the collection must not be empty
+    
+    ostringstream string_stream;
+    string_stream << "SELECT ";
+    bool first_iteration = true;
+    for (auto dimension : dimensions)
+    {
+        if (!first_iteration)
+        {
+            string_stream << ',';
+        }
+        string_stream << "MIN([" << this->document_->GetDataBaseConfiguration2d()->GetDimensionsColumnPrefix() << dimension << "]),";
+        string_stream << "MAX([" << this->document_->GetDataBaseConfiguration2d()->GetDimensionsColumnPrefix() << dimension << "])";
+        first_iteration = false;
+    }
+
+    string_stream << " FROM " << "[" << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << "];";
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     return statement;
 }

@@ -137,6 +137,11 @@ namespace ImgDoc2Net.Interop
                 this.idocread2ReadTileInfo =
                     this.GetProcAddressThrowIfNotFound<IDocRead2d_ReadTileInfoDelegate>("IDocRead2d_ReadTileInfo");
 
+                this.idocinfoGetTileDimensions =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo_GetTileDimensions");
+                this.idocinfoGetMinMaxForTileDimensions =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo_GetMinMaxForTileDimensions");
+
                 this.funcPtrBlobOutputSetSizeForwarder =
                     Marshal.GetFunctionPointerForDelegate<BlobOutputSetSizeDelegate>(ImgDoc2ApiInterop.BlobOutputSetSizeDelegateObj);
                 this.funcPtrBlobOutputSetDataForwarder =
@@ -413,7 +418,7 @@ namespace ImgDoc2Net.Interop
                 byte* dimensionsBuffer = stackalloc byte[BufferSize];
 
                 // TODO(Jbl):  we are abusing UIntPtr as an equivalent to size_t, c.f. https://stackoverflow.com/questions/32906774/what-is-equal-to-the-c-size-t-in-c-sharp
-                UIntPtr sizeOfBuffer = new UIntPtr(BufferSize); 
+                UIntPtr sizeOfBuffer = new UIntPtr(BufferSize);
                 returnCode = this.createOptionsGetDimensions(handleCreateOptions, dimensionsBuffer, new IntPtr(&sizeOfBuffer), null);
                 if (sizeOfBuffer.ToUInt32() > BufferSize)
                 {
@@ -898,6 +903,79 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        /// <summary> 
+        /// Get the tile-dimensions of the document. This is corresponding to the native method 'IDocInfo::GetTileDimensions'.
+        /// </summary>
+        /// <param name="read2dHandle"> The reader-2d-object.</param>
+        /// <returns> An array with the dimensions used in the document.</returns>
+        public Dimension[] DocInfoGetTileDimensions(IntPtr read2dHandle)
+        {
+            unsafe
+            {
+                const int initialArraySize = 20;    // number of elements for the initial buffer we supply
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                byte* dimensionsArray = stackalloc byte[initialArraySize];
+                uint count = initialArraySize;
+                int returnCode = this.idocinfoGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                if (count > initialArraySize)
+                {
+                    // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
+                    byte* dimensionsArray2 = stackalloc byte[(int)count];
+                    returnCode = this.idocinfoGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
+                    dimensionsArray = dimensionsArray2;
+                }
+
+                Dimension[] dimensions = new Dimension[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    dimensions[i] = new Dimension(Convert.ToChar(dimensionsArray[i]));
+                }
+
+                return dimensions;
+            }
+        }
+
+        public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfoGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
+        {
+            int dimensionCount = dimensions.Count();
+            unsafe
+            {
+                Span<byte> dimensionsArray = stackalloc byte[dimensionCount];
+                int i = 0;
+                foreach (var dimension in dimensions)
+                {
+                    dimensionsArray[i] = (byte)dimension.Id;
+                    ++i;
+                }
+
+                MinMaxInterop[] minMaxInteropArray = new MinMaxInterop[dimensionCount];
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+
+                fixed (byte* pointerToDimensionArray = dimensionsArray)
+                fixed (MinMaxInterop* pointerToMinMaxArray = &minMaxInteropArray[0])
+                {
+                    int returnCode = this.idocinfoGetMinMaxForTileDimensions(
+                        read2dHandle,
+                        new IntPtr(pointerToDimensionArray),
+                        (uint)dimensionCount,
+                        new IntPtr(pointerToMinMaxArray),
+                        &errorInformation);
+                }
+
+                var result = new Dictionary<Dimension, (int Minimum, int Maximum)>(dimensionCount);
+
+                i = 0;
+                foreach (var d in dimensionsArray)
+                {
+                    result[new Dimension(Convert.ToChar(d))] = (minMaxInteropArray[i].Minimum, minMaxInteropArray[i].Maximum);
+                    ++i;
+                }
+
+                return result;
+            }
+        }
+
         /// <summary> Helper method that handles the interop with functions which return a string (using a semantic like with 
         ///           "createOptionsGetFilename" or "openExistingOptionsGetFilename").</summary>
         /// <exception cref="Exception"> Thrown when an exception error condition occurs.</exception>
@@ -1260,6 +1338,9 @@ namespace ImgDoc2Net.Interop
 
         private readonly CreateEnvironmentObjectDelegate createEnvironmentObject;
 
+        private readonly IDocInfo_GetTileDimensionsDelegate idocinfoGetTileDimensions;
+        private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfoGetMinMaxForTileDimensions;
+
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate void GetStatisticsDelegate(ImgDoc2StatisticsInterop* statisticsInterop);
 
@@ -1373,6 +1454,21 @@ namespace ImgDoc2Net.Interop
             IntPtr pfnIsLevelActive,
             IntPtr reportFatalErrorAndExit);
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocInfo_GetTileDimensionsDelegate(
+            IntPtr read2dHandle,
+            IntPtr pointerToDimensionsArray,
+            IntPtr pointerToCount,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocInfo_GetMinMaxForTileDimensionsDelegate(
+            IntPtr read2dHandle,
+            IntPtr pointerToDimensionsArray,
+            uint pointerToCount,
+            IntPtr pointerToMinMaxArray,
+            ImgDoc2ErrorInformation* errorInformation);
+
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         private unsafe struct ImgDoc2ErrorInformation
         {
@@ -1461,6 +1557,13 @@ namespace ImgDoc2Net.Interop
             public double Y;
             public double Width;
             public double Height;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct MinMaxInterop
+        {
+            public int Minimum;
+            public int Maximum;
         }
     }
 
@@ -1607,7 +1710,7 @@ namespace ImgDoc2Net.Interop
             var tileBaseInfoInterop = default(TileBaseInfoInterop);
             tileBaseInfoInterop.PixelWidth = (uint)tile2dBaseInfo.PixelWidth;
             tileBaseInfoInterop.PixelHeight = (uint)tile2dBaseInfo.PixelHeight;
-            tileBaseInfoInterop.PixelType = 0;
+            tileBaseInfoInterop.PixelType = (byte)tile2dBaseInfo.PixelType;
             return tileBaseInfoInterop;
         }
 

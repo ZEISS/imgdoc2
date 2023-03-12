@@ -8,7 +8,7 @@ namespace ImgDoc2Net.Interfaces
     /// This enumeration lists the pixel types. 
     /// This is corresponding to the file "pixeltypes.h".
     /// </summary>
-    public enum PixelType 
+    public enum PixelType : byte
     {
         /// <summary> 
         /// An enum constant representing an invalid pixel type.

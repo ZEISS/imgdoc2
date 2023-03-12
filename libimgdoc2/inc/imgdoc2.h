@@ -17,6 +17,7 @@ So - this is the only file which is to be included by a client application.
 #include "ClassFactory.h"
 #include "IDocRead2d.h"
 #include "IDocWrite2d.h"
+#include "IDocInfo.h"
 #include "IDoc.h"
 #include "TileCoordinate.h"
 #include "exceptions.h"

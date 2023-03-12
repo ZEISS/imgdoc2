@@ -7,7 +7,7 @@ namespace ImgDoc2Net.Implementation
     using System;
 
     /// <summary>   This structure is representing a 'dimension' in imgdoc2. </summary>
-    public struct Dimension
+    public struct Dimension : IComparable<Dimension>
     {
         /// <summary> The dimension identifier.</summary>
         public char Id;
@@ -23,9 +23,18 @@ namespace ImgDoc2Net.Implementation
             this.Id = c;
         }
 
+        /// <summary> Compares this Dimension object to another to determine their relative ordering.</summary>
+        /// <param name="other"> Another instance to compare.</param>
+        /// <returns> Negative if this object is less than the other, 0 if they are equal, or positive if
+        ///     this is greater.</returns>
+        public int CompareTo(Dimension other)
+        {
+            return this.Id.CompareTo(other.Id);
+        }
+
         private static void ThrowIfInvalidChar(char c)
         {
-            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
+            if (!Utilities.IsValidDimension(c))
             {
                 throw new ArgumentException("Dimension must be a-zA-Z.");
             }

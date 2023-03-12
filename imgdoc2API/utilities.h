@@ -61,4 +61,13 @@ public:
 
     static imgdoc2::LogicalOperator ConvertToLogicalOperatorEnum(std::uint8_t value);
     static imgdoc2::ComparisonOperation ConvertToComparisonOperationEnum(std::uint8_t value);
+
+    /// Copies the specified source string to the destination string. The destination
+    /// string has the size specified by n. It is ensured that the destination will be
+    /// null-terminated. If the source string is too long, it will be truncated.
+    ///
+    /// \param          src     The source string.
+    /// \param [out]    dest    The destination string.
+    /// \param          n       The maximum size of the destination string (including the null terminator).
+    static void copy_string_to_fixed_size(const char* src, char* dest, size_t n);
 };

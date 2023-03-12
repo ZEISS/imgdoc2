@@ -9,15 +9,20 @@ namespace Imgdoc2cmd
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
+    /// <summary> This object gathers the command line options.</summary>
     internal partial class Options
     {
+        /// <summary> Values that represent the available commands.</summary>
         public enum CommandType
         {
             None,
             QueryForTilesAndReport,
-            QueryForTilesAndSaveTiles
+            QueryForTilesAndSaveTiles,
+            CreateSyntheticDocument,
+            PrintInformation
         }
     }
 
@@ -27,11 +32,27 @@ namespace Imgdoc2cmd
         private string sourceDocument = string.Empty;
         private string dimensionQuery = string.Empty;
         private string destinationFolder = string.Empty;
+        private string coordinateBounds = string.Empty;
+        private string outputFilename = string.Empty;
+        private (int tileWidth, int tileHeight) tileSize = (1024, 1024);
 
+        /// <summary> Gets the command.</summary>
+        /// <value> The command.</value>
         public CommandType Command => this.command;
+
+        /// <summary> Gets the filename of the source document.</summary>
+        /// <value> The source document.</value>
         public string SourceDocument => this.sourceDocument;
+
         public string DimensionQuery => this.dimensionQuery;
+
         public string DestinationFolder => this.destinationFolder;
+
+        public string CoordinateBounds => this.coordinateBounds;
+
+        public string OutputFilename => this.outputFilename;
+
+        public (int tileWidth, int tileHeight) TileSize => this.tileSize;
     }
 
     internal partial class Options
@@ -56,18 +77,27 @@ namespace Imgdoc2cmd
             var app = new CommandLineApplication();
 
             app.HelpOption();
+            app.ExtendedHelpText = GetExtendedHelpText();
 
-            var commandOption = app.Option("-c|--command <COMMAND>", "The command to execute", CommandOptionType.SingleValue);
+            var commandOption = app.Option("-c|--command <COMMAND>", $"The command to execute. Possible values are {GetListOfCommands()}.", CommandOptionType.SingleValue);
             commandOption.DefaultValue = "None";
 
             var sourceFileOption = app.Option("-s|--source <FILENAME>", "The source document to open", CommandOptionType.SingleValue);
             sourceFileOption.DefaultValue = string.Empty;
 
-            var dimensionQueryOption = app.Option("-q|--dimension-query <QUERYSTRING>", "The dimension query", CommandOptionType.SingleValue);
+            var dimensionQueryOption = app.Option("-q|--dimension-query <QUERYSTRING>", "The dimension query clause, in the format e.g. \"A3,5B-3,1m9,10\".", CommandOptionType.SingleValue);
             dimensionQueryOption.DefaultValue = string.Empty;
 
             var destinationDirectoryOption = app.Option("-d|--destination-folder <FOLDER>", "Destination folder", CommandOptionType.SingleValue);
             destinationDirectoryOption.DefaultValue = string.Empty;
+
+            var boundsOption = app.Option("-b|--coordinate-bounds <BOUNDS>", "The coordinate range, it is given in the format e.g. \"Z1T1-10\".", CommandOptionType.SingleValue);
+            boundsOption.DefaultValue = string.Empty;
+
+            var outputFileOption = app.Option("-o|--output-document <FILENAME>", "The output file", CommandOptionType.SingleValue);
+            outputFileOption.DefaultValue = string.Empty;
+
+            var tileSizeOption = app.Option("-t|--tile-size <TILESIZE>", "Specify the size of a tile in pixels. Format is 'width x height', e.g. '1024x1024'.", CommandOptionType.SingleValue);
 
             app.OnExecute(() => { });
 
@@ -92,12 +122,71 @@ namespace Imgdoc2cmd
 
             this.destinationFolder = destinationDirectoryOption.Value() ?? string.Empty;
 
+            this.coordinateBounds = boundsOption.Value() ?? string.Empty;
+
+            this.outputFilename = outputFileOption.Value() ?? string.Empty;
+
+            if (tileSizeOption.HasValue())
+            {
+                if (!TryParseTileSize(tileSizeOption.Value(), out this.tileSize))
+                {
+                    throw new ArgumentException($"Invalid <TILESIZE> given: {tileSizeOption.Value()}.");
+                }
+            }
+
             return true;
         }
 
         private static bool TryParseCommandType(string text, out Options.CommandType command)
         {
             return Enum.TryParse<Options.CommandType>(text, true, out command);
+        }
+
+        /// <summary> Attempts to parse a string in the format '&lt;integer&gt; x &lt;integer&gt;' from the given string.</summary>
+        /// <param name="text">     The string to parse.</param>
+        /// <param name="tileSize"> The two integers.</param>
+        /// <returns> True if it succeeds, false if it fails.</returns>
+        private static bool TryParseTileSize(string? text, out (int, int) tileSize)
+        {
+            tileSize = (0, 0);
+            if (text == null)
+            {
+                return false;
+            }
+
+            const string pattern = @"\s*(\d+)\s*x\s*(\d+)";
+            var m = Regex.Match(text, pattern);
+            if (m.Success)
+            {
+                return int.TryParse(m.Groups[1].Value, out tileSize.Item1) && int.TryParse(m.Groups[2].Value, out tileSize.Item2);
+            }
+
+            return false;
+        }
+
+        private static string GetListOfCommands()
+        {
+            // TODO(JBL): we could create this list programmatically
+            return "PrintInformation, QueryForTilesAndReport, QueryForTilesAndSaveTiles, CreateSyntheticDocument";
+        }
+
+        private static string GetExtendedHelpText()
+        {
+            return @"
+command ""CreateSyntheticDocument"":
+ This command will create a new document with the filename as given with the '-o|--output-document' option.
+ The bounds for the document is specified with the '-b|--coordinate-bounds' option. The size of the individual
+ tiles can be set with the '-t|--tile-size' option.
+
+command ""QueryForTilesAndReport"":
+ This command will use the query specified with the '-q|--dimension-query' option and print information (about all matching tiles).
+
+command ""QueryForTilesAndSaveTiles"":
+ This command will use the query specified with the '-q|--dimension-query' option and save matching tiles (as PNG) to the folder specified with the '-d|--destination-folder' option.
+
+command ""PrintInformation"":
+ Use this command to print information about the document.
+";
         }
     }
 }
