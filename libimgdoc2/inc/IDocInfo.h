@@ -13,8 +13,8 @@ namespace imgdoc2
     /// This structure gathers a minimum and maximum value.
     struct CoordinateBounds
     {
-        int minimum_value;
-        int maximum_value;
+        int minimum_value;  ///< The minimum value.
+        int maximum_value;  ///< The maximum value.
     };
 
     /// This interface is used for retrieving information about the document.

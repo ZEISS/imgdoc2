@@ -125,11 +125,14 @@ namespace imgdoc2
         [[nodiscard]] imgdoc2::dbIndex GetIndex() const { return this->index_; }
     };
 
+    /// Exception for signalling an unexpected internal error condition.
     class internal_error_exception : public imgdoc2_exception
     {
     public:
         internal_error_exception() = delete;
 
+        /// Constructor.
+        /// \param error_message Message describing the error.
         explicit internal_error_exception(const std::string& error_message)
             : imgdoc2_exception(error_message.c_str())
         {}

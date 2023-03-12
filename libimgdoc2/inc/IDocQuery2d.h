@@ -11,6 +11,7 @@
 #include "ITIleInfoQueryClause.h"
 #include "IBlobOutput.h"
 
+/// This interface is providing read-only access to the document.
 class IDocQuery2d
 {
 public:
