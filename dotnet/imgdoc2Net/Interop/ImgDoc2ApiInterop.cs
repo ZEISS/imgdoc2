@@ -16,7 +16,7 @@ namespace ImgDoc2Net.Interop
     /// <summary>   
     /// This class contains "the lowest level interop interface". 
     /// </summary>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         private const string BaseDllNameWindows = @"imgdoc2API";
         private const string BaseDllNameLinux = @"libimgdoc2API";
