@@ -231,7 +231,7 @@ namespace ImgDoc2Net.Interop
     /// <content>   
     /// In this part we find the wrappers for calling into native code. 
     /// </content>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         /// <summary>   Gets the "ImgDoc2Statistics". </summary>
         /// <returns>   The "ImgDoc2Statistics". </returns>
@@ -1024,7 +1024,7 @@ namespace ImgDoc2Net.Interop
     /// <content> 
     /// Here we gather "simple overloads" of the interface functions.
     /// </content>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         public void Writer2dAddTile(IntPtr write2dHandle, ITileCoordinate coordinate, in LogicalPosition logicalPosition, Tile2dBaseInfo tile2dBaseInfo, DataType dataType, byte[] data)
         {
@@ -1048,7 +1048,7 @@ namespace ImgDoc2Net.Interop
     /// <content> 
     /// The public class "QueryResult" is defined in this part.
     /// </content>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         public class QueryResult
         {
@@ -1079,7 +1079,7 @@ namespace ImgDoc2Net.Interop
     /// This part is concerned with "Blob-output"-implementation - which is a mechanism for returning binary blobs
     /// from the native code, where we allocation of the memory is to take place in the managed code.
     /// </content>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         /// <summary>
         /// Delegate to the (static) BlobOutputSetSizeFunction-forwarder-function. It is important that this delegate does NOT get
@@ -1191,7 +1191,7 @@ namespace ImgDoc2Net.Interop
     /// <content> 
     /// This part is concerned with constructing and implementing the "environment object".
     /// </content>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         private static readonly EnvironmentCallbackFunctionLogDelegate EnvironmentCallbackFunctionLogDelegateObj =
             ImgDoc2ApiInterop.EnvironmentCallbackFunctionLog;
@@ -1248,7 +1248,7 @@ namespace ImgDoc2Net.Interop
         }
     }
 
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         /// <summary> Handles error cases - i.e. if the imgdoc2-API-return-code is indicating an error, we retrieve the
         ///           error-information from the interop-error-information struct and turn it into an appropriate
@@ -1290,7 +1290,7 @@ namespace ImgDoc2Net.Interop
     /// <summary>   
     /// This part contains the declaration of the delegates and native structs. 
     /// </summary>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         private const int ImgDoc2ErrorInformationMessageMaxLength = 200;
 
@@ -1570,7 +1570,7 @@ namespace ImgDoc2Net.Interop
     /// <summary>   
     /// This part contains the declaration of the delegates and native structs. 
     /// </summary>
-    public partial class ImgDoc2ApiInterop
+    internal partial class ImgDoc2ApiInterop
     {
         /// <summary>   
         /// Converts a tileCoordinate to a blittable data-structure.
