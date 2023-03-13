@@ -16,6 +16,7 @@
 #include "tilebaseinfointerop.h"
 #include "statisticsinterop.h"
 #include "rectangledoubleinterop.h"
+#include "minmaxfortiledimensioninterop.h"
 
 typedef std::intptr_t ObjectHandle;
 
@@ -145,4 +146,26 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileInfo(
     TileCoordinateInterop* tile_coordinate_interop,
     LogicalPositionInfoInterop* logical_position_info_interop,
     TileBlobInfoInterop* tile_blob_info_interop,
+    ImgDoc2ErrorInformation* error_information);
+
+/// Get the tile-dimensions used in the document. On input, the parameter 'count' must give the
+/// size of the memory pointed to by 'dimensions' (= the number of elements in there). On output,
+/// the actual number of elements available is put into 'count'. At most, the initial number 
+/// of elements are copied to the 'dimension' buffer.
+///
+/// \param           handle                         The handle of the read2d-object.
+/// \param           dimensions                     Pointer to a buffer.
+/// \param           count                          On input, the size of the array pointed to by 'dimensions', on output the actual number of dimension available.
+/// \param           error_information              If non-null, in case of an error, additional information describing the error are put here.
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTileDimensions(
+    HandleDocRead2D handle,
+    imgdoc2::Dimension* dimensions,
+    std::uint32_t* count,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetMinMaxForTileDimensions(
+    HandleDocRead2D handle,
+    const imgdoc2::Dimension* dimensions,
+    std::uint32_t count,
+    MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information);

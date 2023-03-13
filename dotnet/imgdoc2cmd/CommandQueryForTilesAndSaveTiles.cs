@@ -19,39 +19,6 @@ namespace Imgdoc2cmd
 
     internal class CommandQueryForTilesAndSaveTiles : CommandQueryForTilesBase
     {
-        //private readonly CommandHelper commandHelper;
-
-        //public CommandQueryForTilesAndSaveTiles()
-        //{
-        //    this.commandHelper = new CommandHelper();
-        //}
-
-        //public void Execute(Options options)
-        //{
-        //    this.commandHelper.OpenSourceDocument(options.SourceDocument);
-
-        //    var reader2d = this.commandHelper.GetRead2d();
-
-        //    DimensionQueryClause dimensionQueryClause = Utilities.CreateFromStringRepresentation(options.DimensionQuery);
-        //    TileInfoQueryClause tileInfoQueryClause = new TileInfoQueryClause();
-        //    tileInfoQueryClause.PyramidLevelConditionsModifiable.Add(new QueryClause() { ComparisonOperator = QueryComparisonOperator.Equal, Value = 0 });
-
-        //    QueryOptions queryOptions = new QueryOptions
-        //    {
-        //        MaxNumbersOfResults = 100_000
-        //    };
-
-        //    var list = reader2d.Query(dimensionQueryClause, tileInfoQueryClause, queryOptions);
-
-        //    int bitmapNumber = 0;
-        //    foreach (var pk in list)
-        //    {
-        //        var tileInfo = reader2d.ReadTileInfo(pk);
-        //        string outputFilename = Path.Combine(options.DestinationFolder, $"tile_{bitmapNumber}.png");
-        //        this.ProcessTile(pk, outputFilename, tileInfo);
-        //        ++bitmapNumber;
-        //    }
-        //}
         protected override void ProcessTiles(List<long> tiles, Options options)
         {
             int bitmapNumber = 0;

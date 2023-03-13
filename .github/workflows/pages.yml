@@ -47,7 +47,7 @@ jobs:
           mkdir ${{github.workspace}}/documentation/imgdoc2net
           cp -r ${{github.workspace}}/libimgdoc2/doxygen/html/* ${{github.workspace}}/documentation/libimgdoc2
           cp -r ${{github.workspace}}/dotnet/imgdoc2Net/doxygen/html/* ${{github.workspace}}/documentation/imgdoc2net
-          echo "<meta http-equiv=\"Refresh\" content=\"0; url='https://ZEISS.github.io/imgdoc2/libimgdoc2/'\" />" >> ${{github.workspace}}/documentation/index.html
+          echo "<meta http-equiv=\"Refresh\" content=\"0; url='libimgdoc2/'\" />" >> ${{github.workspace}}/documentation/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v3

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "utilities.h"
+#include <algorithm>
 
 using namespace imgdoc2;
 using namespace std;
@@ -148,4 +149,12 @@ imgdoc2::ComparisonOperation Utilities::ConvertToComparisonOperationEnum(std::ui
     }
 
     return static_cast<ComparisonOperation>(value);
+}
+
+void Utilities::copy_string_to_fixed_size(const char* src, char* dest, size_t n)
+{
+    const size_t length_of_source = strlen(src);
+    const size_t length_to_copy = min(length_of_source, n - 1);
+    memcpy(dest, src, length_to_copy);
+    dest[length_to_copy] = '\0';
 }

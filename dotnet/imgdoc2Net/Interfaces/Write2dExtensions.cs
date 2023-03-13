@@ -9,7 +9,7 @@ namespace ImgDoc2Net.Interfaces
     using System.Text;
 
     /// <summary>   
-    /// In this class we gather extensions methods (on the . 
+    /// In this class we gather extensions methods (on the IWrite2d-interface). 
     /// </summary>
     public static class Write2dExtensions
     {
@@ -21,12 +21,19 @@ namespace ImgDoc2Net.Interfaces
             DataType dataType,
             byte[] data)
         {
-            unsafe
+            if (data != null)
             {
-                fixed (byte* pointerToData = &data[0])
+                unsafe
                 {
-                    return write2.AddTile(tileCoordinate, in logicalPosition, tile2dBaseInfo, dataType, new IntPtr(pointerToData), data.Length);
+                    fixed (byte* pointerToData = &data[0])
+                    {
+                        return write2.AddTile(tileCoordinate, in logicalPosition, tile2dBaseInfo, dataType, new IntPtr(pointerToData), data.Length);
+                    }
                 }
+            }
+            else
+            {
+                return write2.AddTile(tileCoordinate, in logicalPosition, tile2dBaseInfo, dataType, IntPtr.Zero, 0);
             }
         }
     }

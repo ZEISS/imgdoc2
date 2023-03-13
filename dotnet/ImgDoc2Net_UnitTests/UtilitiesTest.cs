@@ -50,5 +50,98 @@ namespace ImgDoc2Net_UnitTests
         {
             Assert.Throws<ArgumentException>(() => ImgDoc2Net.Implementation.Utilities.CreateFromStringRepresentation(textRepresentation));
         }
+
+        [Theory]
+        [InlineData("A5Y4z75343-43@ä+", new string[] { "A5", "Y4", "z75343-43@ä+" })]
+        [InlineData("r5Y4z", new string[] { "r5", "Y4", "z" })]
+        [InlineData("A5p", new string[] { "A5", "p" })]
+        [InlineData("z5", new string[] { "z5" })]
+        public void SplitStringAtDimensionIdentifiersAndCheckResult(string text, string[] expectedResult)
+        {
+            var result = ImgDoc2Net.Implementation.Utilities.SplitStringAtDimensionIdentifiers(text);
+            result.Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("Ökd")]
+        [InlineData("5Y4z")]
+        [InlineData("5p")]
+        public void CallSplitStringAtDimensionIdentifiersWithInvalidStringAndExpectException(string text)
+        {
+            Assert.Throws<ArgumentException>(() => ImgDoc2Net.Implementation.Utilities.SplitStringAtDimensionIdentifiers(text));
+        }
+
+        [Theory]
+        [InlineData("z5", new char[] { 'z' }, new int[] { 5 }, new int[] { 5 })]
+        [InlineData("z5t6M9", new char[] { 'z', 't', 'M' }, new int[] { 5, 6, 9 }, new int[] { 5, 6, 9 })]
+        [InlineData("z5-6", new char[] { 'z' }, new int[] { 5 }, new int[] { 6 })]
+        [InlineData("z5-6m-4-5", new char[] { 'z', 'm' }, new int[] { 5, -4 }, new int[] { 6, 5 })]
+        [InlineData("z 5 - 6    m -4 -   5  ", new char[] { 'z', 'm' }, new int[] { 5, -4 }, new int[] { 6, 5 })]
+        [InlineData("l -5 - -3    m -4 -   -1  ", new char[] { 'l', 'm' }, new int[] { -5, -4 }, new int[] { -3, -1 })]
+        [InlineData("  ", new char[] { }, new int[] { }, new int[] { })]
+        public void CallParseStringRepresentationOfDimensionAndRangeAndCheckResult(string text, char[] expectedDimensions, int[] expectedStart, int[] expectedEnd)
+        {
+            var result = ImgDoc2Net.Implementation.Utilities.ParseStringRepresentationOfDimensionAndRange(text);
+            var expectedResult = CreateList(expectedDimensions, expectedStart, expectedEnd);
+            result.Should().Equal(expectedResult);
+
+            static List<ValueTuple<Dimension, int, int>> CreateList(char[] expectedDimensions, int[] expectedStart, int[] expectedEnd)
+            {
+                List<ValueTuple<Dimension, int, int>> list = new List<ValueTuple<Dimension, int, int>>(expectedDimensions.Length);
+                for (int index = 0; index < expectedDimensions.Length; ++index)
+                {
+                    list.Add(ValueTuple.Create(new Dimension(expectedDimensions[index]), expectedStart[index], expectedEnd[index]));
+                }
+
+                return list;
+            }
+        }
+
+        [Theory]
+        [InlineData("#-5")]
+        [InlineData("a5,")]
+        [InlineData("a5-,")]
+        [InlineData("abc")]
+        [InlineData("ab4c3")]
+        [InlineData("a4-5.,b4c3")]
+        [InlineData("X")]
+        [InlineData("X--4")]
+        public void CallParseStringRepresentationOfDimensionAndRangeWithInvalidStringAndExpectExceptiopn(string text)
+        {
+            Assert.Throws<ArgumentException>(() => ImgDoc2Net.Implementation.Utilities.ParseStringRepresentationOfDimensionAndRange(text));
+        }
+
+        [Fact]
+        public void EnumerateCoordinatesInBoundsAndCheckResult()
+        {
+            var bounds = ImgDoc2Net.Implementation.Utilities.ParseStringRepresentationOfDimensionAndRange("w0-2x1-2");
+            var list = ImgDoc2Net.Implementation.Utilities.EnumerateCoordinatesInBounds(bounds);
+
+            var expectedResult = new List<TileCoordinate>
+            {
+                new TileCoordinate(new[] {Tuple.Create(new Dimension('w'), 0), Tuple.Create(new Dimension('x'), 1)}),
+                new TileCoordinate(new[] {Tuple.Create(new Dimension('w'), 1), Tuple.Create(new Dimension('x'), 1)}),
+                new TileCoordinate(new[] {Tuple.Create(new Dimension('w'), 2), Tuple.Create(new Dimension('x'), 1)}),
+                new TileCoordinate(new[] {Tuple.Create(new Dimension('w'), 0), Tuple.Create(new Dimension('x'), 2)}),
+                new TileCoordinate(new[] {Tuple.Create(new Dimension('w'), 1), Tuple.Create(new Dimension('x'), 2)}),
+                new TileCoordinate(new[] {Tuple.Create(new Dimension('w'), 2), Tuple.Create(new Dimension('x'), 2)}),
+            };
+
+            list.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Fact]
+        public void EnumerateCoordinatesInBoundsWithInvalidCollectionDuplicateDimensionAndExpectException()
+        {
+            var bounds = ImgDoc2Net.Implementation.Utilities.ParseStringRepresentationOfDimensionAndRange("w0-2w1-2");
+            Assert.Throws<ArgumentException>(() => ImgDoc2Net.Implementation.Utilities.EnumerateCoordinatesInBounds(bounds));
+        }
+
+        [Fact]
+        public void EnumerateCoordinatesInBoundsWithInvalidCollectionEndBeforeStartAndExpectException()
+        {
+            var bounds = ImgDoc2Net.Implementation.Utilities.ParseStringRepresentationOfDimensionAndRange("w3--2");
+            Assert.Throws<ArgumentException>(() => ImgDoc2Net.Implementation.Utilities.EnumerateCoordinatesInBounds(bounds));
+        }
     }
 }

@@ -6,13 +6,14 @@ namespace Imgdoc2cmd
 {
     using ImgDoc2Net.Implementation;
     using ImgDoc2Net.Interfaces;
+    using ImgDoc2Net.Interop;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
 
-    internal abstract class CommandQueryForTilesBase:ICommand
+    internal abstract class CommandQueryForTilesBase : ICommand
     {
         private readonly CommandHelper commandHelper;
 
@@ -41,7 +42,16 @@ namespace Imgdoc2cmd
                 MaxNumbersOfResults = 100_000
             };
 
-            var list = reader2d.Query(dimensionQueryClause, tileInfoQueryClause, queryOptions);
+            List<long> list;
+            try
+            {
+                list = reader2d.Query(dimensionQueryClause, tileInfoQueryClause, queryOptions);
+            }
+            catch (ImgDoc2Exception imgDoc2Exception)
+            {
+                Console.Error.WriteLine($"Exception executing 'Query' -> {imgDoc2Exception.Message}");
+                return;
+            }
 
             this.ProcessTiles(list, options);
         }

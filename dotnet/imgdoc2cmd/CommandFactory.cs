@@ -20,6 +20,10 @@ namespace Imgdoc2cmd
                     return new CommandQueryForTilesAndReport();
                 case Options.CommandType.QueryForTilesAndSaveTiles:
                     return new CommandQueryForTilesAndSaveTiles();
+                case Options.CommandType.CreateSyntheticDocument:
+                    return new CommandCreateSyntheticDocument();
+                case Options.CommandType.PrintInformation:
+                    return new CommandPrintInformation();
             }
 
             throw new ArgumentException("Unknown command");

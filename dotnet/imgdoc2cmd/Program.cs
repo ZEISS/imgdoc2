@@ -16,6 +16,12 @@ namespace Imgdoc2cmd
                 {
                     return 0;
                 }
+
+                if (options.Command == Options.CommandType.None)
+                {
+                    Console.Error.WriteLine("No command specified.");
+                    return 1;
+                }
             }
             catch (Exception exception)
             {

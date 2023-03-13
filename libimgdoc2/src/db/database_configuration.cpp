@@ -138,6 +138,11 @@ bool DatabaseConfigurationCommon::IsDimensionIndexed(imgdoc2::Dimension dimensio
     return this->indexed_dimensions_.find(dimension) != this->indexed_dimensions_.cend();
 }
 
+bool DatabaseConfigurationCommon::IsTileDimensionValid(imgdoc2::Dimension dimension) const
+{
+    return this->dimensions_.find(dimension) != this->dimensions_.cend();
+}
+
 std::string DatabaseConfigurationCommon::GetColumnNameOfBlobTableOrThrow(int column_identifier) const
 {
     std::string column_name;;

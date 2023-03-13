@@ -110,6 +110,18 @@ namespace ImgDoc2Net.Implementation
                 out _);
             return logicalPosition;
         }
+
+        /// <inheritdoc/>
+        public Dimension[] GetTileDimensions()
+        {
+            return ImgDoc2ApiInterop.Instance.DocInfoGetTileDimensions(this.reader2dObjectHandle);
+        }
+
+        /// <inheritdoc/>
+        public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
+        {
+            return ImgDoc2ApiInterop.Instance.DocInfoGetMinMaxForTileDimensions(this.reader2dObjectHandle, dimensions);
+        }
     }
 
     /// <content>
