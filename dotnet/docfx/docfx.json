@@ -1,0 +1,34 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["imgdoc2Net/ImgDoc2Net.csproj"],
+		  "src": "../"
+        }
+      ],
+      "dest": "api",
+      "includePrivateMembers": false,
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false,
+      "noRestore": false,
+      "namespaceLayout": "flattened"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/api/**.yml",
+          "**/api/index.md"
+        ]
+      },
+      {
+        "files": ["imgdoc2Net/doc/**.md"],
+		 "src": "../"
+      },
+	  {
+	  "files": ["index.md"]
+	  }
+  ]}
+}
