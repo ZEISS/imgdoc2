@@ -24,11 +24,11 @@
         ]
       },
       {
-        "files": [ "imgdoc2Net/doc/**.md" ],
+        "files": [ "imgdoc2Net/doc/**.md", "imgdoc2Net/doc/**.yml" ],
         "src": "../"
       },
       {
-        "files": [ "index.md" ]
+        "files": [ "index.md", "toc.yml" ]
       }
     ],
     "resource": [
