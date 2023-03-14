@@ -1,4 +1,4 @@
-{
+﻿{
   "metadata": [
     {
       "src": [
@@ -24,11 +24,18 @@
         ]
       },
       {
-        "files": ["imgdoc2Net/doc/**.md"],
-		 "src": "../"
+        "files": [ "imgdoc2Net/doc/**.md" ],
+        "src": "../"
       },
-	  {
-	  "files": ["index.md"]
-	  }
-  ]}
+      {
+        "files": [ "index.md" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [ "imgdoc2Net/doc/assets/**" ],
+        "src": "../"
+      }
+    ]
+  }
 }
