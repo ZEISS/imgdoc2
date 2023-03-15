@@ -1,0 +1,504 @@
+{
+  "homepages": [],
+  "source_base_path": "C:/Dev/Github/ptahmose_imgdoc2/dotnet/docfx",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Conceptual",
+      "source_relative_path": "../imgdoc2Net/doc/HowTos/HowToWriteAnInteropFunction.md",
+      "output": {
+        ".html": {
+          "relative_path": "imgdoc2Net/doc/HowTos/HowToWriteAnInteropFunction.html",
+          "hash": "HrexBSHqpjgHIXnRpgHbmCH3sAHVMwhQol+pFBjAdQo="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "../imgdoc2Net/doc/HowTos/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "imgdoc2Net/doc/HowTos/toc.html",
+          "hash": "kv9STxr7idMoVltM83vrlu20pOrqJOncDHkVA7S5hbQ="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "../imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_1.png",
+      "output": {
+        "resource": {
+          "relative_path": "imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_1.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "../imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_2.png",
+      "output": {
+        "resource": {
+          "relative_path": "imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_2.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "../imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_3.png",
+      "output": {
+        "resource": {
+          "relative_path": "imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_3.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "../imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_4.png",
+      "output": {
+        "resource": {
+          "relative_path": "imgdoc2Net/doc/assets/HowToWriteAnInteropFunction_4.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "../imgdoc2Net/doc/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "imgdoc2Net/doc/toc.html",
+          "hash": "FXHy12fLZjvOJyCYHjn6M5EVdkhc2ckZSF8vnSNSZz4="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.CreateOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.CreateOptions.html",
+          "hash": "blFOy5K83efEPvcHeCsjMdwVPAlsPLpIGdedyDdvDCo="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.Dimension.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.Dimension.html",
+          "hash": "vcynNi11buTwtg0V84/JRUz6uWMUmWyR09ZyVGhdhqE="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.DimensionQueryClause.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.DimensionQueryClause.html",
+          "hash": "0i0vOCTxCymdX8T4feWo4wm9sfrAtsveHT5ofLbjLxc="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.Document.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.Document.html",
+          "hash": "JF8awhw5db7qN4TkMbY07jkC/2BwbfQAecaqq3c9Sxs="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.OpenExistingOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.OpenExistingOptions.html",
+          "hash": "3TVfhKJVGTqBzLn8ve6D5NEag7V2R+HT5Hy5+mWKEGM="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.TileCoordinate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.TileCoordinate.html",
+          "hash": "TH0bR+fFguodZRsQEh2MDuVm0dqVqOh9DWFaobLN488="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.TileInfoQueryClause.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.TileInfoQueryClause.html",
+          "hash": "OuOt+nF1OhwF2LzGjhCMyEzIJhM6mlsuCx1/T0u6sMg="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.Utilities.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.Utilities.html",
+          "hash": "M75y/X76TsqUMD5Z8HgJAEyq42Uu4mdJOh8+UUbWEUU="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Implementation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Implementation.html",
+          "hash": "yeK07Mofq77LrqxRqM5NyBhDDlXehWFbRZ6c8970WQo="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.DataType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.DataType.html",
+          "hash": "aRSQdBpFm/wFkBELu+VOgnZ8mBdC3JBMQuOCBzVFVsw="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.DimensionCondition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.DimensionCondition.html",
+          "hash": "cMcA6nVADc7PFRwNnz6As6vvPdJ08IL17rO6w6kbH5M="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.ICreateOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.ICreateOptions.html",
+          "hash": "V6w4Vg5s9iKoA3t+2Gv4XYz4TX3VZQYPjjp59LK8ekk="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IDimensionQueryClause.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IDimensionQueryClause.html",
+          "hash": "ubrd1LtUpynIQRoKApUUbGNWK74oKMknAAlwFd/WvwI="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IDocInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IDocInfo.html",
+          "hash": "VwawTAWDHc9AU7vp+EhvZx7QhUHmJ8i34JfpLNGq9vE="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IDocQuery2d.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IDocQuery2d.html",
+          "hash": "kBas/42UzaOOoDKj45dXsGK6pS4GsNCd4zMu/VM5yf4="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IDocument.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IDocument.html",
+          "hash": "7rOHudTr0GgVKFLtbHu943spEvU685aljVZ9V4YkNQU="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IOpenExistingOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IOpenExistingOptions.html",
+          "hash": "v/5moh6I413hxsckubWefIWPmDiXQOff1hAGuAYekGg="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IRead2d.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IRead2d.html",
+          "hash": "EQtdVEbewYOVkcSrBa5Xo1MkeLXnifI1XP4aCOdKhoI="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.ITileCoordinate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.ITileCoordinate.html",
+          "hash": "OalkjdyKg3yH0PLqrNjVazSBMLAZRh4v+xEjy/2Wooc="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.ITileInfoQueryClause.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.ITileInfoQueryClause.html",
+          "hash": "cGssvq8mykmTMVFjG+9bBzW+gf/9v68nR958Mda5Gkc="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.IWrite2d.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.IWrite2d.html",
+          "hash": "ex3kVL2WN2dc7DdaDncI7TmdU5fP28xVbIejti8ZXMo="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.ImgDoc2Statistics.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.ImgDoc2Statistics.html",
+          "hash": "Ye9EdvH/2LYJqIGrNmJ+RcA1ekOP7ZZHgMcXlBf2S4g="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.LogicalPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.LogicalPosition.html",
+          "hash": "AUYcCtIRX1uTBS1VztslPq5vTZ8GOqSMaEdlmOe9uH4="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.PixelType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.PixelType.html",
+          "hash": "lBAjwEDsTr1nr7RP8VDwesRLUvhGWsbASJ4Pvde7MI8="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.QueryClause.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.QueryClause.html",
+          "hash": "uZLFojGlKvVHEWI4y5dyORv91tcBR+cYN2Ek7xnRet0="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.QueryComparisonOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.QueryComparisonOperator.html",
+          "hash": "o/OLvOOTEbrNcCYixrG+zEdnutrknchi11RATvIxWcU="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.QueryLogicalOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.QueryLogicalOperator.html",
+          "hash": "sNB9P7O4o66IUG69JzB6ERdxZNvAb1tAbiHc2QWpj9I="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.QueryOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.QueryOptions.html",
+          "hash": "uzZus7WZF/Rmq3vy62CIeD1A0AGijsbA5RrWaNWJIBk="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.Rectangle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.Rectangle.html",
+          "hash": "EPd7hIZCkMxw7KkQWHhoQ4z6ffDD5ctkxXC/WR8h/7s="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.Tile2dBaseInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.Tile2dBaseInfo.html",
+          "hash": "P7P4CJzmkU40BhGdhn9TuFIoSb0sARi0HwB7FN7N0oc="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.TileBlobInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.TileBlobInfo.html",
+          "hash": "BfeCbapAfWLcf56KMQFe1N6hjg4IT5XBzMlkBaWwld8="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.Write2dExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.Write2dExtensions.html",
+          "hash": "LwHLEyGxjB86ymiiBlK7dOeQTAtoQcW8TFcPUZLYnTM="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interfaces.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interfaces.html",
+          "hash": "svO7PZ4vsgB/XRLBcOLkZM6oi1TrHi75D2c69vuecwM="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interop.ImgDoc2Exception.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interop.ImgDoc2Exception.html",
+          "hash": "SC8cWN3PHpcbpWxGpg/Elf2TpBg2UEHWv6w4PorNwqU="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/ImgDoc2Net.Interop.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/ImgDoc2Net.Interop.html",
+          "hash": "1/T0JQL6LLJHJVYRB70txzD1P782YcDQcxYMVFQujpI="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "EdcZuQUEN7cpo2MPCvzZGIY5GTBYNWHv3065LOwkdWE="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "vJTDu1Pn10IinBiJ+nkLVOyTMu/591I6QQcM/n77jxE="
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "QUswO3EIXwZELicC+hr7JcDs2WS+J2CZR9sD2qzwfa4="
+        }
+      },
+      "version": ""
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interfaces.QueryClause
+  commentId: T:ImgDoc2Net.Interfaces.QueryClause
+  id: QueryClause
+  parent: ImgDoc2Net.Interfaces
+  children:
+  - ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator
+  - ImgDoc2Net.Interfaces.QueryClause.LogicalOperator
+  - ImgDoc2Net.Interfaces.QueryClause.Value
+  langs:
+  - csharp
+  - vb
+  name: QueryClause
+  nameWithType: QueryClause
+  fullName: ImgDoc2Net.Interfaces.QueryClause
+  type: Struct
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/QueryClause.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: QueryClause
+    path: ../imgdoc2Net/Interfaces/QueryClause.cs
+    startLine: 7
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: This defines a query clause.
+  example: []
+  syntax:
+    content: public struct QueryClause
+    content.vb: Public Structure QueryClause
+  inheritedMembers:
+  - System.ValueType.Equals(System.Object)
+  - System.ValueType.GetHashCode
+  - System.ValueType.ToString
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+- uid: ImgDoc2Net.Interfaces.QueryClause.LogicalOperator
+  commentId: P:ImgDoc2Net.Interfaces.QueryClause.LogicalOperator
+  id: LogicalOperator
+  parent: ImgDoc2Net.Interfaces.QueryClause
+  langs:
+  - csharp
+  - vb
+  name: LogicalOperator
+  nameWithType: QueryClause.LogicalOperator
+  fullName: ImgDoc2Net.Interfaces.QueryClause.LogicalOperator
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/QueryClause.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: LogicalOperator
+    path: ../imgdoc2Net/Interfaces/QueryClause.cs
+    startLine: 12
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the logical operator.
+  example: []
+  syntax:
+    content: public QueryLogicalOperator LogicalOperator { get; set; }
+    parameters: []
+    return:
+      type: ImgDoc2Net.Interfaces.QueryLogicalOperator
+      description: The logical operator.
+    content.vb: Public Property LogicalOperator As QueryLogicalOperator
+  overload: ImgDoc2Net.Interfaces.QueryClause.LogicalOperator*
+- uid: ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator
+  commentId: P:ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator
+  id: ComparisonOperator
+  parent: ImgDoc2Net.Interfaces.QueryClause
+  langs:
+  - csharp
+  - vb
+  name: ComparisonOperator
+  nameWithType: QueryClause.ComparisonOperator
+  fullName: ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/QueryClause.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: ComparisonOperator
+    path: ../imgdoc2Net/Interfaces/QueryClause.cs
+    startLine: 17
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the comparison operator.
+  example: []
+  syntax:
+    content: public QueryComparisonOperator ComparisonOperator { get; set; }
+    parameters: []
+    return:
+      type: ImgDoc2Net.Interfaces.QueryComparisonOperator
+      description: The comparison operator.
+    content.vb: Public Property ComparisonOperator As QueryComparisonOperator
+  overload: ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator*
+- uid: ImgDoc2Net.Interfaces.QueryClause.Value
+  commentId: P:ImgDoc2Net.Interfaces.QueryClause.Value
+  id: Value
+  parent: ImgDoc2Net.Interfaces.QueryClause
+  langs:
+  - csharp
+  - vb
+  name: Value
+  nameWithType: QueryClause.Value
+  fullName: ImgDoc2Net.Interfaces.QueryClause.Value
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/QueryClause.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Value
+    path: ../imgdoc2Net/Interfaces/QueryClause.cs
+    startLine: 22
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the value.
+  example: []
+  syntax:
+    content: public int Value { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+      description: The value.
+    content.vb: Public Property Value As Integer
+  overload: ImgDoc2Net.Interfaces.QueryClause.Value*
+references:
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  name: Equals(object)
+  nameWithType: ValueType.Equals(object)
+  fullName: System.ValueType.Equals(object)
+  nameWithType.vb: ValueType.Equals(Object)
+  fullName.vb: System.ValueType.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
+  name: ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.ValueType
+  commentId: T:System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: ImgDoc2Net.Interfaces.QueryClause.LogicalOperator*
+  commentId: Overload:ImgDoc2Net.Interfaces.QueryClause.LogicalOperator
+  name: LogicalOperator
+  nameWithType: QueryClause.LogicalOperator
+  fullName: ImgDoc2Net.Interfaces.QueryClause.LogicalOperator
+- uid: ImgDoc2Net.Interfaces.QueryLogicalOperator
+  commentId: T:ImgDoc2Net.Interfaces.QueryLogicalOperator
+  parent: ImgDoc2Net.Interfaces
+  name: QueryLogicalOperator
+  nameWithType: QueryLogicalOperator
+  fullName: ImgDoc2Net.Interfaces.QueryLogicalOperator
+- uid: ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator*
+  commentId: Overload:ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator
+  name: ComparisonOperator
+  nameWithType: QueryClause.ComparisonOperator
+  fullName: ImgDoc2Net.Interfaces.QueryClause.ComparisonOperator
+- uid: ImgDoc2Net.Interfaces.QueryComparisonOperator
+  commentId: T:ImgDoc2Net.Interfaces.QueryComparisonOperator
+  parent: ImgDoc2Net.Interfaces
+  name: QueryComparisonOperator
+  nameWithType: QueryComparisonOperator
+  fullName: ImgDoc2Net.Interfaces.QueryComparisonOperator
+- uid: ImgDoc2Net.Interfaces.QueryClause.Value*
+  commentId: Overload:ImgDoc2Net.Interfaces.QueryClause.Value
+  name: Value
+  nameWithType: QueryClause.Value
+  fullName: ImgDoc2Net.Interfaces.QueryClause.Value
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer

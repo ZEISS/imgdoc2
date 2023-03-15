@@ -1,0 +1,451 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interfaces.LogicalPosition
+  commentId: T:ImgDoc2Net.Interfaces.LogicalPosition
+  id: LogicalPosition
+  parent: ImgDoc2Net.Interfaces
+  children:
+  - ImgDoc2Net.Interfaces.LogicalPosition.Height
+  - ImgDoc2Net.Interfaces.LogicalPosition.PositionX
+  - ImgDoc2Net.Interfaces.LogicalPosition.PositionY
+  - ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel
+  - ImgDoc2Net.Interfaces.LogicalPosition.Width
+  langs:
+  - csharp
+  - vb
+  name: LogicalPosition
+  nameWithType: LogicalPosition
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition
+  type: Struct
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/LogicalPosition.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: LogicalPosition
+    path: ../imgdoc2Net/Interfaces/LogicalPosition.cs
+    startLine: 9
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nThis defines the logical position of a tile. \n"
+  example: []
+  syntax:
+    content: public struct LogicalPosition
+    content.vb: Public Structure LogicalPosition
+  inheritedMembers:
+  - System.ValueType.Equals(System.Object)
+  - System.ValueType.GetHashCode
+  - System.ValueType.ToString
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.PositionX
+  commentId: P:ImgDoc2Net.Interfaces.LogicalPosition.PositionX
+  id: PositionX
+  parent: ImgDoc2Net.Interfaces.LogicalPosition
+  langs:
+  - csharp
+  - vb
+  name: PositionX
+  nameWithType: LogicalPosition.PositionX
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.PositionX
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/LogicalPosition.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: PositionX
+    path: ../imgdoc2Net/Interfaces/LogicalPosition.cs
+    startLine: 13
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: 'Gets or sets the x-position in pixel-coordinate-system of the top-left corner of the tile. '
+  example: []
+  syntax:
+    content: public double PositionX { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: 'The x-position in pixel-coordinate-system of the top-left corner of the tile. '
+    content.vb: Public Property PositionX As Double
+  overload: ImgDoc2Net.Interfaces.LogicalPosition.PositionX*
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.PositionY
+  commentId: P:ImgDoc2Net.Interfaces.LogicalPosition.PositionY
+  id: PositionY
+  parent: ImgDoc2Net.Interfaces.LogicalPosition
+  langs:
+  - csharp
+  - vb
+  name: PositionY
+  nameWithType: LogicalPosition.PositionY
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.PositionY
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/LogicalPosition.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: PositionY
+    path: ../imgdoc2Net/Interfaces/LogicalPosition.cs
+    startLine: 17
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: 'Gets or sets the y-position in pixel-coordinate-system of the top-left corner of the tile. '
+  example: []
+  syntax:
+    content: public double PositionY { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: 'The y-position in pixel-coordinate-system of the top-left corner of the tile. '
+    content.vb: Public Property PositionY As Double
+  overload: ImgDoc2Net.Interfaces.LogicalPosition.PositionY*
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.Width
+  commentId: P:ImgDoc2Net.Interfaces.LogicalPosition.Width
+  id: Width
+  parent: ImgDoc2Net.Interfaces.LogicalPosition
+  langs:
+  - csharp
+  - vb
+  name: Width
+  nameWithType: LogicalPosition.Width
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.Width
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/LogicalPosition.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Width
+    path: ../imgdoc2Net/Interfaces/LogicalPosition.cs
+    startLine: 21
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: 'Gets or sets the width in pixel-coordinate-system of the top-left corner of the tile. '
+  example: []
+  syntax:
+    content: public double Width { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: 'The width in pixel-coordinate-system of the top-left corner of the tile. '
+    content.vb: Public Property Width As Double
+  overload: ImgDoc2Net.Interfaces.LogicalPosition.Width*
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.Height
+  commentId: P:ImgDoc2Net.Interfaces.LogicalPosition.Height
+  id: Height
+  parent: ImgDoc2Net.Interfaces.LogicalPosition
+  langs:
+  - csharp
+  - vb
+  name: Height
+  nameWithType: LogicalPosition.Height
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.Height
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/LogicalPosition.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Height
+    path: ../imgdoc2Net/Interfaces/LogicalPosition.cs
+    startLine: 25
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: 'Gets or sets the height in pixel-coordinate-system of the top-left corner of the tile. '
+  example: []
+  syntax:
+    content: public double Height { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: 'The height in pixel-coordinate-system of the top-left corner of the tile. '
+    content.vb: Public Property Height As Double
+  overload: ImgDoc2Net.Interfaces.LogicalPosition.Height*
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel
+  commentId: P:ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel
+  id: PyramidLevel
+  parent: ImgDoc2Net.Interfaces.LogicalPosition
+  langs:
+  - csharp
+  - vb
+  name: PyramidLevel
+  nameWithType: LogicalPosition.PyramidLevel
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/LogicalPosition.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: PyramidLevel
+    path: ../imgdoc2Net/Interfaces/LogicalPosition.cs
+    startLine: 29
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: 'Gets or sets the pyramid level of the tile. '
+  example: []
+  syntax:
+    content: public int PyramidLevel { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+      description: 'The pyramid level of the tile. '
+    content.vb: Public Property PyramidLevel As Integer
+  overload: ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel*
+references:
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  name: Equals(object)
+  nameWithType: ValueType.Equals(object)
+  fullName: System.ValueType.Equals(object)
+  nameWithType.vb: ValueType.Equals(Object)
+  fullName.vb: System.ValueType.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
+  name: ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.ValueType
+  commentId: T:System.ValueType
+  parent: System
+  isExternal: true
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.PositionX*
+  commentId: Overload:ImgDoc2Net.Interfaces.LogicalPosition.PositionX
+  name: PositionX
+  nameWithType: LogicalPosition.PositionX
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.PositionX
+- uid: System.Double
+  commentId: T:System.Double
+  parent: System
+  isExternal: true
+  name: double
+  nameWithType: double
+  fullName: double
+  nameWithType.vb: Double
+  fullName.vb: Double
+  name.vb: Double
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.PositionY*
+  commentId: Overload:ImgDoc2Net.Interfaces.LogicalPosition.PositionY
+  name: PositionY
+  nameWithType: LogicalPosition.PositionY
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.PositionY
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.Width*
+  commentId: Overload:ImgDoc2Net.Interfaces.LogicalPosition.Width
+  name: Width
+  nameWithType: LogicalPosition.Width
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.Width
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.Height*
+  commentId: Overload:ImgDoc2Net.Interfaces.LogicalPosition.Height
+  name: Height
+  nameWithType: LogicalPosition.Height
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.Height
+- uid: ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel*
+  commentId: Overload:ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel
+  name: PyramidLevel
+  nameWithType: LogicalPosition.PyramidLevel
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition.PyramidLevel
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer

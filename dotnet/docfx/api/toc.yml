@@ -1,0 +1,74 @@
+### YamlMime:TableOfContent
+- uid: ImgDoc2Net.Implementation
+  name: ImgDoc2Net.Implementation
+  items:
+  - uid: ImgDoc2Net.Implementation.CreateOptions
+    name: CreateOptions
+  - uid: ImgDoc2Net.Implementation.Dimension
+    name: Dimension
+  - uid: ImgDoc2Net.Implementation.DimensionQueryClause
+    name: DimensionQueryClause
+  - uid: ImgDoc2Net.Implementation.Document
+    name: Document
+  - uid: ImgDoc2Net.Implementation.OpenExistingOptions
+    name: OpenExistingOptions
+  - uid: ImgDoc2Net.Implementation.TileCoordinate
+    name: TileCoordinate
+  - uid: ImgDoc2Net.Implementation.TileInfoQueryClause
+    name: TileInfoQueryClause
+  - uid: ImgDoc2Net.Implementation.Utilities
+    name: Utilities
+- uid: ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  items:
+  - uid: ImgDoc2Net.Interfaces.DataType
+    name: DataType
+  - uid: ImgDoc2Net.Interfaces.DimensionCondition
+    name: DimensionCondition
+  - uid: ImgDoc2Net.Interfaces.ICreateOptions
+    name: ICreateOptions
+  - uid: ImgDoc2Net.Interfaces.IDimensionQueryClause
+    name: IDimensionQueryClause
+  - uid: ImgDoc2Net.Interfaces.IDocInfo
+    name: IDocInfo
+  - uid: ImgDoc2Net.Interfaces.IDocQuery2d
+    name: IDocQuery2d
+  - uid: ImgDoc2Net.Interfaces.IDocument
+    name: IDocument
+  - uid: ImgDoc2Net.Interfaces.ImgDoc2Statistics
+    name: ImgDoc2Statistics
+  - uid: ImgDoc2Net.Interfaces.IOpenExistingOptions
+    name: IOpenExistingOptions
+  - uid: ImgDoc2Net.Interfaces.IRead2d
+    name: IRead2d
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - uid: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+    name: ITileInfoQueryClause
+  - uid: ImgDoc2Net.Interfaces.IWrite2d
+    name: IWrite2d
+  - uid: ImgDoc2Net.Interfaces.LogicalPosition
+    name: LogicalPosition
+  - uid: ImgDoc2Net.Interfaces.PixelType
+    name: PixelType
+  - uid: ImgDoc2Net.Interfaces.QueryClause
+    name: QueryClause
+  - uid: ImgDoc2Net.Interfaces.QueryComparisonOperator
+    name: QueryComparisonOperator
+  - uid: ImgDoc2Net.Interfaces.QueryLogicalOperator
+    name: QueryLogicalOperator
+  - uid: ImgDoc2Net.Interfaces.QueryOptions
+    name: QueryOptions
+  - uid: ImgDoc2Net.Interfaces.Rectangle
+    name: Rectangle
+  - uid: ImgDoc2Net.Interfaces.Tile2dBaseInfo
+    name: Tile2dBaseInfo
+  - uid: ImgDoc2Net.Interfaces.TileBlobInfo
+    name: TileBlobInfo
+  - uid: ImgDoc2Net.Interfaces.Write2dExtensions
+    name: Write2dExtensions
+- uid: ImgDoc2Net.Interop
+  name: ImgDoc2Net.Interop
+  items:
+  - uid: ImgDoc2Net.Interop.ImgDoc2Exception
+    name: ImgDoc2Exception

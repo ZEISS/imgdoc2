@@ -1,0 +1,169 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+  commentId: T:ImgDoc2Net.Interfaces.ITileInfoQueryClause
+  id: ITileInfoQueryClause
+  parent: ImgDoc2Net.Interfaces
+  children:
+  - ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions
+  langs:
+  - csharp
+  - vb
+  name: ITileInfoQueryClause
+  nameWithType: ITileInfoQueryClause
+  fullName: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+  type: Interface
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/ITileInfoQueryClause.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: ITileInfoQueryClause
+    path: ../imgdoc2Net/Interfaces/ITileInfoQueryClause.cs
+    startLine: 9
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Interface defining the query-clause on &quot;tile-info&quot;.
+  example: []
+  syntax:
+    content: public interface ITileInfoQueryClause
+    content.vb: Public Interface ITileInfoQueryClause
+- uid: ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions
+  commentId: P:ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions
+  id: PyramidLevelConditions
+  parent: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+  langs:
+  - csharp
+  - vb
+  name: PyramidLevelConditions
+  nameWithType: ITileInfoQueryClause.PyramidLevelConditions
+  fullName: ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/ITileInfoQueryClause.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: PyramidLevelConditions
+    path: ../imgdoc2Net/Interfaces/ITileInfoQueryClause.cs
+    startLine: 14
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets the query clauses for the pyramid level.
+  example: []
+  syntax:
+    content: IEnumerable<QueryClause> PyramidLevelConditions { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IEnumerable{ImgDoc2Net.Interfaces.QueryClause}
+      description: The pyramid level conditions.
+    content.vb: ReadOnly Property PyramidLevelConditions As IEnumerable(Of QueryClause)
+  overload: ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions*
+references:
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions*
+  commentId: Overload:ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions
+  name: PyramidLevelConditions
+  nameWithType: ITileInfoQueryClause.PyramidLevelConditions
+  fullName: ImgDoc2Net.Interfaces.ITileInfoQueryClause.PyramidLevelConditions
+- uid: System.Collections.Generic.IEnumerable{ImgDoc2Net.Interfaces.QueryClause}
+  commentId: T:System.Collections.Generic.IEnumerable{ImgDoc2Net.Interfaces.QueryClause}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  name: IEnumerable<QueryClause>
+  nameWithType: IEnumerable<QueryClause>
+  fullName: System.Collections.Generic.IEnumerable<ImgDoc2Net.Interfaces.QueryClause>
+  nameWithType.vb: IEnumerable(Of QueryClause)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of ImgDoc2Net.Interfaces.QueryClause)
+  name.vb: IEnumerable(Of QueryClause)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: <
+  - uid: ImgDoc2Net.Interfaces.QueryClause
+    name: QueryClause
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.QueryClause
+    name: QueryClause
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true

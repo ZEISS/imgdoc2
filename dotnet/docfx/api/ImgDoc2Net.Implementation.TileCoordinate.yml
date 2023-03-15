@@ -1,0 +1,860 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Implementation.TileCoordinate
+  commentId: T:ImgDoc2Net.Implementation.TileCoordinate
+  id: TileCoordinate
+  parent: ImgDoc2Net.Implementation
+  children:
+  - ImgDoc2Net.Implementation.TileCoordinate.#ctor
+  - ImgDoc2Net.Implementation.TileCoordinate.#ctor(System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}})
+  - ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates
+  - ImgDoc2Net.Implementation.TileCoordinate.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  - ImgDoc2Net.Implementation.TileCoordinate.Equals(System.Object)
+  - ImgDoc2Net.Implementation.TileCoordinate.GetHashCode
+  - ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  langs:
+  - csharp
+  - vb
+  name: TileCoordinate
+  nameWithType: TileCoordinate
+  fullName: ImgDoc2Net.Implementation.TileCoordinate
+  type: Class
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: TileCoordinate
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 18
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nImplementation of the IPlaneCoordinate - interface. This class is immutable.\n"
+  example: []
+  syntax:
+    content: 'public class TileCoordinate : ITileCoordinate, IEquatable<ITileCoordinate>'
+    content.vb: Public Class TileCoordinate Implements ITileCoordinate, IEquatable(Of ITileCoordinate)
+  inheritance:
+  - System.Object
+  implements:
+  - ImgDoc2Net.Interfaces.ITileCoordinate
+  - System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}
+  inheritedMembers:
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: ImgDoc2Net.Implementation.TileCoordinate.#ctor
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.#ctor
+  id: '#ctor'
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: TileCoordinate()
+  nameWithType: TileCoordinate.TileCoordinate()
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.TileCoordinate()
+  type: Constructor
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: .ctor
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 25
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nInitializes a new instance of the <xref href=\"ImgDoc2Net.Implementation.TileCoordinate\" data-throw-if-not-resolved=\"false\"></xref> class.\n"
+  example: []
+  syntax:
+    content: public TileCoordinate()
+    content.vb: Public Sub New()
+  overload: ImgDoc2Net.Implementation.TileCoordinate.#ctor*
+  nameWithType.vb: TileCoordinate.New()
+  fullName.vb: ImgDoc2Net.Implementation.TileCoordinate.New()
+  name.vb: New()
+- uid: ImgDoc2Net.Implementation.TileCoordinate.#ctor(System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}})
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.#ctor(System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}})
+  id: '#ctor(System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}})'
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: TileCoordinate(IEnumerable<Tuple<Dimension, int>>)
+  nameWithType: TileCoordinate.TileCoordinate(IEnumerable<Tuple<Dimension, int>>)
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.TileCoordinate(System.Collections.Generic.IEnumerable<System.Tuple<ImgDoc2Net.Implementation.Dimension, int>>)
+  type: Constructor
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: .ctor
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 34
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nInitializes a new instance of the <xref href=\"ImgDoc2Net.Implementation.TileCoordinate\" data-throw-if-not-resolved=\"false\"></xref> class.\n"
+  example: []
+  syntax:
+    content: public TileCoordinate(IEnumerable<Tuple<Dimension, int>> initial)
+    parameters:
+    - id: initial
+      type: System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}}
+      description: The initial.
+    content.vb: Public Sub New(initial As IEnumerable(Of Tuple(Of Dimension, Integer)))
+  overload: ImgDoc2Net.Implementation.TileCoordinate.#ctor*
+  nameWithType.vb: TileCoordinate.New(IEnumerable(Of Tuple(Of Dimension, Integer)))
+  fullName.vb: ImgDoc2Net.Implementation.TileCoordinate.New(System.Collections.Generic.IEnumerable(Of System.Tuple(Of ImgDoc2Net.Implementation.Dimension, Integer)))
+  name.vb: New(IEnumerable(Of Tuple(Of Dimension, Integer)))
+- uid: ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  id: TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: TryGetCoordinate(Dimension, out int)
+  nameWithType: TileCoordinate.TryGetCoordinate(Dimension, out int)
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension, out int)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: TryGetCoordinate
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 51
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nTries the get the specified coordinate.\n"
+  example: []
+  syntax:
+    content: public bool TryGetCoordinate(Dimension dimension, out int coordinate)
+    parameters:
+    - id: dimension
+      type: ImgDoc2Net.Implementation.Dimension
+      description: The dimension.
+    - id: coordinate
+      type: System.Int32
+      description: The coordinate.
+    return:
+      type: System.Boolean
+      description: True if the specified coordinate could be retrieved, false otherwise.
+    content.vb: Public Function TryGetCoordinate(dimension As Dimension, coordinate As Integer) As Boolean
+  overload: ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate*
+  implements:
+  - ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  nameWithType.vb: TileCoordinate.TryGetCoordinate(Dimension, Integer)
+  fullName.vb: ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension, Integer)
+  name.vb: TryGetCoordinate(Dimension, Integer)
+- uid: ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates
+  id: EnumCoordinates
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: EnumCoordinates()
+  nameWithType: TileCoordinate.EnumCoordinates()
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates()
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: EnumCoordinates
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 60
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nEnumerates the coordinates.\n"
+  example: []
+  syntax:
+    content: public IEnumerable<Tuple<Dimension, int>> EnumCoordinates()
+    return:
+      type: System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}}
+      description: An enumerator for the dimension-coordinate-pairs.
+    content.vb: Public Function EnumCoordinates() As IEnumerable(Of Tuple(Of Dimension, Integer))
+  overload: ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates*
+  implements:
+  - ImgDoc2Net.Interfaces.ITileCoordinate.EnumCoordinates
+- uid: ImgDoc2Net.Implementation.TileCoordinate.Equals(System.Object)
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: Equals(object)
+  nameWithType: TileCoordinate.Equals(object)
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.Equals(object)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Equals
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 75
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nDetermines whether the specified <xref href=\"System.Object\" data-throw-if-not-resolved=\"false\"></xref>, is equal to this instance.\n"
+  example: []
+  syntax:
+    content: public override bool Equals(object obj)
+    parameters:
+    - id: obj
+      type: System.Object
+      description: The <xref href="System.Object" data-throw-if-not-resolved="false"></xref> to compare with this instance.
+    return:
+      type: System.Boolean
+      description: "\n<code>True</code> if the specified <xref href=\"System.Object\" data-throw-if-not-resolved=\"false\"></xref> is equal to this instance; otherwise, <code>false</code>.\n"
+    content.vb: Public Overrides Function Equals(obj As Object) As Boolean
+  overridden: System.Object.Equals(System.Object)
+  overload: ImgDoc2Net.Implementation.TileCoordinate.Equals*
+  nameWithType.vb: TileCoordinate.Equals(Object)
+  fullName.vb: ImgDoc2Net.Implementation.TileCoordinate.Equals(Object)
+  name.vb: Equals(Object)
+- uid: ImgDoc2Net.Implementation.TileCoordinate.GetHashCode
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.GetHashCode
+  id: GetHashCode
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: TileCoordinate.GetHashCode()
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.GetHashCode()
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: GetHashCode
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 90
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nReturns a hash code for this instance.\n"
+  remarks: "\nI guess it would be possible to create a better hash-function here. However - if we use the actual data in the hash-function,\nthis requires that the class is immutable (the hash-code must not change).\n"
+  example: []
+  syntax:
+    content: public override int GetHashCode()
+    return:
+      type: System.Int32
+      description: "\nA hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. \n"
+    content.vb: Public Overrides Function GetHashCode() As Integer
+  overridden: System.Object.GetHashCode
+  overload: ImgDoc2Net.Implementation.TileCoordinate.GetHashCode*
+- uid: ImgDoc2Net.Implementation.TileCoordinate.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  commentId: M:ImgDoc2Net.Implementation.TileCoordinate.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  id: Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  parent: ImgDoc2Net.Implementation.TileCoordinate
+  langs:
+  - csharp
+  - vb
+  name: Equals(ITileCoordinate)
+  nameWithType: TileCoordinate.Equals(ITileCoordinate)
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Implementation/TileCoordinate.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Equals
+    path: ../imgdoc2Net/Implementation/TileCoordinate.cs
+    startLine: 109
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Implementation
+  summary: "\nIndicates whether the current object is equal to another object of the same type.\n"
+  example: []
+  syntax:
+    content: public bool Equals(ITileCoordinate other)
+    parameters:
+    - id: other
+      type: ImgDoc2Net.Interfaces.ITileCoordinate
+      description: An object to compare with this object.
+    return:
+      type: System.Boolean
+      description: "\nTrue if the current object is equal to the <code data-dev-comment-type=\"paramref\" class=\"paramref\">other</code> parameter; otherwise, false.\n"
+    content.vb: Public Function Equals(other As ITileCoordinate) As Boolean
+  overload: ImgDoc2Net.Implementation.TileCoordinate.Equals*
+  implements:
+  - System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+references:
+- uid: ImgDoc2Net.Implementation
+  commentId: N:ImgDoc2Net.Implementation
+  name: ImgDoc2Net.Implementation
+  nameWithType: ImgDoc2Net.Implementation
+  fullName: ImgDoc2Net.Implementation
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Implementation
+    name: Implementation
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Implementation
+    name: Implementation
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: ImgDoc2Net.Interfaces.ITileCoordinate
+  commentId: T:ImgDoc2Net.Interfaces.ITileCoordinate
+  parent: ImgDoc2Net.Interfaces
+  name: ITileCoordinate
+  nameWithType: ITileCoordinate
+  fullName: ImgDoc2Net.Interfaces.ITileCoordinate
+- uid: System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}
+  commentId: T:System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}
+  parent: System
+  definition: System.IEquatable`1
+  name: IEquatable<ITileCoordinate>
+  nameWithType: IEquatable<ITileCoordinate>
+  fullName: System.IEquatable<ImgDoc2Net.Interfaces.ITileCoordinate>
+  nameWithType.vb: IEquatable(Of ITileCoordinate)
+  fullName.vb: System.IEquatable(Of ImgDoc2Net.Interfaces.ITileCoordinate)
+  name.vb: IEquatable(Of ITileCoordinate)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+  - name: <
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: System.IEquatable`1
+  commentId: T:System.IEquatable`1
+  isExternal: true
+  name: IEquatable<T>
+  nameWithType: IEquatable<T>
+  fullName: System.IEquatable<T>
+  nameWithType.vb: IEquatable(Of T)
+  fullName.vb: System.IEquatable(Of T)
+  name.vb: IEquatable(Of T)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: ImgDoc2Net.Implementation.TileCoordinate
+  commentId: T:ImgDoc2Net.Implementation.TileCoordinate
+  name: TileCoordinate
+  nameWithType: TileCoordinate
+  fullName: ImgDoc2Net.Implementation.TileCoordinate
+- uid: ImgDoc2Net.Implementation.TileCoordinate.#ctor*
+  commentId: Overload:ImgDoc2Net.Implementation.TileCoordinate.#ctor
+  name: TileCoordinate
+  nameWithType: TileCoordinate.TileCoordinate
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.TileCoordinate
+  nameWithType.vb: TileCoordinate.New
+  fullName.vb: ImgDoc2Net.Implementation.TileCoordinate.New
+  name.vb: New
+- uid: System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}}
+  commentId: T:System.Collections.Generic.IEnumerable{System.Tuple{ImgDoc2Net.Implementation.Dimension,System.Int32}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  name: IEnumerable<Tuple<Dimension, int>>
+  nameWithType: IEnumerable<Tuple<Dimension, int>>
+  fullName: System.Collections.Generic.IEnumerable<System.Tuple<ImgDoc2Net.Implementation.Dimension, int>>
+  nameWithType.vb: IEnumerable(Of Tuple(Of Dimension, Integer))
+  fullName.vb: System.Collections.Generic.IEnumerable(Of System.Tuple(Of ImgDoc2Net.Implementation.Dimension, Integer))
+  name.vb: IEnumerable(Of Tuple(Of Dimension, Integer))
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: <
+  - uid: System.Tuple`2
+    name: Tuple
+    isExternal: true
+  - name: <
+  - uid: ImgDoc2Net.Implementation.Dimension
+    name: Dimension
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Tuple`2
+    name: Tuple
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: ImgDoc2Net.Implementation.Dimension
+    name: Dimension
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+- uid: ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate*
+  commentId: Overload:ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate
+  name: TryGetCoordinate
+  nameWithType: TileCoordinate.TryGetCoordinate
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.TryGetCoordinate
+- uid: ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  commentId: M:ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+  parent: ImgDoc2Net.Interfaces.ITileCoordinate
+  isExternal: true
+  name: TryGetCoordinate(Dimension, out int)
+  nameWithType: ITileCoordinate.TryGetCoordinate(Dimension, out int)
+  fullName: ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension, out int)
+  nameWithType.vb: ITileCoordinate.TryGetCoordinate(Dimension, Integer)
+  fullName.vb: ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension, Integer)
+  name.vb: TryGetCoordinate(Dimension, Integer)
+  spec.csharp:
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+    name: TryGetCoordinate
+  - name: (
+  - uid: ImgDoc2Net.Implementation.Dimension
+    name: Dimension
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate.TryGetCoordinate(ImgDoc2Net.Implementation.Dimension,System.Int32@)
+    name: TryGetCoordinate
+  - name: (
+  - uid: ImgDoc2Net.Implementation.Dimension
+    name: Dimension
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+  - name: )
+- uid: ImgDoc2Net.Implementation.Dimension
+  commentId: T:ImgDoc2Net.Implementation.Dimension
+  parent: ImgDoc2Net.Implementation
+  name: Dimension
+  nameWithType: Dimension
+  fullName: ImgDoc2Net.Implementation.Dimension
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates*
+  commentId: Overload:ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates
+  name: EnumCoordinates
+  nameWithType: TileCoordinate.EnumCoordinates
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.EnumCoordinates
+- uid: ImgDoc2Net.Interfaces.ITileCoordinate.EnumCoordinates
+  commentId: M:ImgDoc2Net.Interfaces.ITileCoordinate.EnumCoordinates
+  parent: ImgDoc2Net.Interfaces.ITileCoordinate
+  name: EnumCoordinates()
+  nameWithType: ITileCoordinate.EnumCoordinates()
+  fullName: ImgDoc2Net.Interfaces.ITileCoordinate.EnumCoordinates()
+  spec.csharp:
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate.EnumCoordinates
+    name: EnumCoordinates
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate.EnumCoordinates
+    name: EnumCoordinates
+  - name: (
+  - name: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: ImgDoc2Net.Implementation.TileCoordinate.Equals*
+  commentId: Overload:ImgDoc2Net.Implementation.TileCoordinate.Equals
+  name: Equals
+  nameWithType: TileCoordinate.Equals
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.Equals
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+- uid: ImgDoc2Net.Implementation.TileCoordinate.GetHashCode*
+  commentId: Overload:ImgDoc2Net.Implementation.TileCoordinate.GetHashCode
+  name: GetHashCode
+  nameWithType: TileCoordinate.GetHashCode
+  fullName: ImgDoc2Net.Implementation.TileCoordinate.GetHashCode
+- uid: System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  commentId: M:System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  parent: System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}
+  definition: System.IEquatable`1.Equals(`0)
+  name: Equals(ITileCoordinate)
+  nameWithType: IEquatable<ITileCoordinate>.Equals(ITileCoordinate)
+  fullName: System.IEquatable<ImgDoc2Net.Interfaces.ITileCoordinate>.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  nameWithType.vb: IEquatable(Of ITileCoordinate).Equals(ITileCoordinate)
+  fullName.vb: System.IEquatable(Of ImgDoc2Net.Interfaces.ITileCoordinate).Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+  spec.csharp:
+  - uid: System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - name: )
+  spec.vb:
+  - uid: System.IEquatable{ImgDoc2Net.Interfaces.ITileCoordinate}.Equals(ImgDoc2Net.Interfaces.ITileCoordinate)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - name: )
+- uid: System.IEquatable`1.Equals(`0)
+  commentId: M:System.IEquatable`1.Equals(`0)
+  isExternal: true
+  name: Equals(T)
+  nameWithType: IEquatable<T>.Equals(T)
+  fullName: System.IEquatable<T>.Equals(T)
+  nameWithType.vb: IEquatable(Of T).Equals(T)
+  fullName.vb: System.IEquatable(Of T).Equals(T)
+  spec.csharp:
+  - uid: System.IEquatable`1.Equals(`0)
+    name: Equals
+    isExternal: true
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: System.IEquatable`1.Equals(`0)
+    name: Equals
+    isExternal: true
+  - name: (
+  - name: T
+  - name: )

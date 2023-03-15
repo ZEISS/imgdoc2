@@ -1,0 +1,22 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interop
+  commentId: N:ImgDoc2Net.Interop
+  id: ImgDoc2Net.Interop
+  children:
+  - ImgDoc2Net.Interop.ImgDoc2Exception
+  langs:
+  - csharp
+  - vb
+  name: ImgDoc2Net.Interop
+  nameWithType: ImgDoc2Net.Interop
+  fullName: ImgDoc2Net.Interop
+  type: Namespace
+  assemblies:
+  - ImgDoc2Net
+references:
+- uid: ImgDoc2Net.Interop.ImgDoc2Exception
+  commentId: T:ImgDoc2Net.Interop.ImgDoc2Exception
+  name: ImgDoc2Exception
+  nameWithType: ImgDoc2Exception
+  fullName: ImgDoc2Net.Interop.ImgDoc2Exception

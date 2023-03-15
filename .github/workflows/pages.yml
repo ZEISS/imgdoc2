@@ -43,21 +43,15 @@ jobs:
       - name: DocFx action for ImgDoc2Net
         run : |
           dotnet tool update -g docfx
-          cd dotnet/
-          mkdir docfx_out
-          cd docfx_out
-          pwd
-          docfx ../docfx/docfx.json
-          cd ..
-          ls -l
-          ls -l docfx_out
+          cd dotnet/docfx
+          docfx
       - name: Prepare doxygen-generated documentation for upload
         run: |
           mkdir ${{github.workspace}}/documentation
           mkdir ${{github.workspace}}/documentation/libimgdoc2
           mkdir ${{github.workspace}}/documentation/imgdoc2net
           cp -r ${{github.workspace}}/libimgdoc2/doxygen/html/* ${{github.workspace}}/documentation/libimgdoc2
-          cp -r ${{github.workspace}}/dotnet/docfx_out/* ${{github.workspace}}/documentation/imgdoc2net
+          cp -r ${{github.workspace}}/dotnet/docfx/* ${{github.workspace}}/documentation/imgdoc2net
           #cp -r ${{github.workspace}}/dotnet/imgdoc2Net/doxygen/html/* ${{github.workspace}}/documentation/imgdoc2net
           #echo "<meta http-equiv=\"Refresh\" content=\"0; url='libimgdoc2/'\" />" >> ${{github.workspace}}/documentation/index.html
 

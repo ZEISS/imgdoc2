@@ -1,0 +1,168 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interfaces.IDocument
+  commentId: T:ImgDoc2Net.Interfaces.IDocument
+  id: IDocument
+  parent: ImgDoc2Net.Interfaces
+  children:
+  - ImgDoc2Net.Interfaces.IDocument.Get2dReader
+  - ImgDoc2Net.Interfaces.IDocument.Get2dWriter
+  langs:
+  - csharp
+  - vb
+  name: IDocument
+  nameWithType: IDocument
+  fullName: ImgDoc2Net.Interfaces.IDocument
+  type: Interface
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocument.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: IDocument
+    path: ../imgdoc2Net/Interfaces/IDocument.cs
+    startLine: 14
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nThis interface is representing a &apos;document&apos;.\nDepending on the type of the document, objects for interacting with it can be created.\n"
+  example: []
+  syntax:
+    content: 'public interface IDocument : IDisposable'
+    content.vb: Public Interface IDocument Inherits IDisposable
+  inheritedMembers:
+  - System.IDisposable.Dispose
+- uid: ImgDoc2Net.Interfaces.IDocument.Get2dReader
+  commentId: M:ImgDoc2Net.Interfaces.IDocument.Get2dReader
+  id: Get2dReader
+  parent: ImgDoc2Net.Interfaces.IDocument
+  langs:
+  - csharp
+  - vb
+  name: Get2dReader()
+  nameWithType: IDocument.Get2dReader()
+  fullName: ImgDoc2Net.Interfaces.IDocument.Get2dReader()
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocument.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Get2dReader
+    path: ../imgdoc2Net/Interfaces/IDocument.cs
+    startLine: 22
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nTry to get a &quot;reader object&quot; for a 2D-document. This method may return null\nif such an object cannot be constructed.\n"
+  example: []
+  syntax:
+    content: IRead2d Get2dReader()
+    return:
+      type: ImgDoc2Net.Interfaces.IRead2d
+      description: The 2D reader object.
+    content.vb: Function Get2dReader() As IRead2d
+  overload: ImgDoc2Net.Interfaces.IDocument.Get2dReader*
+- uid: ImgDoc2Net.Interfaces.IDocument.Get2dWriter
+  commentId: M:ImgDoc2Net.Interfaces.IDocument.Get2dWriter
+  id: Get2dWriter
+  parent: ImgDoc2Net.Interfaces.IDocument
+  langs:
+  - csharp
+  - vb
+  name: Get2dWriter()
+  nameWithType: IDocument.Get2dWriter()
+  fullName: ImgDoc2Net.Interfaces.IDocument.Get2dWriter()
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocument.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Get2dWriter
+    path: ../imgdoc2Net/Interfaces/IDocument.cs
+    startLine: 30
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nTry to get a &quot;write object&quot; for a 2D-document. This method may return null\nif such an object cannot be constructed.\n"
+  example: []
+  syntax:
+    content: IWrite2d Get2dWriter()
+    return:
+      type: ImgDoc2Net.Interfaces.IWrite2d
+      description: The 2D writer object.
+    content.vb: Function Get2dWriter() As IWrite2d
+  overload: ImgDoc2Net.Interfaces.IDocument.Get2dWriter*
+references:
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: System.IDisposable.Dispose
+  commentId: M:System.IDisposable.Dispose
+  parent: System.IDisposable
+  isExternal: true
+  name: Dispose()
+  nameWithType: IDisposable.Dispose()
+  fullName: System.IDisposable.Dispose()
+  spec.csharp:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: ImgDoc2Net.Interfaces.IDocument.Get2dReader*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocument.Get2dReader
+  name: Get2dReader
+  nameWithType: IDocument.Get2dReader
+  fullName: ImgDoc2Net.Interfaces.IDocument.Get2dReader
+- uid: ImgDoc2Net.Interfaces.IRead2d
+  commentId: T:ImgDoc2Net.Interfaces.IRead2d
+  parent: ImgDoc2Net.Interfaces
+  name: IRead2d
+  nameWithType: IRead2d
+  fullName: ImgDoc2Net.Interfaces.IRead2d
+- uid: ImgDoc2Net.Interfaces.IDocument.Get2dWriter*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocument.Get2dWriter
+  name: Get2dWriter
+  nameWithType: IDocument.Get2dWriter
+  fullName: ImgDoc2Net.Interfaces.IDocument.Get2dWriter
+- uid: ImgDoc2Net.Interfaces.IWrite2d
+  commentId: T:ImgDoc2Net.Interfaces.IWrite2d
+  parent: ImgDoc2Net.Interfaces
+  name: IWrite2d
+  nameWithType: IWrite2d
+  fullName: ImgDoc2Net.Interfaces.IWrite2d

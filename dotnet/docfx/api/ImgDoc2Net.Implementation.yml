@@ -1,0 +1,86 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Implementation
+  commentId: N:ImgDoc2Net.Implementation
+  id: ImgDoc2Net.Implementation
+  children:
+  - ImgDoc2Net.Implementation.CreateOptions
+  - ImgDoc2Net.Implementation.Dimension
+  - ImgDoc2Net.Implementation.DimensionQueryClause
+  - ImgDoc2Net.Implementation.Document
+  - ImgDoc2Net.Implementation.OpenExistingOptions
+  - ImgDoc2Net.Implementation.TileCoordinate
+  - ImgDoc2Net.Implementation.TileInfoQueryClause
+  - ImgDoc2Net.Implementation.Utilities
+  langs:
+  - csharp
+  - vb
+  name: ImgDoc2Net.Implementation
+  nameWithType: ImgDoc2Net.Implementation
+  fullName: ImgDoc2Net.Implementation
+  type: Namespace
+  assemblies:
+  - ImgDoc2Net
+references:
+- uid: ImgDoc2Net.Implementation.CreateOptions
+  commentId: T:ImgDoc2Net.Implementation.CreateOptions
+  parent: ImgDoc2Net.Implementation
+  name: CreateOptions
+  nameWithType: CreateOptions
+  fullName: ImgDoc2Net.Implementation.CreateOptions
+- uid: ImgDoc2Net.Implementation.Dimension
+  commentId: T:ImgDoc2Net.Implementation.Dimension
+  parent: ImgDoc2Net.Implementation
+  name: Dimension
+  nameWithType: Dimension
+  fullName: ImgDoc2Net.Implementation.Dimension
+- uid: ImgDoc2Net.Implementation.DimensionQueryClause
+  commentId: T:ImgDoc2Net.Implementation.DimensionQueryClause
+  parent: ImgDoc2Net.Implementation
+  name: DimensionQueryClause
+  nameWithType: DimensionQueryClause
+  fullName: ImgDoc2Net.Implementation.DimensionQueryClause
+- uid: ImgDoc2Net.Implementation.Document
+  commentId: T:ImgDoc2Net.Implementation.Document
+  parent: ImgDoc2Net.Implementation
+  name: Document
+  nameWithType: Document
+  fullName: ImgDoc2Net.Implementation.Document
+- uid: ImgDoc2Net.Implementation.OpenExistingOptions
+  commentId: T:ImgDoc2Net.Implementation.OpenExistingOptions
+  parent: ImgDoc2Net.Implementation
+  name: OpenExistingOptions
+  nameWithType: OpenExistingOptions
+  fullName: ImgDoc2Net.Implementation.OpenExistingOptions
+- uid: ImgDoc2Net.Implementation.TileCoordinate
+  commentId: T:ImgDoc2Net.Implementation.TileCoordinate
+  name: TileCoordinate
+  nameWithType: TileCoordinate
+  fullName: ImgDoc2Net.Implementation.TileCoordinate
+- uid: ImgDoc2Net.Implementation.TileInfoQueryClause
+  commentId: T:ImgDoc2Net.Implementation.TileInfoQueryClause
+  name: TileInfoQueryClause
+  nameWithType: TileInfoQueryClause
+  fullName: ImgDoc2Net.Implementation.TileInfoQueryClause
+- uid: ImgDoc2Net.Implementation.Utilities
+  commentId: T:ImgDoc2Net.Implementation.Utilities
+  name: Utilities
+  nameWithType: Utilities
+  fullName: ImgDoc2Net.Implementation.Utilities
+- uid: ImgDoc2Net.Implementation
+  commentId: N:ImgDoc2Net.Implementation
+  name: ImgDoc2Net.Implementation
+  nameWithType: ImgDoc2Net.Implementation
+  fullName: ImgDoc2Net.Implementation
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Implementation
+    name: Implementation
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Implementation
+    name: Implementation

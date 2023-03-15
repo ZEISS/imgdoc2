@@ -1,0 +1,424 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interfaces.Rectangle
+  commentId: T:ImgDoc2Net.Interfaces.Rectangle
+  id: Rectangle
+  parent: ImgDoc2Net.Interfaces
+  children:
+  - ImgDoc2Net.Interfaces.Rectangle.Height
+  - ImgDoc2Net.Interfaces.Rectangle.Width
+  - ImgDoc2Net.Interfaces.Rectangle.X
+  - ImgDoc2Net.Interfaces.Rectangle.Y
+  langs:
+  - csharp
+  - vb
+  name: Rectangle
+  nameWithType: Rectangle
+  fullName: ImgDoc2Net.Interfaces.Rectangle
+  type: Class
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/Rectangle.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Rectangle
+    path: ../imgdoc2Net/Interfaces/Rectangle.cs
+    startLine: 9
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nThis class defines an axis-aligned 2d rectangle.\n"
+  example: []
+  syntax:
+    content: public class Rectangle
+    content.vb: Public Class Rectangle
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: ImgDoc2Net.Interfaces.Rectangle.X
+  commentId: P:ImgDoc2Net.Interfaces.Rectangle.X
+  id: X
+  parent: ImgDoc2Net.Interfaces.Rectangle
+  langs:
+  - csharp
+  - vb
+  name: X
+  nameWithType: Rectangle.X
+  fullName: ImgDoc2Net.Interfaces.Rectangle.X
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/Rectangle.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: X
+    path: ../imgdoc2Net/Interfaces/Rectangle.cs
+    startLine: 13
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the x coordinate of the edge point.
+  example: []
+  syntax:
+    content: public double X { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: The x coordinate.
+    content.vb: Public Property X As Double
+  overload: ImgDoc2Net.Interfaces.Rectangle.X*
+- uid: ImgDoc2Net.Interfaces.Rectangle.Y
+  commentId: P:ImgDoc2Net.Interfaces.Rectangle.Y
+  id: Y
+  parent: ImgDoc2Net.Interfaces.Rectangle
+  langs:
+  - csharp
+  - vb
+  name: Y
+  nameWithType: Rectangle.Y
+  fullName: ImgDoc2Net.Interfaces.Rectangle.Y
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/Rectangle.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Y
+    path: ../imgdoc2Net/Interfaces/Rectangle.cs
+    startLine: 17
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the y coordinate of the edge point.
+  example: []
+  syntax:
+    content: public double Y { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: The y coordinate.
+    content.vb: Public Property Y As Double
+  overload: ImgDoc2Net.Interfaces.Rectangle.Y*
+- uid: ImgDoc2Net.Interfaces.Rectangle.Width
+  commentId: P:ImgDoc2Net.Interfaces.Rectangle.Width
+  id: Width
+  parent: ImgDoc2Net.Interfaces.Rectangle
+  langs:
+  - csharp
+  - vb
+  name: Width
+  nameWithType: Rectangle.Width
+  fullName: ImgDoc2Net.Interfaces.Rectangle.Width
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/Rectangle.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Width
+    path: ../imgdoc2Net/Interfaces/Rectangle.cs
+    startLine: 21
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the width.
+  example: []
+  syntax:
+    content: public double Width { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: The width.
+    content.vb: Public Property Width As Double
+  overload: ImgDoc2Net.Interfaces.Rectangle.Width*
+- uid: ImgDoc2Net.Interfaces.Rectangle.Height
+  commentId: P:ImgDoc2Net.Interfaces.Rectangle.Height
+  id: Height
+  parent: ImgDoc2Net.Interfaces.Rectangle
+  langs:
+  - csharp
+  - vb
+  name: Height
+  nameWithType: Rectangle.Height
+  fullName: ImgDoc2Net.Interfaces.Rectangle.Height
+  type: Property
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/Rectangle.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Height
+    path: ../imgdoc2Net/Interfaces/Rectangle.cs
+    startLine: 25
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Gets or sets the height.
+  example: []
+  syntax:
+    content: public double Height { get; set; }
+    parameters: []
+    return:
+      type: System.Double
+      description: The height.
+    content.vb: Public Property Height As Double
+  overload: ImgDoc2Net.Interfaces.Rectangle.Height*
+references:
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: ImgDoc2Net.Interfaces.Rectangle.X*
+  commentId: Overload:ImgDoc2Net.Interfaces.Rectangle.X
+  name: X
+  nameWithType: Rectangle.X
+  fullName: ImgDoc2Net.Interfaces.Rectangle.X
+- uid: System.Double
+  commentId: T:System.Double
+  parent: System
+  isExternal: true
+  name: double
+  nameWithType: double
+  fullName: double
+  nameWithType.vb: Double
+  fullName.vb: Double
+  name.vb: Double
+- uid: ImgDoc2Net.Interfaces.Rectangle.Y*
+  commentId: Overload:ImgDoc2Net.Interfaces.Rectangle.Y
+  name: Y
+  nameWithType: Rectangle.Y
+  fullName: ImgDoc2Net.Interfaces.Rectangle.Y
+- uid: ImgDoc2Net.Interfaces.Rectangle.Width*
+  commentId: Overload:ImgDoc2Net.Interfaces.Rectangle.Width
+  name: Width
+  nameWithType: Rectangle.Width
+  fullName: ImgDoc2Net.Interfaces.Rectangle.Width
+- uid: ImgDoc2Net.Interfaces.Rectangle.Height*
+  commentId: Overload:ImgDoc2Net.Interfaces.Rectangle.Height
+  name: Height
+  nameWithType: Rectangle.Height
+  fullName: ImgDoc2Net.Interfaces.Rectangle.Height

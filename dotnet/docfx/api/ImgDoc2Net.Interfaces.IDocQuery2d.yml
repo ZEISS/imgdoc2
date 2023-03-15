@@ -1,0 +1,566 @@
+### YamlMime:ManagedReference
+items:
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d
+  commentId: T:ImgDoc2Net.Interfaces.IDocQuery2d
+  id: IDocQuery2d
+  parent: ImgDoc2Net.Interfaces
+  children:
+  - ImgDoc2Net.Interfaces.IDocQuery2d.Query(ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  - ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect(ImgDoc2Net.Interfaces.Rectangle,ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  - ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate(System.Int64)
+  - ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData(System.Int64)
+  - ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo(System.Int64)
+  - ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition(System.Int64)
+  langs:
+  - csharp
+  - vb
+  name: IDocQuery2d
+  nameWithType: IDocQuery2d
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d
+  type: Interface
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: IDocQuery2d
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 9
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  syntax:
+    content: public interface IDocQuery2d
+    content.vb: Public Interface IDocQuery2d
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.Query(ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  commentId: M:ImgDoc2Net.Interfaces.IDocQuery2d.Query(ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  id: Query(ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  parent: ImgDoc2Net.Interfaces.IDocQuery2d
+  langs:
+  - csharp
+  - vb
+  name: Query(IDimensionQueryClause, ITileInfoQueryClause, QueryOptions)
+  nameWithType: IDocQuery2d.Query(IDimensionQueryClause, ITileInfoQueryClause, QueryOptions)
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.Query(ImgDoc2Net.Interfaces.IDimensionQueryClause, ImgDoc2Net.Interfaces.ITileInfoQueryClause, ImgDoc2Net.Interfaces.QueryOptions)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: Query
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 17
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Queries the tiles table.
+  example: []
+  syntax:
+    content: List<long> Query(IDimensionQueryClause queryClause, ITileInfoQueryClause tileInfoQueryClause, QueryOptions queryOptions = null)
+    parameters:
+    - id: queryClause
+      type: ImgDoc2Net.Interfaces.IDimensionQueryClause
+      description: The query clause (dealing with dimension indexes).
+    - id: tileInfoQueryClause
+      type: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+      description: The query clause (dealing with other &quot;per tile data&quot;).
+    - id: queryOptions
+      type: ImgDoc2Net.Interfaces.QueryOptions
+      description: (Optional) Options for controlling the operation.
+    return:
+      type: System.Collections.Generic.List{System.Int64}
+      description: >-
+        List of tiles satisfying to the search criterion. In order to check whether the result is complete,
+                 use the queryOptions argument.
+    content.vb: Function Query(queryClause As IDimensionQueryClause, tileInfoQueryClause As ITileInfoQueryClause, queryOptions As QueryOptions = Nothing) As List(Of Long)
+  overload: ImgDoc2Net.Interfaces.IDocQuery2d.Query*
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData(System.Int64)
+  commentId: M:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData(System.Int64)
+  id: ReadTileData(System.Int64)
+  parent: ImgDoc2Net.Interfaces.IDocQuery2d
+  langs:
+  - csharp
+  - vb
+  name: ReadTileData(long)
+  nameWithType: IDocQuery2d.ReadTileData(long)
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData(long)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: ReadTileData
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 22
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Reads tile data for the specified tile.
+  example: []
+  syntax:
+    content: byte[] ReadTileData(long key)
+    parameters:
+    - id: key
+      type: System.Int64
+      description: The primary key.
+    return:
+      type: System.Byte[]
+      description: The tile data blob.
+    content.vb: Function ReadTileData(key As Long) As Byte()
+  overload: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData*
+  nameWithType.vb: IDocQuery2d.ReadTileData(Long)
+  fullName.vb: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData(Long)
+  name.vb: ReadTileData(Long)
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect(ImgDoc2Net.Interfaces.Rectangle,ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  commentId: M:ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect(ImgDoc2Net.Interfaces.Rectangle,ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  id: QueryTilesIntersectingRect(ImgDoc2Net.Interfaces.Rectangle,ImgDoc2Net.Interfaces.IDimensionQueryClause,ImgDoc2Net.Interfaces.ITileInfoQueryClause,ImgDoc2Net.Interfaces.QueryOptions)
+  parent: ImgDoc2Net.Interfaces.IDocQuery2d
+  langs:
+  - csharp
+  - vb
+  name: QueryTilesIntersectingRect(Rectangle, IDimensionQueryClause, ITileInfoQueryClause, QueryOptions)
+  nameWithType: IDocQuery2d.QueryTilesIntersectingRect(Rectangle, IDimensionQueryClause, ITileInfoQueryClause, QueryOptions)
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect(ImgDoc2Net.Interfaces.Rectangle, ImgDoc2Net.Interfaces.IDimensionQueryClause, ImgDoc2Net.Interfaces.ITileInfoQueryClause, ImgDoc2Net.Interfaces.QueryOptions)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: QueryTilesIntersectingRect
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 32
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Queries for tiles intersecting with the specified rectangle (and satisfying the other criteria).
+  example: []
+  syntax:
+    content: List<long> QueryTilesIntersectingRect(Rectangle rectangle, IDimensionQueryClause queryClause, ITileInfoQueryClause tileInfoQueryClause, QueryOptions queryOptions = null)
+    parameters:
+    - id: rectangle
+      type: ImgDoc2Net.Interfaces.Rectangle
+      description: The rectangle.
+    - id: queryClause
+      type: ImgDoc2Net.Interfaces.IDimensionQueryClause
+      description: The query clause (dealing with dimension indexes).
+    - id: tileInfoQueryClause
+      type: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+      description: The query clause (dealing with other &quot;per tile data&quot;).
+    - id: queryOptions
+      type: ImgDoc2Net.Interfaces.QueryOptions
+      description: (Optional) Options for controlling the operation.
+    return:
+      type: System.Collections.Generic.List{System.Int64}
+      description: >-
+        List of tiles satisfying to the search criterion. In order to check whether the result is complete,
+                 use the queryOptions argument.
+    content.vb: Function QueryTilesIntersectingRect(rectangle As Rectangle, queryClause As IDimensionQueryClause, tileInfoQueryClause As ITileInfoQueryClause, queryOptions As QueryOptions = Nothing) As List(Of Long)
+  overload: ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect*
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo(System.Int64)
+  commentId: M:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo(System.Int64)
+  id: ReadTileInfo(System.Int64)
+  parent: ImgDoc2Net.Interfaces.IDocQuery2d
+  langs:
+  - csharp
+  - vb
+  name: ReadTileInfo(long)
+  nameWithType: IDocQuery2d.ReadTileInfo(long)
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo(long)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: ReadTileInfo
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 46
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nReads tile information for the specified tile. There are three pieces of information which can be retrieved by this method,\nnamely the tile-coordinate, the logical position and the tile-blob-info.\n"
+  remarks: "\nUnfortunately, it seems Doxygen is unable to generate documentation for this ValueType-syntax \n(-> https://github.com/doxygen/doxygen/issues/7633).\n"
+  example: []
+  syntax:
+    content: (ITileCoordinate coordinate, LogicalPosition logicalPosition, TileBlobInfo tileBlobInfo) ReadTileInfo(long key)
+    parameters:
+    - id: key
+      type: System.Int64
+      description: The primary key.
+    return:
+      type: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}
+      description: The tile information.
+    content.vb: Function ReadTileInfo(key As Long) As (coordinate As ITileCoordinate, logicalPosition As LogicalPosition, tileBlobInfo As TileBlobInfo)
+  overload: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo*
+  nameWithType.vb: IDocQuery2d.ReadTileInfo(Long)
+  fullName.vb: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo(Long)
+  name.vb: ReadTileInfo(Long)
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate(System.Int64)
+  commentId: M:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate(System.Int64)
+  id: ReadTileCoordinate(System.Int64)
+  parent: ImgDoc2Net.Interfaces.IDocQuery2d
+  langs:
+  - csharp
+  - vb
+  name: ReadTileCoordinate(long)
+  nameWithType: IDocQuery2d.ReadTileCoordinate(long)
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate(long)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: ReadTileCoordinate
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 55
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: "\nReads tile-coordinate information for the specified tile.\n"
+  example: []
+  syntax:
+    content: ITileCoordinate ReadTileCoordinate(long key)
+    parameters:
+    - id: key
+      type: System.Int64
+      description: The primary key.
+    return:
+      type: ImgDoc2Net.Interfaces.ITileCoordinate
+      description: The tile information.
+    content.vb: Function ReadTileCoordinate(key As Long) As ITileCoordinate
+  overload: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate*
+  nameWithType.vb: IDocQuery2d.ReadTileCoordinate(Long)
+  fullName.vb: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate(Long)
+  name.vb: ReadTileCoordinate(Long)
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition(System.Int64)
+  commentId: M:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition(System.Int64)
+  id: ReadTileLogicalPosition(System.Int64)
+  parent: ImgDoc2Net.Interfaces.IDocQuery2d
+  langs:
+  - csharp
+  - vb
+  name: ReadTileLogicalPosition(long)
+  nameWithType: IDocQuery2d.ReadTileLogicalPosition(long)
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition(long)
+  type: Method
+  source:
+    remote:
+      path: dotnet/imgdoc2Net/Interfaces/IDocQuery2d.cs
+      branch: main
+      repo: git@github.com:ptahmose/imgdoc2.git
+    id: ReadTileLogicalPosition
+    path: ../imgdoc2Net/Interfaces/IDocQuery2d.cs
+    startLine: 62
+  assemblies:
+  - ImgDoc2Net
+  namespace: ImgDoc2Net.Interfaces
+  summary: Reads logical position information for the specified tile..
+  example: []
+  syntax:
+    content: LogicalPosition ReadTileLogicalPosition(long key)
+    parameters:
+    - id: key
+      type: System.Int64
+      description: The primary key.
+    return:
+      type: ImgDoc2Net.Interfaces.LogicalPosition
+      description: The tile&apos;s logical position.
+    content.vb: Function ReadTileLogicalPosition(key As Long) As LogicalPosition
+  overload: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition*
+  nameWithType.vb: IDocQuery2d.ReadTileLogicalPosition(Long)
+  fullName.vb: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition(Long)
+  name.vb: ReadTileLogicalPosition(Long)
+references:
+- uid: ImgDoc2Net.Interfaces
+  commentId: N:ImgDoc2Net.Interfaces
+  name: ImgDoc2Net.Interfaces
+  nameWithType: ImgDoc2Net.Interfaces
+  fullName: ImgDoc2Net.Interfaces
+  spec.csharp:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+  spec.vb:
+  - uid: ImgDoc2Net
+    name: ImgDoc2Net
+  - name: .
+  - uid: ImgDoc2Net.Interfaces
+    name: Interfaces
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.Query*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocQuery2d.Query
+  name: Query
+  nameWithType: IDocQuery2d.Query
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.Query
+- uid: ImgDoc2Net.Interfaces.IDimensionQueryClause
+  commentId: T:ImgDoc2Net.Interfaces.IDimensionQueryClause
+  parent: ImgDoc2Net.Interfaces
+  name: IDimensionQueryClause
+  nameWithType: IDimensionQueryClause
+  fullName: ImgDoc2Net.Interfaces.IDimensionQueryClause
+- uid: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+  commentId: T:ImgDoc2Net.Interfaces.ITileInfoQueryClause
+  parent: ImgDoc2Net.Interfaces
+  name: ITileInfoQueryClause
+  nameWithType: ITileInfoQueryClause
+  fullName: ImgDoc2Net.Interfaces.ITileInfoQueryClause
+- uid: ImgDoc2Net.Interfaces.QueryOptions
+  commentId: T:ImgDoc2Net.Interfaces.QueryOptions
+  parent: ImgDoc2Net.Interfaces
+  name: QueryOptions
+  nameWithType: QueryOptions
+  fullName: ImgDoc2Net.Interfaces.QueryOptions
+- uid: System.Collections.Generic.List{System.Int64}
+  commentId: T:System.Collections.Generic.List{System.Int64}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  name: List<long>
+  nameWithType: List<long>
+  fullName: System.Collections.Generic.List<long>
+  nameWithType.vb: List(Of Long)
+  fullName.vb: System.Collections.Generic.List(Of Long)
+  name.vb: List(Of Long)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: <
+  - uid: System.Int64
+    name: long
+    isExternal: true
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int64
+    name: Long
+    isExternal: true
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData
+  name: ReadTileData
+  nameWithType: IDocQuery2d.ReadTileData
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileData
+- uid: System.Int64
+  commentId: T:System.Int64
+  parent: System
+  isExternal: true
+  name: long
+  nameWithType: long
+  fullName: long
+  nameWithType.vb: Long
+  fullName.vb: Long
+  name.vb: Long
+- uid: System.Byte[]
+  isExternal: true
+  name: byte[]
+  nameWithType: byte[]
+  fullName: byte[]
+  nameWithType.vb: Byte()
+  fullName.vb: Byte()
+  name.vb: Byte()
+  spec.csharp:
+  - uid: System.Byte
+    name: byte
+    isExternal: true
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.Byte
+    name: Byte
+    isExternal: true
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect
+  name: QueryTilesIntersectingRect
+  nameWithType: IDocQuery2d.QueryTilesIntersectingRect
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.QueryTilesIntersectingRect
+- uid: ImgDoc2Net.Interfaces.Rectangle
+  commentId: T:ImgDoc2Net.Interfaces.Rectangle
+  parent: ImgDoc2Net.Interfaces
+  name: Rectangle
+  nameWithType: Rectangle
+  fullName: ImgDoc2Net.Interfaces.Rectangle
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo
+  name: ReadTileInfo
+  nameWithType: IDocQuery2d.ReadTileInfo
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileInfo
+- uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}
+  commentId: T:System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}
+  parent: System
+  definition: System.ValueTuple`3
+  name: (ITileCoordinate coordinate, LogicalPosition logicalPosition, TileBlobInfo tileBlobInfo)
+  nameWithType: (ITileCoordinate coordinate, LogicalPosition logicalPosition, TileBlobInfo tileBlobInfo)
+  fullName: (ImgDoc2Net.Interfaces.ITileCoordinate coordinate, ImgDoc2Net.Interfaces.LogicalPosition logicalPosition, ImgDoc2Net.Interfaces.TileBlobInfo tileBlobInfo)
+  nameWithType.vb: (coordinate As ITileCoordinate, logicalPosition As LogicalPosition, tileBlobInfo As TileBlobInfo)
+  fullName.vb: (coordinate As ImgDoc2Net.Interfaces.ITileCoordinate, logicalPosition As ImgDoc2Net.Interfaces.LogicalPosition, tileBlobInfo As ImgDoc2Net.Interfaces.TileBlobInfo)
+  name.vb: (coordinate As ITileCoordinate, logicalPosition As LogicalPosition, tileBlobInfo As TileBlobInfo)
+  spec.csharp:
+  - name: (
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - name: " "
+  - uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}.coordinate
+    name: coordinate
+  - name: ','
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.LogicalPosition
+    name: LogicalPosition
+  - name: " "
+  - uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}.logicalPosition
+    name: logicalPosition
+  - name: ','
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.TileBlobInfo
+    name: TileBlobInfo
+  - name: " "
+  - uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}.tileBlobInfo
+    name: tileBlobInfo
+  - name: )
+  spec.vb:
+  - name: (
+  - uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}.coordinate
+    name: coordinate
+  - name: " "
+  - name: As
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.ITileCoordinate
+    name: ITileCoordinate
+  - name: ','
+  - name: " "
+  - uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}.logicalPosition
+    name: logicalPosition
+  - name: " "
+  - name: As
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.LogicalPosition
+    name: LogicalPosition
+  - name: ','
+  - name: " "
+  - uid: System.ValueTuple{ImgDoc2Net.Interfaces.ITileCoordinate,ImgDoc2Net.Interfaces.LogicalPosition,ImgDoc2Net.Interfaces.TileBlobInfo}.tileBlobInfo
+    name: tileBlobInfo
+  - name: " "
+  - name: As
+  - name: " "
+  - uid: ImgDoc2Net.Interfaces.TileBlobInfo
+    name: TileBlobInfo
+  - name: )
+- uid: System.ValueTuple`3
+  commentId: T:System.ValueTuple`3
+  name: (T1, T2, T3)
+  nameWithType: (T1, T2, T3)
+  fullName: (T1, T2, T3)
+  spec.csharp:
+  - name: (
+  - name: T1
+  - name: ','
+  - name: " "
+  - name: T2
+  - name: ','
+  - name: " "
+  - name: T3
+  - name: )
+  spec.vb:
+  - name: (
+  - name: T1
+  - name: ','
+  - name: " "
+  - name: T2
+  - name: ','
+  - name: " "
+  - name: T3
+  - name: )
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate
+  name: ReadTileCoordinate
+  nameWithType: IDocQuery2d.ReadTileCoordinate
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileCoordinate
+- uid: ImgDoc2Net.Interfaces.ITileCoordinate
+  commentId: T:ImgDoc2Net.Interfaces.ITileCoordinate
+  parent: ImgDoc2Net.Interfaces
+  name: ITileCoordinate
+  nameWithType: ITileCoordinate
+  fullName: ImgDoc2Net.Interfaces.ITileCoordinate
+- uid: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition*
+  commentId: Overload:ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition
+  name: ReadTileLogicalPosition
+  nameWithType: IDocQuery2d.ReadTileLogicalPosition
+  fullName: ImgDoc2Net.Interfaces.IDocQuery2d.ReadTileLogicalPosition
+- uid: ImgDoc2Net.Interfaces.LogicalPosition
+  commentId: T:ImgDoc2Net.Interfaces.LogicalPosition
+  parent: ImgDoc2Net.Interfaces
+  name: LogicalPosition
+  nameWithType: LogicalPosition
+  fullName: ImgDoc2Net.Interfaces.LogicalPosition
