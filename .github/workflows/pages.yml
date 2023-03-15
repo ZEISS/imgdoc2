@@ -42,6 +42,7 @@ jobs:
       #    working-directory: "dotnet/imgdoc2Net" # Working directory
       - name: DocFx action for ImgDoc2Net
         run : |
+          dotnet tool update -g docfx
           cd dotnet/
           mkdir docfx_out
           cd docfx_out
