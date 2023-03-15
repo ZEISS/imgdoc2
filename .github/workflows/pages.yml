@@ -30,16 +30,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      # use doxygen to build the documentation for the C++ part
       - name: Doxygen action for libimgdoc2
         uses: mattnotmitt/doxygen-action@v1.9.5
         with:
           doxyfile-path: "./Doxyfile" # Path to Doxyfile
           working-directory: "libimgdoc2" # Working directory
-      #- name: Doxygen action for ImgDoc2Net
-      #  uses: mattnotmitt/doxygen-action@v1.9.5
-      #  with:
-      #    doxyfile-path: "./Doxyfile" # Path to Doxyfile
-      #    working-directory: "dotnet/imgdoc2Net" # Working directory
+      # ...and docfx to build the documentation for the .NET part
+      # (main motivation for using docfx was that doxygen does not understand latest c# language features)
       - name: DocFx action for ImgDoc2Net
         run : |
           dotnet tool update -g docfx
@@ -57,8 +55,8 @@ jobs:
           mkdir ${{github.workspace}}/documentation/imgdoc2net
           cp -r ${{github.workspace}}/libimgdoc2/doxygen/html/* ${{github.workspace}}/documentation/libimgdoc2
           cp -r ${{github.workspace}}/dotnet/docfx/* ${{github.workspace}}/documentation/imgdoc2net
+          # add a "top-level-HTML-file" redirecting to the actual documentation
           echo "<meta http-equiv=\"Refresh\" content=\"0; url='imgdoc2net/'\" />" >> ${{github.workspace}}/documentation/index.html
-
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
