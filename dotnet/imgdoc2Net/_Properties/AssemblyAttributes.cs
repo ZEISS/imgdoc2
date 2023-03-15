@@ -5,3 +5,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("ImgDoc2Net_UnitTests")]
+[assembly: InternalsVisibleTo("ImgDoc2Playground_Framework")]
+[assembly: InternalsVisibleTo("ImgDoc2Playground_NetCore")]
