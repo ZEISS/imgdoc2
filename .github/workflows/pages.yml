@@ -48,6 +48,9 @@ jobs:
           cd docfx_out
           pwd
           docfx ../docfx/docfx.json
+          cd ..
+          ls -l
+          ls -l docfx_out
       - name: Prepare doxygen-generated documentation for upload
         run: |
           mkdir ${{github.workspace}}/documentation
