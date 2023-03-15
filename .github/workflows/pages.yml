@@ -35,11 +35,17 @@ jobs:
         with:
           doxyfile-path: "./Doxyfile" # Path to Doxyfile
           working-directory: "libimgdoc2" # Working directory
-      - name: Doxygen action for ImgDoc2Net
-        uses: mattnotmitt/doxygen-action@v1.9.5
-        with:
-          doxyfile-path: "./Doxyfile" # Path to Doxyfile
-          working-directory: "dotnet/imgdoc2Net" # Working directory
+      #- name: Doxygen action for ImgDoc2Net
+      #  uses: mattnotmitt/doxygen-action@v1.9.5
+      #  with:
+      #    doxyfile-path: "./Doxyfile" # Path to Doxyfile
+      #    working-directory: "dotnet/imgdoc2Net" # Working directory
+      - name: DocFx action for ImgDoc2Net
+        run : |
+          cd dotnet/
+          mkdir docfx_out
+          cd docfx_out
+          docfx ../docfx/docfx.json
       - name: Prepare doxygen-generated documentation for upload
         run: |
           mkdir ${{github.workspace}}/documentation

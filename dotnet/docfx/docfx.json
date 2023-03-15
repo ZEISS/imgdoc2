@@ -33,11 +33,7 @@
     ],
     "resource": [
       {
-        "files": [ "logo.svg" ],
-        "src": "."
-      },
-      {
-        "files": [ "imgdoc2Net/doc/assets/**" ],
+        "files": [ "imgdoc2Net/doc/assets/**.png" ],
         "src": "../"
       }
     ]
