@@ -36,10 +36,6 @@ namespace ImgDoc2Net.Interfaces
         /// Reads tile information for the specified tile. There are three pieces of information which can be retrieved by this method,
         /// namely the tile-coordinate, the logical position and the tile-blob-info.
         /// </summary>
-        /// <remarks>
-        /// Unfortunately, it seems Doxygen is unable to generate documentation for this ValueType-syntax 
-        /// (-> https://github.com/doxygen/doxygen/issues/7633).
-        /// </remarks>
         ///
         /// <param name="key"> The primary key.</param>
         ///
