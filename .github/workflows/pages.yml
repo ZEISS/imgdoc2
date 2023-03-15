@@ -46,6 +46,7 @@ jobs:
           cd dotnet/
           mkdir docfx_out
           cd docfx_out
+          pwd
           docfx ../docfx/docfx.json
       - name: Prepare doxygen-generated documentation for upload
         run: |
