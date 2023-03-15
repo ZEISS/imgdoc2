@@ -2,4 +2,4 @@
 
 The documentation specific to the .NET-integration of imgdoc2 is found here.
 
-Documenation of the C++ layer of imgdoc2 can be found [here](..//libimgdoc2/).
+Documentation of the C++ layer of imgdoc2 can be found [here](..//libimgdoc2/).
