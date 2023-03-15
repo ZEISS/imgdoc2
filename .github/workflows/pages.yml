@@ -39,7 +39,7 @@ jobs:
       # ...and docfx to build the documentation for the .NET part
       # (main motivation for using docfx was that doxygen does not understand latest c# language features)
       - name: DocFx action for ImgDoc2Net
-        run : |
+        run: |
           dotnet tool update -g docfx
           cd dotnet/docfx
           docfx
