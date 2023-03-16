@@ -1,0 +1,33 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["imgdoc2Net/ImgDoc2Net.csproj"],
+          "src": "../"
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["**/api/**.yml", "**/api/index.md"]
+      },
+      {
+        "files": ["imgdoc2Net/doc/**.md", "imgdoc2Net/doc/**.yml"],
+        "src": "../"
+      },
+      {
+        "files": ["index.md", "toc.yml"]
+      }
+    ],
+    "resource": [
+      {
+        "files": ["imgdoc2Net/doc/assets/**.png"],
+        "src": "../"
+      }
+    ]
+  }
+}
