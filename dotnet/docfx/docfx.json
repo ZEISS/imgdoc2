@@ -7,12 +7,7 @@
           "src": "../"
         }
       ],
-      "dest": "api",
-      "includePrivateMembers": false,
-      "disableGitFeatures": false,
-      "disableDefaultFilter": false,
-      "noRestore": false,
-      "namespaceLayout": "flattened"
+      "dest": "api"
     }
   ],
   "build": {
