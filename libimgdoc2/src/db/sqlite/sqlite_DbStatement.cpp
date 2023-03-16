@@ -68,10 +68,25 @@ SqliteDbStatement::SqliteDbStatement(sqlite3_stmt* sql_statement)  :
     return this->sql_statement_;
 }
 
-/*virtual*/int SqliteDbStatement::GetResultInt32(int column)
+/*virtual*/std::int32_t SqliteDbStatement::GetResultInt32(int column)
 {
-    const int value = sqlite3_column_int(this->sql_statement_, column);
+    const std::int32_t value = sqlite3_column_int(this->sql_statement_, column);
     return value;
+}
+
+/*virtual*/std::optional<std::int32_t> SqliteDbStatement::GetResultInt32OrNull(int column)
+{
+    int32_t result = this->GetResultInt32(column);
+    if (result == 0)
+    {
+        // a value of 0 **could** mean that we actually read a NULL (and it got coalesced into a 0) -> https://www.sqlite.org/c3ref/column_blob.html
+        if (sqlite3_column_type(this->sql_statement_, column) == SQLITE_NULL)
+        {
+            return {};
+        }
+    }
+
+    return result;
 }
 
 /*virtual*/std::int64_t SqliteDbStatement::GetResultInt64(int column)

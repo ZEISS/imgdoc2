@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <string>
+#include <optional>
 #include <IBlobOutput.h>
 
 /// This interface is representing a "prepared/compiled" database-statement. The life-cycle of a data-base statement is:
@@ -40,7 +41,8 @@ public:
     /// \param  size    The size of the data (in bytes).
     virtual void BindBlob_Static(int index, const void* data, size_t size) = 0;
 
-    virtual int GetResultInt32(int column) = 0;
+    virtual std::int32_t GetResultInt32(int column) = 0;
+    virtual std::optional<std::int32_t> GetResultInt32OrNull(int column) = 0;
     virtual std::uint32_t GetResultUInt32(int column) = 0;
     virtual std::uint8_t GetResultUInt8(int column) = 0;
     virtual std::int64_t GetResultInt64(int column) = 0;

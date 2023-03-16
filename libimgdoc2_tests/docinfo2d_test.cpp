@@ -225,6 +225,20 @@ TEST(DocInfo2d, GetMinMaxForTileDimensionCallWithEmptyArrayOfDimensionsAndCheckR
     create_options->SetUseSpatialIndex(false);
     create_options->SetCreateBlobTable(false);
     const auto doc = ClassFactory::CreateNew(create_options.get());
+    
+    const auto writer = doc->GetWriter2d();
+    LogicalPositionInfo position_info;
+    TileBaseInfo tileInfo;
+    TileCoordinate tc({ { 'w', 5 } });
+    position_info.posX = 0;
+    position_info.posY = 0;
+    position_info.width = 10;
+    position_info.height = 10;
+    position_info.pyrLvl = 0;
+    tileInfo.pixelWidth = 10;
+    tileInfo.pixelHeight = 10;
+    tileInfo.pixelType = 0;
+    writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
 
     const auto reader = doc->GetReader2d();
 
@@ -233,4 +247,27 @@ TEST(DocInfo2d, GetMinMaxForTileDimensionCallWithEmptyArrayOfDimensionsAndCheckR
 
     // assert
     EXPECT_TRUE(result.empty());
+}
+
+TEST(DocInfo2d, GetMinMaxForTileDimensionWithEmptyDocumentAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('w');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    auto result = reader->GetMinMaxForTileDimension({'w'});
+
+    // assert
+    
+    // we expect to get a coordinate-bounds for 'w', but it should be invalid
+    ASSERT_EQ(result.size(), 1);
+    ASSERT_TRUE(result.find('w') != result.cend());
+    ASSERT_FALSE(result['w'].IsValid());
 }
