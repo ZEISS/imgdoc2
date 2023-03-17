@@ -18,6 +18,17 @@ namespace ImgDoc2Net.Interfaces
         /// <returns> An array with the dimensions used in the document. </returns>
         Dimension[] GetTileDimensions();
 
+        /// <summary> 
+        /// Gets minimum and maximum value for the specified tile dimensions.
+        /// If the minimum/maximum cannot be determined (for a dimension), then the result will be
+        /// one where Minimum is greater than Maximum. This can happen e.g. if the document is empty, or
+        /// the coordinates are Null.
+        /// </summary>
+        /// <param name="dimensions"> The dimensions to query the min/max for.</param>
+        /// <returns> 
+        /// A dictionary with the key 'dimension' and the value a tuple containing the minimum and the maximum. A minimum
+        /// greater than the maximum means that the value is indeterminate.
+        /// </returns>
         Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions);
     }
 }

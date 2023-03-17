@@ -41,8 +41,18 @@ public:
     /// \param  size    The size of the data (in bytes).
     virtual void BindBlob_Static(int index, const void* data, size_t size) = 0;
 
+    /// Gets the column of the result as an int32. This will coerce/convert that data into the desired type 'int32' if necessary.
+    /// In particular, a DB-NULL is mapped to '0'.
+    /// \param  column  The column.
+    /// \returns    The value of the specified column.
     virtual std::int32_t GetResultInt32(int column) = 0;
+
+    /// Gets the column of the result as an int32. This will convert that data into the desired type 'int32' if necessary.
+    /// However, a DB-NULL is NOT mapped to '0', instead an empty result is returned.
+    /// \param  column  The column.
+    /// \returns    If it exists and is valid, the value of the specified column; otherwise an empty value.
     virtual std::optional<std::int32_t> GetResultInt32OrNull(int column) = 0;
+
     virtual std::uint32_t GetResultUInt32(int column) = 0;
     virtual std::uint8_t GetResultUInt8(int column) = 0;
     virtual std::int64_t GetResultInt64(int column) = 0;
