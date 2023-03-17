@@ -37,12 +37,27 @@ namespace Imgdoc2cmd
             using var document = Document.CreateNew(createOptions);
             using var writer = document.Get2dWriter();
 
+            var rowsColumns = options.TilesRowsColumnsCount;
             foreach (var tileCoordinate in Utilities.EnumerateCoordinatesInBounds(dimensionBounds))
             {
-                LogicalPosition logicalPosition = new LogicalPosition() { PositionX = 0, PositionY = 0, Width = tileSize.tileWidth, Height = tileSize.tileHeight, PyramidLevel = 0 };
-                Tile2dBaseInfo tile2dBaseInfo = new Tile2dBaseInfo(tileSize.tileWidth, tileSize.tileHeight, PixelType.Bgr24);
-                byte[] tileData = CreateTile(tileCoordinate, in logicalPosition, 1024, 1024);
-                long pk = writer.AddTile(tileCoordinate, logicalPosition, tile2dBaseInfo, DataType.UncompressedBitmap, tileData);
+                for (int y = 0; y < rowsColumns.tilesColumnCount; ++y)
+                {
+                    for (int x = 0; x < rowsColumns.tilesRowCount; ++x)
+                    {
+                        LogicalPosition logicalPosition = new LogicalPosition()
+                        {
+                            PositionX = tileSize.tileWidth * x,
+                            PositionY = tileSize.tileHeight * y,
+                            Width = tileSize.tileWidth,
+                            Height = tileSize.tileHeight,
+                            PyramidLevel = 0
+                        };
+
+                        Tile2dBaseInfo tile2dBaseInfo = new Tile2dBaseInfo(tileSize.tileWidth, tileSize.tileHeight, PixelType.Bgr24);
+                        byte[] tileData = CreateTile(tileCoordinate, in logicalPosition, 1024, 1024);
+                        long pk = writer.AddTile(tileCoordinate, logicalPosition, tile2dBaseInfo, DataType.UncompressedBitmap, tileData);
+                    }
+                }
             }
         }
     }

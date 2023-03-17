@@ -35,6 +35,7 @@ namespace Imgdoc2cmd
         private string coordinateBounds = string.Empty;
         private string outputFilename = string.Empty;
         private (int tileWidth, int tileHeight) tileSize = (1024, 1024);
+        private (int tilesColumnCount, int tilesRowCount) tilesRowsColumns = (1, 1);
 
         /// <summary> Gets the command.</summary>
         /// <value> The command.</value>
@@ -53,6 +54,8 @@ namespace Imgdoc2cmd
         public string OutputFilename => this.outputFilename;
 
         public (int tileWidth, int tileHeight) TileSize => this.tileSize;
+
+        public (int tilesColumnCount, int tilesRowCount) TilesRowsColumnsCount => this.tilesRowsColumns;
     }
 
     internal partial class Options
@@ -99,6 +102,8 @@ namespace Imgdoc2cmd
 
             var tileSizeOption = app.Option("-t|--tile-size <TILESIZE>", "Specify the size of a tile in pixels. Format is 'width x height', e.g. '1024x1024'.", CommandOptionType.SingleValue);
 
+            var tilesRowsColumns = app.Option("-r|--tiles-rows-columns <TILESROWSCOLUMNS>", "Specify the number of tiles in rows and columns. Format is 'rows x columns', e.g. '2x3'.", CommandOptionType.SingleValue);
+
             app.OnExecute(() => { });
 
             app.Execute(arguments);
@@ -134,6 +139,14 @@ namespace Imgdoc2cmd
                 }
             }
 
+            if (tilesRowsColumns.HasValue())
+            {
+                if (!TryParseTilesRowsColumns(tilesRowsColumns.Value(), out this.tilesRowsColumns))
+                {
+                    throw new ArgumentException($"Invalid <TILESROWSCOLUMNS> given: {tilesRowsColumns.Value()}.");
+                }
+            }
+
             return true;
         }
 
@@ -148,7 +161,31 @@ namespace Imgdoc2cmd
         /// <returns> True if it succeeds, false if it fails.</returns>
         private static bool TryParseTileSize(string? text, out (int, int) tileSize)
         {
-            tileSize = (0, 0);
+            return TryParseIntxInt(text, out tileSize);
+            //tileSize = (0, 0);
+            //if (text == null)
+            //{
+            //    return false;
+            //}
+
+            //const string pattern = @"\s*(\d+)\s*x\s*(\d+)";
+            //var m = Regex.Match(text, pattern);
+            //if (m.Success)
+            //{
+            //    return int.TryParse(m.Groups[1].Value, out tileSize.Item1) && int.TryParse(m.Groups[2].Value, out tileSize.Item2);
+            //}
+
+            //return false;
+        }
+
+        private static bool TryParseTilesRowsColumns(string? text, out (int, int) rowsColumnsCount)
+        {
+            return TryParseIntxInt(text, out rowsColumnsCount);
+        }
+
+        private static bool TryParseIntxInt(string? text, out (int, int) firstSecond)
+        {
+            firstSecond = (0, 0);
             if (text == null)
             {
                 return false;
@@ -158,10 +195,11 @@ namespace Imgdoc2cmd
             var m = Regex.Match(text, pattern);
             if (m.Success)
             {
-                return int.TryParse(m.Groups[1].Value, out tileSize.Item1) && int.TryParse(m.Groups[2].Value, out tileSize.Item2);
+                return int.TryParse(m.Groups[1].Value, out firstSecond.Item1) && int.TryParse(m.Groups[2].Value, out firstSecond.Item2);
             }
 
             return false;
+
         }
 
         private static string GetListOfCommands()
