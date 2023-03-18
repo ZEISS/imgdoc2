@@ -60,7 +60,7 @@ set(LibImgDoc2_Srcfiles
          "inc/impl/BlobOutputImplementations.h"
          "inc/impl/DataObjectImplementations.h" 
          "inc/IEnvironment.h" 
-         "inc/TileInfoQueryClause.h" "inc/IDocInfo.h" "inc/IDocQuery2d.h")
+         "inc/TileInfoQueryClause.h" "inc/IDocInfo.h" "inc/IDocQuery2d.h" "inc/IDocQuery3d.h" "inc/IDocWrite3d.h" "inc/IDocRead3d.h" "inc/DocumentType.h")
 
 add_library(libimgdoc2 STATIC
                 ${LibImgDoc2_Srcfiles}

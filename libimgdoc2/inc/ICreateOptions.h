@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_set>
 #include "types.h"
+#include "DocumentType.h"
 
 namespace imgdoc2
 {
@@ -14,6 +15,8 @@ namespace imgdoc2
     class ICreateOptions
     {
     public:
+        virtual void SetDocumentType(imgdoc2::DocumentType document_type) = 0;
+
         /// Sets the filename. For a Sqlite-based database, this string allows for additional functionality
         /// (like an in-memory database) - cf. https://sqlite.org/inmemorydb.html, https://sqlite.org/uri.html.
         /// The string must be given in UTF-8 encoding.
@@ -39,9 +42,11 @@ namespace imgdoc2
         /// \param  dim The dimension for which to create an index.
         virtual void AddIndexForDimension(imgdoc2::Dimension dim) = 0;
 
-        /// Sets a flag indicating whehter a BLOB table is to be constructed. Only if a BLOB table is present, the storage-type "BlobInDatabase" can be used.
+        /// Sets a flag indicating whether a BLOB table is to be constructed. Only if a BLOB table is present, the storage-type "BlobInDatabase" can be used.
         /// \param  create_blob_table True to create BLOB table.
         virtual void SetCreateBlobTable(bool create_blob_table) = 0;
+
+        [[nodiscard]] virtual imgdoc2::DocumentType GetDocumentType() const = 0;
 
         /// Whether the document should be created with a spatial index.
         /// \returns True if a spatial index is requested; false otherwise.

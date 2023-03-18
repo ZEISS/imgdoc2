@@ -13,6 +13,7 @@ using namespace imgdoc2;
 class CreateOptions : public imgdoc2::ICreateOptions
 {
 private:
+    imgdoc2::DocumentType document_type_ = imgdoc2::DocumentType::kImage2d;
     std::string     filename_;
     std::unordered_set<Dimension> dimensions_;
     std::unordered_set<Dimension> dimensionsToIndex_;
@@ -21,12 +22,22 @@ private:
 public:
     CreateOptions() = default;
 
+    void SetDocumentType(imgdoc2::DocumentType document_type) override
+    {
+        this->document_type_ = document_type;
+    }
+
+    [[nodiscard]] imgdoc2::DocumentType GetDocumentType() const override
+    {
+        return this->document_type_;
+    }
+
     void SetFilename(const char* filename) override
     {
         this->filename_ = filename;
     }
 
-    const std::string& GetFilename() const override
+    [[nodiscard]] const std::string& GetFilename() const override
     {
         return this->filename_;
     }
@@ -41,7 +52,7 @@ public:
         this->create_blob_table_ = create_blob_table;
     }
 
-    bool GetUseSpatialIndex() const override
+    [[nodiscard]] bool GetUseSpatialIndex() const override
     {
         return this->use_spatial_index_;
     }
@@ -58,17 +69,17 @@ public:
         this->dimensionsToIndex_.emplace(dim);
     }
 
-    const std::unordered_set<Dimension>& GetDimensions() const override
+    [[nodiscard]] const std::unordered_set<Dimension>& GetDimensions() const override
     {
         return this->dimensions_;
     }
 
-    const std::unordered_set<imgdoc2::Dimension>& GetIndexedDimensions() const override
+    [[nodiscard]] const std::unordered_set<imgdoc2::Dimension>& GetIndexedDimensions() const override
     {
         return this->dimensionsToIndex_;
     }
 
-    bool GetCreateBlobTable() const override
+    [[nodiscard]] bool GetCreateBlobTable() const override
     {
         return this->create_blob_table_;
     }
