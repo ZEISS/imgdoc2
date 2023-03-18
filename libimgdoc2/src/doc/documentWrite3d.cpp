@@ -19,7 +19,15 @@ using namespace imgdoc2;
             imgdoc2::TileDataStorageType storage_type,
             const imgdoc2::IDataObjBase* data)
 {
-    throw logic_error("The method or operation is not implemented.");
+    TransactionHelper<dbIndex> transaction{
+        this->document_->GetDatabase_connection(),
+        [&]()->dbIndex
+        {
+            return this->AddBrickInternal(coord, info, brickInfo, datatype, storage_type, data);
+        }
+    };
+
+    return transaction.Execute();
 }
 
 /*virtual*/void DocumentWrite3d::BeginTransaction()
@@ -33,6 +41,17 @@ using namespace imgdoc2;
 }
 
 /*virtual*/void DocumentWrite3d::RollbackTransaction()
+{
+    throw logic_error("The method or operation is not implemented.");
+}
+
+imgdoc2::dbIndex DocumentWrite3d::AddBrickInternal(
+        const imgdoc2::ITileCoordinate* coord,
+        const imgdoc2::LogicalPositionInfo3D* info,
+        const imgdoc2::BrickBaseInfo* tileInfo,
+        imgdoc2::DataTypes datatype,
+        imgdoc2::TileDataStorageType storage_type,
+        const imgdoc2::IDataObjBase* data)
 {
     throw logic_error("The method or operation is not implemented.");
 }

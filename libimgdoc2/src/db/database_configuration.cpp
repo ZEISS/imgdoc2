@@ -6,6 +6,8 @@
 #include "database_constants.h"
 #include <stdexcept>
 
+#include "database_utilities.h"
+
 using namespace std;
 
 void DatabaseConfigurationCommon::SetTableName(TableTypeCommon tableType, const char* name)
@@ -186,7 +188,7 @@ std::string DatabaseConfigurationCommon::GetColumnNameOfBlobTableOrThrow(int col
 
 const std::string& DatabaseConfiguration2D::GetDocTypeConstant() const
 {
-    static string kTiles2DDocType = "Tiles2D";
+    static string kTiles2DDocType = DbUtilities::GetDocTypeValueForDocumentType(imgdoc2::DocumentType::kImage2d);
     return kTiles2DDocType;
 }
 
@@ -274,4 +276,101 @@ void DatabaseConfiguration2D::SetDefaultColumnNamesForTilesDataTable()
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration2D::kTilesDataTable_Column_TileDataType, DbConstants::kTilesDataTable_Column_TileDataType_DefaultName/*"TileDataType"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration2D::kTilesDataTable_Column_BinDataStorageType, DbConstants::kTilesDataTable_Column_BinDataStorageType_DefaultName/*"BinDataStorageType"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration2D::kTilesDataTable_Column_BinDataId, DbConstants::kTilesDataTable_Column_BinDataId_DefaultName/*"BinDataId"*/);
+}
+
+// ----------------------------------------------------------------------------
+
+const std::string& DatabaseConfiguration3D::GetDocTypeConstant() const
+{
+    static string kTiles3DDocType = DbUtilities::GetDocTypeValueForDocumentType(imgdoc2::DocumentType::kImage3d);
+    return kTiles3DDocType;
+}
+
+void DatabaseConfiguration3D::SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name)
+{
+    SetColumnName(this->map_tilesinfotable_columnids_to_columnname_, columnIdentifier, column_name);
+}
+
+bool DatabaseConfiguration3D::TryGetColumnNameOfTilesInfoTable(int columnIdentifier, std::string* column_name) const
+{
+    return GetColumnName(this->map_tilesinfotable_columnids_to_columnname_, columnIdentifier, column_name);
+}
+
+void DatabaseConfiguration3D::SetColumnNameForTilesDataTable(int columnIdentifier, const char* column_name)
+{
+    SetColumnName(this->map_tilesdatatable_columnids_to_columnname_, columnIdentifier, column_name);
+}
+
+bool DatabaseConfiguration3D::TryGetColumnNameOfTilesDataTable(int columnIdentifier, std::string* column_name) const
+{
+    return GetColumnName(this->map_tilesdatatable_columnids_to_columnname_, columnIdentifier, column_name);
+}
+
+void DatabaseConfiguration3D::SetColumnNameForTilesSpatialIndexTable(int columnIdentifier, const char* column_name)
+{
+    SetColumnName(this->map_tilespatialindextable_columnids_to_columnname_, columnIdentifier, column_name);
+}
+
+bool DatabaseConfiguration3D::TryGetColumnNameOfTilesSpatialIndexTable(int columnIdentifier, std::string* column_name) const
+{
+    return GetColumnName(this->map_tilespatialindextable_columnids_to_columnname_, columnIdentifier, column_name);
+}
+
+
+std::string DatabaseConfiguration3D::GetColumnNameOfTilesDataTableOrThrow(int column_identifier) const
+{
+    std::string column_name;
+    if (!this->TryGetColumnNameOfTilesDataTable(column_identifier, &column_name))
+    {
+        throw std::runtime_error("column-name not present");
+    }
+
+    return column_name;
+}
+
+std::string DatabaseConfiguration3D::GetColumnNameOfTilesInfoTableOrThrow(int columnIdentifier) const
+{
+    std::string column_name;
+    if (!this->TryGetColumnNameOfTilesInfoTable(columnIdentifier, &column_name))
+    {
+        throw std::runtime_error("column-name not present");
+    }
+
+    return column_name;
+}
+
+std::string DatabaseConfiguration3D::GetColumnNameOfTilesSpatialIndexTableOrThrow(int columnIdentifier) const
+{
+    std::string column_name;
+    if (!this->TryGetColumnNameOfTilesSpatialIndexTable(columnIdentifier, &column_name))
+    {
+        throw std::runtime_error("column-name not present");
+    }
+
+    return column_name;
+}
+
+void DatabaseConfiguration3D::SetDefaultColumnNamesForTilesInfoTable()
+{
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk, DbConstants::kTilesInfoTable_Column_Pk_DefaultName/*"Pk"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX, DbConstants::kTilesInfoTable_Column_TileX_DefaultName/*"TileX"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY, DbConstants::kTilesInfoTable_Column_TileY_DefaultName/*"TileY"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ, DbConstants::kTilesInfoTable_Column_TileZ_DefaultName/*"TileZ"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW, DbConstants::kTilesInfoTable_Column_TileW_DefaultName /*"TileW"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH, DbConstants::kTilesInfoTable_Column_TileH_DefaultName/*"TileH"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD, DbConstants::kTilesInfoTable_Column_TileD_DefaultName/*"TileD"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_PyramidLevel, DbConstants::kTilesInfoTable_Column_PyramidLevel_DefaultName/*"PyramidLevel"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileDataId, DbConstants::kTilesInfoTable_Column_TileDataId_DefaultName/*"TileDataId"*/);
+}
+
+void DatabaseConfiguration3D::SetDefaultColumnNamesForTilesDataTable()
+{
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_Pk, DbConstants::kTilesDataTable_Column_Pk_DefaultName/*"Pk"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelWidth, DbConstants::kTilesDataTable_Column_PixelWidth_DefaultName/*"PixelWidth"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelHeight, DbConstants::kTilesDataTable_Column_PixelHeight_DefaultName/*"PixelHeight"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelDepth, DbConstants::kTilesDataTable_Column_PixelDepth_DefaultName/*"PixelDepth"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelType, DbConstants::kTilesDataTable_Column_PixelType_DefaultName/*"PixelType"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_TileDataType, DbConstants::kTilesDataTable_Column_TileDataType_DefaultName/*"TileDataType"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_BinDataStorageType, DbConstants::kTilesDataTable_Column_BinDataStorageType_DefaultName/*"BinDataStorageType"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_BinDataId, DbConstants::kTilesDataTable_Column_BinDataId_DefaultName/*"BinDataId"*/);
 }

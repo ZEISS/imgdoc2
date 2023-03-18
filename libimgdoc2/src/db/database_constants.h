@@ -42,6 +42,7 @@ public:
     static const char* const kTilesDataTable_Column_BinDataStorageType_DefaultName;
     static const char* const kTilesDataTable_Column_BinDataId_DefaultName;
 
+    static const char* const kTilesDataTable_Column_PixelDepth_DefaultName;
 
     static const char* const kTilesInfoTable_Column_Pk_DefaultName;
     static const char* const kTilesInfoTable_Column_TileX_DefaultName;
@@ -51,6 +52,9 @@ public:
     static const char* const kTilesInfoTable_Column_PyramidLevel_DefaultName;
     static const char* const kTilesInfoTable_Column_TileDataId_DefaultName;
 
+    static const char* const kTilesInfoTable_Column_TileZ_DefaultName;
+    static const char* const kTilesInfoTable_Column_TileD_DefaultName;
+
     static const char* const kBlobTable_Column_Pk_DefaultName;
     static const char* const kBlobTable_Column_Data_DefaultName;
 
@@ -59,6 +63,8 @@ public:
     static const char* const kSqliteSpatialIndexTable_Column_maxX_DefaultName;
     static const char* const kSqliteSpatialIndexTable_Column_minY_DefaultName;
     static const char* const kSqliteSpatialIndexTable_Column_maxY_DefaultName;
+    static const char* const kSqliteSpatialIndexTable_Column_minZ_DefaultName;
+    static const char* const kSqliteSpatialIndexTable_Column_maxZ_DefaultName;
 
     static const char* const kDimensionColumnPrefix_Default;  // = "Dim_"
     static const char* const kIndexForDimensionColumnPrefix_Default; // = "IndexForDim_"

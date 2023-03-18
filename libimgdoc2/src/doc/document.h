@@ -14,11 +14,17 @@ class Document : public imgdoc2::IDoc, public std::enable_shared_from_this<Docum
 {
 private:
     std::shared_ptr<IDbConnection> database_connection_;
-    std::shared_ptr<DatabaseConfiguration2D> database_configuration_2d_;
+    std::shared_ptr<DatabaseConfiguration2D> database_configuration_2d_;    ///< The database configuration for a "tiles-2d-document". Note that this member is only valid if the document is a "tiles-2d-document", and it is mutually exclusive to 'database_configuration_3d_'.
+    std::shared_ptr<DatabaseConfiguration3D> database_configuration_3d_;    ///< The database configuration for a "bricks-3d-document". Note that this member is only valid if the document is a "bricks-3d-document", and it is mutually exclusive to 'database_configuration_2d_'.
 public:
     Document(std::shared_ptr<IDbConnection> database_connection, std::shared_ptr<DatabaseConfiguration2D> database_configuration) :
         database_connection_(std::move(database_connection)),
         database_configuration_2d_(std::move(database_configuration))
+    {}
+
+    Document(std::shared_ptr<IDbConnection> database_connection, std::shared_ptr<DatabaseConfiguration3D> database_configuration) :
+        database_connection_(std::move(database_connection)),
+        database_configuration_3d_(std::move(database_configuration))
     {}
 
     /// Try to get a "write object" for a 2D-document. This method may return an empty shared_ptr

@@ -4,9 +4,6 @@
 
 #pragma once
 
-
-#pragma once
-
 #include <utility>
 #include <memory>
 #include <imgdoc2.h>
@@ -36,13 +33,13 @@ public:
     ~DocumentWrite3d() override = default;
 
 private:
-    //imgdoc2::dbIndex AddTileInternal(
-    //    const imgdoc2::ITileCoordinate* coord,
-    //    const imgdoc2::LogicalPositionInfo* info,
-    //    const imgdoc2::TileBaseInfo* tileInfo,
-    //    imgdoc2::DataTypes datatype,
-    //    imgdoc2::TileDataStorageType storage_type,
-    //    const imgdoc2::IDataObjBase* data);
+    imgdoc2::dbIndex AddBrickInternal(
+        const imgdoc2::ITileCoordinate* coord,
+        const imgdoc2::LogicalPositionInfo3D* info,
+        const imgdoc2::BrickBaseInfo* tileInfo,
+        imgdoc2::DataTypes datatype,
+        imgdoc2::TileDataStorageType storage_type,
+        const imgdoc2::IDataObjBase* data);
 
     //void AddToSpatialIndex(imgdoc2::dbIndex index, const imgdoc2::LogicalPositionInfo& logical_position_info);
 

@@ -77,6 +77,12 @@ namespace imgdoc2
         explicit discovery_exception(const char* error_message)
             : imgdoc2_exception(error_message)
         {}
+
+        /// Constructor.
+        /// \param error_message Message describing the error.
+        explicit discovery_exception(const std::string& error_message)
+            : discovery_exception(error_message.c_str())
+        {}
     };
 
     /// Exception for signalling invalid arguments.

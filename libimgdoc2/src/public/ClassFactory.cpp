@@ -109,17 +109,34 @@ public:
     // TODO(JBL)
 
     // tweak settings
-
-    DbCreator db_creator(db_connection);
-    const auto configuration = db_creator.CreateTables(create_options);
-
-    const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
-    if (database_configuration_2d)
+    switch (create_options->GetDocumentType())  // NOLINT(clang-diagnostic-switch)
     {
-        return make_shared<Document>(db_connection, database_configuration_2d);
-    }
+        case DocumentType::kImage2d:
+        {
+            DbCreator db_creator(db_connection);
+            const auto database_configuration_2d = db_creator.CreateTables2d(create_options);
 
-    // TODO(JBL): 3D version should follow here
+            //const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
+            if (database_configuration_2d)
+            {
+                return make_shared<Document>(db_connection, database_configuration_2d);
+            }
+
+            break;
+        }
+        case DocumentType::kImage3d:
+        {
+            DbCreator db_creator(db_connection);
+            const auto database_configuration_3d = db_creator.CreateTables3d(create_options);
+
+            if (database_configuration_3d)
+            {
+                return make_shared<Document>(db_connection, database_configuration_3d);
+            }
+
+            break;
+        }
+    }
 
     return {};
 }
@@ -133,13 +150,17 @@ public:
     DbDiscovery database_discovery{ db_connection };
     database_discovery.DoDiscovery();
 
-    const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(database_discovery.GetDatabaseConfiguration());
+    const auto database_configuration_2d = database_discovery.GetDatabaseConfiguration2DOrNull();
     if (database_configuration_2d)
     {
         return make_shared<Document>(db_connection, database_configuration_2d);
     }
 
-    // TODO(JBL): 3d version should follow here
+    const auto database_configuration_3d = database_discovery.GetDatabaseConfiguration3DOrNull();
+    if (database_configuration_3d)
+    {
+        return make_shared<Document>(db_connection, database_configuration_3d);
+    }
 
     return {};
 }

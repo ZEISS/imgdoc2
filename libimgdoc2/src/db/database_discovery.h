@@ -37,8 +37,14 @@ public:
 
     void DoDiscovery();
 
-    std::shared_ptr<DatabaseConfigurationCommon> GetDatabaseConfiguration();
+    imgdoc2::DocumentType GetDocumentType() const;
 
+    std::shared_ptr<DatabaseConfigurationCommon> GetDatabaseConfigurationCommon() const;
+
+    std::shared_ptr<DatabaseConfiguration2D> GetDatabaseConfiguration2DOrThrow() const;
+    std::shared_ptr<DatabaseConfiguration3D> GetDatabaseConfiguration3DOrThrow() const;
+    std::shared_ptr<DatabaseConfiguration2D> GetDatabaseConfiguration2DOrNull() const;
+    std::shared_ptr<DatabaseConfiguration3D> GetDatabaseConfiguration3DOrNull() const;
 private:
     GeneralDataDiscoveryResult DiscoverGeneralTable();
 
@@ -50,6 +56,7 @@ private:
     void Check_Tables_And_Determine_Dimensions(GeneralDataDiscoveryResult& general_table_discovery_result);
 
     void FillInformationForConfiguration2D(const GeneralDataDiscoveryResult& general_data_discovery_result, DatabaseConfiguration2D& configuration_2d);
+    void FillInformationForConfiguration3D(const GeneralDataDiscoveryResult& general_data_discovery_result, DatabaseConfiguration3D& configuration_3d);
 
     struct ExpectedColumnsInfo
     {
