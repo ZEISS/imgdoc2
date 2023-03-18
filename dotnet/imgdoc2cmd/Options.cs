@@ -25,9 +25,13 @@ namespace Imgdoc2cmd
             PrintInformation
         }
 
+        /// <summary> Values that represent the "unit" in which the overlap is given.</summary>
         public enum OverlapUnit
         {
+            /// <summary> An enum constant representing the unit 'pixel', i.e. the value gives the number of pixels for which the tiles overlap.</summary>
             Pixel,
+
+            /// <summary> An enum constant representing the unit 'percentage', i.e. the value gives the overlap as a percentage of the width/height of a tile.</summary>
             Percentage
         }
     }
@@ -65,6 +69,8 @@ namespace Imgdoc2cmd
 
         public (int tilesColumnCount, int tilesRowCount) TilesRowsColumnsCount => this.tilesRowsColumns;
 
+        /// <summary> Gets the value which determins the overlap of the tiles. The unit is given by "TilesOverlapUnit".</summary>
+        /// <value> The tiles overlap.</value>
         public float TilesOverlap => this.tilesOverlap;
 
         public OverlapUnit TilesOverlapUnit => this.tilesOverlapUnit;
@@ -215,20 +221,6 @@ namespace Imgdoc2cmd
         private static bool TryParseTileSize(string? text, out (int, int) tileSize)
         {
             return TryParseIntxInt(text, out tileSize);
-            //tileSize = (0, 0);
-            //if (text == null)
-            //{
-            //    return false;
-            //}
-
-            //const string pattern = @"\s*(\d+)\s*x\s*(\d+)";
-            //var m = Regex.Match(text, pattern);
-            //if (m.Success)
-            //{
-            //    return int.TryParse(m.Groups[1].Value, out tileSize.Item1) && int.TryParse(m.Groups[2].Value, out tileSize.Item2);
-            //}
-
-            //return false;
         }
 
         private static bool TryParseTilesRowsColumns(string? text, out (int, int) rowsColumnsCount)
