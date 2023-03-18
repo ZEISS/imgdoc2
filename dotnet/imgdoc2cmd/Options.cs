@@ -73,6 +73,8 @@ namespace Imgdoc2cmd
         /// <value> The tiles overlap.</value>
         public float TilesOverlap => this.tilesOverlap;
 
+        /// <summary> Gets the 'unit' in which the tiles overlap is given.</summary>
+        /// <value> The tiles overlap unit.</value>
         public OverlapUnit TilesOverlapUnit => this.tilesOverlapUnit;
     }
 
@@ -259,7 +261,9 @@ namespace Imgdoc2cmd
 command ""CreateSyntheticDocument"":
  This command will create a new document with the filename as given with the '-o|--output-document' option.
  The bounds for the document is specified with the '-b|--coordinate-bounds' option. The size of the individual
- tiles can be set with the '-t|--tile-size' option.
+ tiles can be set with the '-t|--tile-size' option. It is also possible to specify the number of rows and columns
+ for a checker-board arrangement of tiles in a plane with the '-r|--tiles-rows-columns' option. In this case,
+ the overlap between tiles can be specified with the '-v|--tiles-overlap' option.
 
 command ""QueryForTilesAndReport"":
  This command will use the query specified with the '-q|--dimension-query' option and print information (about all matching tiles).
