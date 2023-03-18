@@ -16,7 +16,7 @@ using namespace testing;
 /// has an M-index, starting to count from 1.
 /// \param  use_spatial_index   True if the document is to use a spatial index.
 /// \returns                    The newly created in-memory "checkerboard document".
-shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
+static shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
 {
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
     create_options->SetFilename(":memory:");

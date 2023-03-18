@@ -6,6 +6,8 @@
 #include "document.h"
 #include "documentRead2d.h"
 #include "documentWrite2d.h"
+#include "documentRead3d.h"
+#include "documentWrite3d.h"
 
 using namespace std;
 using namespace imgdoc2;
@@ -18,4 +20,14 @@ using namespace imgdoc2;
 /*virtual*/std::shared_ptr<imgdoc2::IDocRead2d> Document::GetReader2d()
 {
     return std::make_shared<DocumentRead2d>(shared_from_this());
+}
+
+/*virtual*/std::shared_ptr<imgdoc2::IDocWrite3d> Document::GetWriter3d()
+{
+    return std::make_shared<DocumentWrite3d>(shared_from_this());
+}
+
+/*virtual*/std::shared_ptr<imgdoc2::IDocRead3d> Document::GetReader3d()
+{
+    return std::make_shared<DocumentRead3d>(shared_from_this());
 }

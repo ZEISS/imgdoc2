@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "TileBaseInfo.h"
+#include "BrickBaseInfo.h"
 #include "DataTypes.h"
 #include "IDataObj.h"
 #include "IDatabaseTransaction.h"
@@ -15,18 +15,18 @@ namespace imgdoc2
     class IDocWrite3d : public imgdoc2::IDatabaseTransaction
     {
     public:
-        /// Adds a tile to the document, and if successful, return its primary key.
+        /// Adds a brick to the document, and if successful, return its primary key.
         /// \param  coord        The coordinate.
         /// \param  info         The logical position information.
-        /// \param  tileInfo     Information describing the tile.
+        /// \param  brickInfo     Information describing the brick.
         /// \param  datatype     The datatype.
         /// \param  storage_type Type of the storage.
         /// \param  data         The data.
         /// \returns If successful, the primary key of the newly added tile.
-        virtual imgdoc2::dbIndex AddTile(
+        virtual imgdoc2::dbIndex AddBrick(
             const imgdoc2::ITileCoordinate* coord,
             const imgdoc2::LogicalPositionInfo3D* info,
-            const imgdoc2::TileBaseInfo* tileInfo,
+            const imgdoc2::BrickBaseInfo* brickInfo,
             imgdoc2::DataTypes datatype,
             imgdoc2::TileDataStorageType storage_type,
             const imgdoc2::IDataObjBase* data) = 0;

@@ -4,7 +4,7 @@
 
 #pragma once
 #include "LogicalPositionInfo.h"
-#include "TileBaseInfo.h"
+#include "BrickBaseInfo.h"
 #include "ITileCoordinate.h"
 #include "LogicalPositionInfo.h"
 #include "IDimCoordinateQueryClause.h"
@@ -26,8 +26,8 @@ public:
     /// \param          idx             The primary key of the tile.
     /// \param [out]    coord           If non-null and the operation is successful, the tile-coordinate will be put here.
     /// \param [out]    info            If non-null and the operation is successful, the logical position will be put here.
-    /// \param [out]    tile_blob_info  If non-null and the operation is successful, the tile-blob-info will be put here.
-    virtual void ReadBrickInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo3D* info, imgdoc2::TileBlobInfo* tile_blob_info) = 0;
+    /// \param [out]    brick_blob_info If non-null and the operation is successful, the brick-blob-info will be put here.
+    virtual void ReadBrickInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo3D* info, imgdoc2::BrickBlobInfo* brick_blob_info) = 0;
 
    // /// Query the tiles table. The 
    ///// \param clause        The query clause (dealing with dimension indexes).
