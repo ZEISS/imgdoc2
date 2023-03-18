@@ -51,6 +51,9 @@ public:
 public:
     [[nodiscard]] const std::shared_ptr<IDbConnection>& GetDatabase_connection() const { return this->database_connection_; }
     [[nodiscard]] const std::shared_ptr<DatabaseConfiguration2D>& GetDataBaseConfiguration2d() const { return this->database_configuration_2d_; }
+    [[nodiscard]] const std::shared_ptr<DatabaseConfiguration3D>& GetDataBaseConfiguration3d() const { return this->database_configuration_3d_; }
 
     [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->database_connection_->GetHostingEnvironment(); }
+    [[nodiscard]] bool IsDocument2d() const { return this->database_configuration_2d_.operator bool(); }
+    [[nodiscard]] bool IsDocument3d() const { return this->database_configuration_3d_.operator bool(); }
 };

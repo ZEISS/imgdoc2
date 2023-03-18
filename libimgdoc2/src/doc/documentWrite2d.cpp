@@ -53,10 +53,10 @@ imgdoc2::dbIndex DocumentWrite2d::AddTileInternal(
     imgdoc2::TileDataStorageType storage_type,
     const imgdoc2::IDataObjBase* data)
 {
-    auto tiles_data_id = this->AddTileData(tileInfo, datatype, storage_type, data);
+    const auto tiles_data_id = this->AddTileData(tileInfo, datatype, storage_type, data);
 
     ostringstream string_stream;
-    string_stream << "INSERT INTO " << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << " ("
+    string_stream << "INSERT INTO [" << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << "] ("
         << "[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "],"
         << "[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "],"
         << "[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) << "],"
@@ -68,7 +68,7 @@ imgdoc2::dbIndex DocumentWrite2d::AddTileInternal(
     coord->EnumCoordinates(
         [&](Dimension dimension, int value)->bool
         {
-            string_stream << ", " << this->document_->GetDataBaseConfiguration2d()->GetDimensionsColumnPrefix() << dimension;
+            string_stream << ", [" << this->document_->GetDataBaseConfiguration2d()->GetDimensionsColumnPrefix() << dimension << ']';
             coordinate_values.push_back(value);
             return true;
         });
@@ -124,7 +124,7 @@ imgdoc2::dbIndex DocumentWrite2d::AddTileData(const imgdoc2::TileBaseInfo* tile_
         << "[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration2D::kTilesDataTable_Column_BinDataId) << "]"
         ") VALUES( ?1, ?2, ?3, ?4, ?5, ?6);";
 
-    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    const auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
 
     int binding_index = 1;
     statement->BindInt32(binding_index++, tile_info->pixelWidth);

@@ -54,7 +54,7 @@ static shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
 /// \param [in]     reader          The reader object.
 /// \param          keys            The PKs of the tiles to query.
 /// \returns        The m index of items.
-vector<int> GetMIndexOfItems(IDocRead2d* reader, const vector<dbIndex>& keys)
+static vector<int> GetMIndexOfItems(IDocRead2d* reader, const vector<dbIndex>& keys)
 {
     vector<int> m_indices;
     for (const auto pk : keys)

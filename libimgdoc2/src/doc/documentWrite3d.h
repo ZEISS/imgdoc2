@@ -34,19 +34,19 @@ public:
 
 private:
     imgdoc2::dbIndex AddBrickInternal(
-        const imgdoc2::ITileCoordinate* coord,
+        const imgdoc2::ITileCoordinate* coordinate,
         const imgdoc2::LogicalPositionInfo3D* info,
         const imgdoc2::BrickBaseInfo* tileInfo,
-        imgdoc2::DataTypes datatype,
+        imgdoc2::DataTypes data_type,
         imgdoc2::TileDataStorageType storage_type,
         const imgdoc2::IDataObjBase* data);
 
-    //void AddToSpatialIndex(imgdoc2::dbIndex index, const imgdoc2::LogicalPositionInfo& logical_position_info);
+    void AddToSpatialIndex(imgdoc2::dbIndex index, const imgdoc2::LogicalPositionInfo3D& logical_position_info);
 
-    //imgdoc2::dbIndex AddTileData(const imgdoc2::TileBaseInfo* tile_info, imgdoc2::DataTypes datatype, imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
-    //imgdoc2::dbIndex AddBlobData(imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
+    imgdoc2::dbIndex AddBrickData(const imgdoc2::BrickBaseInfo* tile_info, imgdoc2::DataTypes datatype, imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
+    imgdoc2::dbIndex AddBlobData(imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
 
-    //std::shared_ptr<IDbStatement> CreateInsertDataStatement(const imgdoc2::IDataObjBase* data);
+    std::shared_ptr<IDbStatement> CreateInsertDataStatement(const imgdoc2::IDataObjBase* data);
 
     //const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->document_->GetHostingEnvironment(); }
 

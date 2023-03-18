@@ -56,3 +56,54 @@ static shared_ptr<IDoc> CreateCheckerboard3dDocument(bool use_spatial_index)
 
     return doc;
 }
+
+/// Utility for retrieving the M-coordinate from a list of tiles. No error handling is done here.
+/// \param [in]     reader          The reader object.
+/// \param          keys            The PKs of the tiles to query.
+/// \returns        The m index of items.
+static vector<int> GetMIndexOfItems(IDocRead2d* reader, const vector<dbIndex>& keys)
+{
+    vector<int> m_indices;
+    for (const auto pk : keys)
+    {
+        TileCoordinate tc;
+        reader->ReadTileInfo(pk, &tc, nullptr, nullptr);
+        int m_index;
+        tc.TryGetCoordinate('M', &m_index);
+        m_indices.push_back(m_index);
+    }
+
+    return m_indices;
+}
+
+TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
+{
+    // we query with an empty coordinate-query-clause, and expect that an empty clause means
+    //  "no condition, all items are returned"
+    const auto doc = CreateCheckerboard3dDocument(false);
+    const auto reader = doc->GetReader3d();
+
+    const CDimCoordinateQueryClause coordinate_query_clause;
+
+  /*  vector<dbIndex> result_indices;
+    reader->Query(
+        &coordinate_query_clause,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    // so, we expect to get all tiles in the document, and we check their correctness
+    EXPECT_EQ(result_indices.size(), 100ul);
+    std::array<int, 100> expected_result{};
+    for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
+    {
+        expected_result[i] = 1 + i;
+    }
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
+    */
+}
