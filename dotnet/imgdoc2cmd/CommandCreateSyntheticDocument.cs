@@ -38,6 +38,17 @@ namespace Imgdoc2cmd
             using var writer = document.Get2dWriter();
 
             var rowsColumns = options.TilesRowsColumnsCount;
+            float widthToSubtract = 0, heightToSubtract = 0;
+            if (options.TilesOverlapUnit == Options.OverlapUnit.Pixel)
+            {
+                widthToSubtract = heightToSubtract = options.TilesOverlap;
+            }
+            else if (options.TilesOverlapUnit == Options.OverlapUnit.Percentage)
+            {
+                widthToSubtract = options.TilesOverlap / 100 * tileSize.tileWidth;
+                heightToSubtract = options.TilesOverlap / 100 * tileSize.tileHeight;
+            }
+
             foreach (var tileCoordinate in Utilities.EnumerateCoordinatesInBounds(dimensionBounds))
             {
                 for (int y = 0; y < rowsColumns.tilesColumnCount; ++y)
@@ -46,8 +57,8 @@ namespace Imgdoc2cmd
                     {
                         LogicalPosition logicalPosition = new LogicalPosition()
                         {
-                            PositionX = tileSize.tileWidth * x,
-                            PositionY = tileSize.tileHeight * y,
+                            PositionX = (tileSize.tileWidth - widthToSubtract) * x,
+                            PositionY = (tileSize.tileHeight - heightToSubtract) * y,
                             Width = tileSize.tileWidth,
                             Height = tileSize.tileHeight,
                             PyramidLevel = 0

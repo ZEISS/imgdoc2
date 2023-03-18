@@ -24,6 +24,12 @@ namespace Imgdoc2cmd
             CreateSyntheticDocument,
             PrintInformation
         }
+
+        public enum OverlapUnit
+        {
+            Pixel,
+            Percentage
+        }
     }
 
     internal partial class Options
@@ -36,6 +42,8 @@ namespace Imgdoc2cmd
         private string outputFilename = string.Empty;
         private (int tileWidth, int tileHeight) tileSize = (1024, 1024);
         private (int tilesColumnCount, int tilesRowCount) tilesRowsColumns = (1, 1);
+        private float tilesOverlap = 0.0f;
+        private OverlapUnit tilesOverlapUnit = OverlapUnit.Percentage;
 
         /// <summary> Gets the command.</summary>
         /// <value> The command.</value>
@@ -56,6 +64,10 @@ namespace Imgdoc2cmd
         public (int tileWidth, int tileHeight) TileSize => this.tileSize;
 
         public (int tilesColumnCount, int tilesRowCount) TilesRowsColumnsCount => this.tilesRowsColumns;
+
+        public float TilesOverlap => this.tilesOverlap;
+
+        public OverlapUnit TilesOverlapUnit => this.tilesOverlapUnit;
     }
 
     internal partial class Options
@@ -104,6 +116,8 @@ namespace Imgdoc2cmd
 
             var tilesRowsColumns = app.Option("-r|--tiles-rows-columns <TILESROWSCOLUMNS>", "Specify the number of tiles in rows and columns. Format is 'rows x columns', e.g. '2x3'.", CommandOptionType.SingleValue);
 
+            var tilesOverlapDefinition = app.Option("-v|--tiles-overlap <OVERLAP>", "Specify the overlap for tiling. The value can be given either in percentage ('%') or in pixels ('px'). ", CommandOptionType.SingleValue);
+
             app.OnExecute(() => { });
 
             app.Execute(arguments);
@@ -147,12 +161,51 @@ namespace Imgdoc2cmd
                 }
             }
 
+            if (tilesOverlapDefinition.HasValue())
+            {
+                if (!TryParseTilesOverlap(tilesOverlapDefinition.Value(), out this.tilesOverlap, out this.tilesOverlapUnit))
+                {
+                    throw new ArgumentException($"Invalid <OVERLAP> given: {tilesOverlapDefinition.Value()}.");
+                }
+            }
+
             return true;
         }
 
         private static bool TryParseCommandType(string text, out Options.CommandType command)
         {
             return Enum.TryParse<Options.CommandType>(text, true, out command);
+        }
+
+        private static bool TryParseTilesOverlap(string? text, out float overlap, out Options.OverlapUnit unit)
+        {
+            overlap = 0.0f;
+            unit = Options.OverlapUnit.Percentage;
+            if (text == null)
+            {
+                return false;
+            }
+
+            const string pattern = @"\s*(\d+(?:\.\d+)?)\s*(px|%)\s*";
+            var m = Regex.Match(text, pattern);
+            if (m.Success)
+            {
+                if (float.TryParse(m.Groups[1].Value, out overlap))
+                {
+                    if (m.Groups[2].Value == "%")
+                    {
+                        unit = Options.OverlapUnit.Percentage;
+                    }
+                    else if (m.Groups[2].Value == "px")
+                    {
+                        unit = Options.OverlapUnit.Pixel;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary> Attempts to parse a string in the format '&lt;integer&gt; x &lt;integer&gt;' from the given string.</summary>
