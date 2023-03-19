@@ -15,21 +15,17 @@ using namespace imgdoc2;
 
 /*virtual*/void DocumentRead2d::GetTileDimensions(imgdoc2::Dimension* dimensions, std::uint32_t& count)
 {
-    const auto& tile_dimensions = this->GetDocument()->GetDataBaseConfiguration2d()->GetTileDimensions();
-
-    if (dimensions != nullptr)
-    {
-        copy_n(tile_dimensions.cbegin(), min(count, static_cast<uint32_t>(tile_dimensions.size())), dimensions);
-    }
-
-    count = static_cast<uint32_t>(tile_dimensions.size());
+    DocumentReadBase::GetEntityDimensionsInternal(
+        this->GetDocument()->GetDataBaseConfiguration2d()->GetTileDimensions(), 
+        dimensions, 
+        count);
 }
 
 /*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
 {
-    for (auto dimension : dimensions_to_query_for)
+    for (const auto dimension : dimensions_to_query_for)
     {
-        bool is_valid = this->GetDocument()->GetDataBaseConfiguration2d()->IsTileDimensionValid(dimension);
+        const bool is_valid = this->GetDocument()->GetDataBaseConfiguration2d()->IsTileDimensionValid(dimension);
         if (!is_valid)
         {
             ostringstream string_stream;
@@ -43,12 +39,12 @@ using namespace imgdoc2;
         return {};
     }
 
-    auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for);
+    const auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for);
 
     map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> result;
 
     // we expect exactly "2 * dimensions_to_query_for.size()" results
-    bool is_done = this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get());
+    const bool is_done = this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get());
     if (!is_done)
     {
         throw internal_error_exception("database-query gave no result, this is unexpected.");

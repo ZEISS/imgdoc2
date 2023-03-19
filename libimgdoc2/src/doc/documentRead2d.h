@@ -30,7 +30,6 @@ public:
     std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) override;
    
 private:
-    //std::shared_ptr<IDbStatement> GetReadTileInfo_Statement(bool include_tile_coordinates, bool include_logical_position_info);
     std::shared_ptr<IDbStatement> GetReadTileInfo_Statement(bool include_tile_coordinates, bool include_logical_position_info, bool include_tile_blob_info);
     std::shared_ptr<IDbStatement> CreateQueryStatement(const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause);
     std::shared_ptr<IDbStatement> GetTilesIntersectingRectQueryWithSpatialIndex(const imgdoc2::RectangleD& rect);

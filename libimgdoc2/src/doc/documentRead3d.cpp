@@ -103,7 +103,10 @@ using namespace imgdoc2;
 // interface IDocInfo
 /*virtual*/void DocumentRead3d::GetTileDimensions(imgdoc2::Dimension* dimensions, std::uint32_t& count)
 {
-    throw logic_error("The method or operation is not implemented.");
+    DocumentReadBase::GetEntityDimensionsInternal(
+        this->GetDocument()->GetDataBaseConfiguration3d()->GetTileDimensions(),
+        dimensions,
+        count);
 }
 
 /*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead3d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
