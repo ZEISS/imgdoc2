@@ -129,7 +129,7 @@ using namespace imgdoc2;
     {
         // this means that the tile with the specified index ('idx') was not found
         ostringstream ss;
-        ss << "Request for reading tiledata for an non-existing tile (with pk=" << idx << ")";
+        ss << "Request for reading brick-data for an non-existing brick (with pk=" << idx << ")";
         throw non_existing_tile_exception(ss.str(), idx);
     }
 
@@ -137,7 +137,7 @@ using namespace imgdoc2;
     if (this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get()))
     {
         ostringstream ss;
-        ss << "Multiple results from 'ReadTileData'-query, which must not happen.";
+        ss << "Multiple results from 'ReadBrickData'-query, which must not happen.";
         this->GetHostingEnvironment()->ReportFatalErrorAndExit(ss.str().c_str());
     }
 }
