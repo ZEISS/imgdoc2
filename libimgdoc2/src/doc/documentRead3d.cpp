@@ -157,7 +157,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetReadBrickDataQueryStatement(img
 
     ostringstream string_stream;
     string_stream << "SELECT [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForBlobTableOrThrow() << "]."
-        << "[" << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration2D::kBlobTable_Column_Data) << "] "
+        << "[" << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration3D::kBlobTable_Column_Data) << "] "
         << "FROM [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesDataOrThrow() << "] LEFT JOIN [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForBlobTableOrThrow() << "] "
         << "ON [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesDataOrThrow() << "].[" << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration3D::kTilesDataTable_Column_BinDataId) << "]"
         << " = [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForBlobTableOrThrow() << "].[" << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration3D::kBlobTable_Column_Pk) << "]"

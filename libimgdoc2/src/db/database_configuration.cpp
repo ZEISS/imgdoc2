@@ -356,7 +356,7 @@ void DatabaseConfiguration3D::SetDefaultColumnNamesForTilesInfoTable()
     this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX, DbConstants::kTilesInfoTable_Column_TileX_DefaultName/*"TileX"*/);
     this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY, DbConstants::kTilesInfoTable_Column_TileY_DefaultName/*"TileY"*/);
     this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ, DbConstants::kTilesInfoTable_Column_TileZ_DefaultName/*"TileZ"*/);
-    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW, DbConstants::kTilesInfoTable_Column_TileW_DefaultName /*"TileW"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW, DbConstants::kTilesInfoTable_Column_TileW_DefaultName/*"TileW"*/);
     this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH, DbConstants::kTilesInfoTable_Column_TileH_DefaultName/*"TileH"*/);
     this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD, DbConstants::kTilesInfoTable_Column_TileD_DefaultName/*"TileD"*/);
     this->SetColumnNameForTilesInfoTable(DatabaseConfiguration3D::kTilesInfoTable_Column_PyramidLevel, DbConstants::kTilesInfoTable_Column_PyramidLevel_DefaultName/*"PyramidLevel"*/);
