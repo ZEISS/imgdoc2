@@ -45,6 +45,11 @@ void DbDiscovery::DoDiscovery()
     }
 }
 
+imgdoc2::DocumentType DbDiscovery::GetDocumentType() const
+{
+    return this->GetDatabaseConfigurationCommon()->GetDocumentType();
+}
+
 std::shared_ptr<DatabaseConfigurationCommon> DbDiscovery::GetDatabaseConfigurationCommon() const
 {
     auto configuration = this->configuration_;

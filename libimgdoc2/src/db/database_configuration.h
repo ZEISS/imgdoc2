@@ -90,7 +90,10 @@ public:
     void SetColumnNameForBlobTable(int column_identifier, const char* column_name);
     bool TryGetColumnNameOfBlobTable(int column_identifier, std::string* column_name) const;
 
-    virtual const std::string& GetDocTypeConstant() const = 0;
+    /// Gets document type constant - which document-type is represented by this configuration.
+    ///
+    /// \returns    The document type constant.
+    [[nodiscard]] virtual imgdoc2::DocumentType GetDocumentType() const = 0;
 
     virtual ~DatabaseConfigurationCommon() = default;
 public:
@@ -142,11 +145,7 @@ public:
     static constexpr int kTilesSpatialIndexTable_Column_MinY = 4;
     static constexpr int kTilesSpatialIndexTable_Column_MaxY = 5;
 
-    /// Gets document type constant - the string for the row "DocType" in the general-table which identifies
-    /// the data as "tiles-2D".
-    ///
-    /// \returns    The document type constant.
-    const std::string& GetDocTypeConstant() const override;
+    [[nodiscard]] imgdoc2::DocumentType GetDocumentType() const override;
 
     void SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name);
     bool TryGetColumnNameOfTilesInfoTable(int columnIdentifier, std::string* column_name) const;
@@ -200,11 +199,7 @@ public:
     static constexpr int kTilesSpatialIndexTable_Column_MinZ = 6;
     static constexpr int kTilesSpatialIndexTable_Column_MaxZ = 7;
 
-    /// Gets document type constant - the string for the row "DocType" in the general-table which identifies
-    /// the data as "tiles-3D".
-    ///
-    /// \returns    The document type constant.
-    const std::string& GetDocTypeConstant() const override;
+    [[nodiscard]] imgdoc2::DocumentType GetDocumentType() const override;
 
     void SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name);
     bool TryGetColumnNameOfTilesInfoTable(int columnIdentifier, std::string* column_name) const;

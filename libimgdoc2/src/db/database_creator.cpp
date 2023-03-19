@@ -11,7 +11,7 @@
 #include "database_constants.h"
 #include "DbFactory.h"
 #include "database_discovery.h"
-#include "../doc/document.h"
+#include "database_utilities.h"
 #include "utilities.h"
 
 using namespace std;
@@ -261,7 +261,7 @@ std::string DbCreator::GenerateSqlStatementForFillingGeneralTable_Sqlite(const D
         " VALUES('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kVersion) << "','" << "0.0.1-alpha" << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kTilesDataTable) << "','" << database_configuration_common->GetTableNameForTilesDataOrThrow() << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kTilesInfoTable) << "','" << database_configuration_common->GetTableNameForTilesInfoOrThrow() << "')," <<
-        "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kDocType) << "','" << database_configuration_common->GetDocTypeConstant() << "');";
+        "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kDocType) << "','" << DbUtilities::GetDocTypeValueForDocumentType(database_configuration_common->GetDocumentType()) << "');";
 
     return string_stream.str();
 }

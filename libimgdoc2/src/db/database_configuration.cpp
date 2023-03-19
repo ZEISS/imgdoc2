@@ -186,10 +186,9 @@ std::string DatabaseConfigurationCommon::GetColumnNameOfBlobTableOrThrow(int col
 
 // ----------------------------------------------------------------------------
 
-const std::string& DatabaseConfiguration2D::GetDocTypeConstant() const
+/*virtual*/[[nodiscard]] imgdoc2::DocumentType DatabaseConfiguration2D::GetDocumentType() const
 {
-    static string kTiles2DDocType = DbUtilities::GetDocTypeValueForDocumentType(imgdoc2::DocumentType::kImage2d);
-    return kTiles2DDocType;
+    return imgdoc2::DocumentType::kImage2d;    
 }
 
 void DatabaseConfiguration2D::SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name)
@@ -280,10 +279,9 @@ void DatabaseConfiguration2D::SetDefaultColumnNamesForTilesDataTable()
 
 // ----------------------------------------------------------------------------
 
-const std::string& DatabaseConfiguration3D::GetDocTypeConstant() const
+/*virtual*/imgdoc2::DocumentType DatabaseConfiguration3D::GetDocumentType() const
 {
-    static string kTiles3DDocType = DbUtilities::GetDocTypeValueForDocumentType(imgdoc2::DocumentType::kImage3d);
-    return kTiles3DDocType;
+    return imgdoc2::DocumentType::kImage3d;
 }
 
 void DatabaseConfiguration3D::SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name)
@@ -368,6 +366,7 @@ void DatabaseConfiguration3D::SetDefaultColumnNamesForTilesDataTable()
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_Pk, DbConstants::kTilesDataTable_Column_Pk_DefaultName/*"Pk"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelWidth, DbConstants::kTilesDataTable_Column_PixelWidth_DefaultName/*"PixelWidth"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelHeight, DbConstants::kTilesDataTable_Column_PixelHeight_DefaultName/*"PixelHeight"*/);
+    this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelDepth, DbConstants::kTilesDataTable_Column_PixelDepth_DefaultName/*"PixelDepth"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelDepth, DbConstants::kTilesDataTable_Column_PixelDepth_DefaultName/*"PixelDepth"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_PixelType, DbConstants::kTilesDataTable_Column_PixelType_DefaultName/*"PixelType"*/);
     this->SetColumnNameForTilesDataTable(DatabaseConfiguration3D::kTilesDataTable_Column_TileDataType, DbConstants::kTilesDataTable_Column_TileDataType_DefaultName/*"TileDataType"*/);
