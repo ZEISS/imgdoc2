@@ -116,14 +116,14 @@ using namespace imgdoc2;
     throw logic_error("The method or operation is not implemented.");
 }
 
-shared_ptr<IDbStatement> DocumentRead3d::GetReadBrickInfo_Statement(bool include_tile_coordinates, bool include_logical_position_info, bool include_brick_blob_info)
+shared_ptr<IDbStatement> DocumentRead3d::GetReadBrickInfo_Statement(bool include_brick_coordinates, bool include_logical_position_info, bool include_brick_blob_info)
 {
     // If include_tile_blob_info is false, we create a SQL-state something like this:
     // 
     //  SELECT [Dim_C],[Dim_S],[Dim_T],[Dim_M],[TileX],[TileY],[TileW],[TileH],[PyramidLevel] FROM [TILESINFO] WHERE [TileDataId] = ?1;
     //
     // The SELECT-state contains all included dimensions, then TileX, TileY, TileW, TileH, PyramidLevel.
-    // If include_tile_coordinates is false, then the dimensions are not included; and if include_logical_position_info is false,
+    // If include_brick_coordinates is false, then the dimensions are not included; and if include_logical_position_info is false,
     // then the group "TileX, TileY, TileW, TileH, PyramidLevel" is not included.
     // 
     // If include_tile_blob_info is true, then a SQL-statement something like this is created:
@@ -138,7 +138,7 @@ shared_ptr<IDbStatement> DocumentRead3d::GetReadBrickInfo_Statement(bool include
     // this is used to keep track whether an item (=column-name) as already been added (in order to add ',' when appropriate)
     bool item_has_been_added = false;
 
-    if (include_tile_coordinates)
+    if (include_brick_coordinates)
     {
         const auto tile_dimension = this->document_->GetDataBaseConfiguration3d()->GetTileDimensions();
         for (const auto dimension : tile_dimension)
@@ -184,7 +184,7 @@ shared_ptr<IDbStatement> DocumentRead3d::GetReadBrickInfo_Statement(bool include
         string_stream << "[" << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration3D::kTilesDataTable_Column_TileDataType) << "]";
     }
 
-    if (!include_tile_coordinates && !include_logical_position_info && !include_brick_blob_info)
+    if (!include_brick_coordinates && !include_logical_position_info && !include_brick_blob_info)
     {
         // c.f. https://stackoverflow.com/questions/4253960/sql-how-to-properly-check-if-a-record-exists -> if all three clauses are not given,
         // we create a SQL-statement something like "SELECT 1 FROM [TILESINFO] WHERE [TileDataId] = ?1;" which gives a result of "1" if the
@@ -355,18 +355,20 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryAnd
     }
 
     ostringstream string_stream;
-    string_stream << "SELECT spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk) << " FROM "
-        << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " spatialindex "
-        << "INNER JOIN " << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << " info ON "
-        << "spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk)
-        << " = info." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_Pk)
+    string_stream << "SELECT spatialindex." << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM "
+        << this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " spatialindex "
+        << "INNER JOIN " << this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << " info ON "
+        << "spatialindex." << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk)
+        << " = info." << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk)
         << " WHERE (" <<
-        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxX) << ">=? AND " <<
-        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MinX) << "<=? AND " <<
-        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxY) << ">=? AND " <<
-        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MinY) << "<=?) ";
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxX) << ">=? AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinX) << "<=? AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxY) << ">=? AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinY) << "<=? AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxZ) << ">=? AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinZ) << "<=?) "; 
 
-    const auto query_statement_and_binding_info = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->document_->GetDataBaseConfiguration2d());
+    const auto query_statement_and_binding_info = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->document_->GetDataBaseConfiguration3d());
     string_stream << " AND " << get<0>(query_statement_and_binding_info) << ";";
 
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
@@ -375,6 +377,8 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryAnd
     statement->BindDouble(binding_index++, cuboid.x + cuboid.w);
     statement->BindDouble(binding_index++, cuboid.y);
     statement->BindDouble(binding_index++, cuboid.y + cuboid.h);
+    statement->BindDouble(binding_index++, cuboid.z);
+    statement->BindDouble(binding_index++, cuboid.z + cuboid.d);
 
     for (const auto& bind_info : get<1>(query_statement_and_binding_info))
     {

@@ -118,7 +118,8 @@ TEST_P(WithAndWithoutSpatialIndexFixture2, IndexQueryForRectAndCheckResult)
         nullptr,
         [&](dbIndex index)->bool
         {
-            result_indices.emplace_back(index); return true;
+            result_indices.emplace_back(index);
+            return true;
         });
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
@@ -147,7 +148,8 @@ TEST_P(WithAndWithoutSpatialIndexFixture3, IndexQueryForRectAndCheckResult)
         nullptr,
         [&](dbIndex index)->bool
         {
-            result_indices.emplace_back(index); return true;
+            result_indices.emplace_back(index);
+            return true;
         });
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);

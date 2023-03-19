@@ -107,9 +107,8 @@ TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
 }
 
-struct WithAndWithoutSpatialIndexFixture1 : public testing::TestWithParam<bool> {};
-
-TEST_P(WithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckResult)
+struct Query3dWithAndWithoutSpatialIndexFixture1 : public testing::TestWithParam<bool> {};
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckResult)
 {
     // Using the 10x10x10 checkerboard-document, we query for tiles overlapping with the ROI (0,0,0,15,15,15).
    // We expect to find 8 tiles, with M=1, 2, 11, 12, 101, 102, 111, 112.
@@ -119,7 +118,7 @@ TEST_P(WithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckResult)
 
     vector<dbIndex> result_indices;
     reader->GetTilesIntersectingCuboid(
-        CuboidD{ 0, 0, 0,15, 15 ,15 },
+        CuboidD{ 0, 0, 0, 15, 15 ,15 },
         nullptr,
         nullptr,
         [&](dbIndex index)->bool
@@ -134,5 +133,38 @@ TEST_P(WithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckResult)
 
 INSTANTIATE_TEST_SUITE_P(
     Query3d,
-    WithAndWithoutSpatialIndexFixture1,
+    Query3dWithAndWithoutSpatialIndexFixture1,
+    testing::Values(true, false));
+
+struct Query3dWithAndWithoutSpatialIndexFixture2 : public testing::TestWithParam<bool> {};
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture2, IndexQueryForCuboidAndCoordinateQueryAndCheckResult)
+{
+    // we use a combined "ROI and coordinate-query", we look for subblocks which intersect with the rectangle (0,0,0,15,15,15) and
+    // with the M-index in the range 0 to 5 or 100 to 105 (exclusive the borders), i.e. (M > 0 and M < 5) or (M > 100 and M<105).
+    // We expect to find four subblocks (with M-index 1, 2, 101 and 102).
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    CDimCoordinateQueryClause coordinate_query_clause;
+    coordinate_query_clause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 0, 5 });
+    coordinate_query_clause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 100, 105 });
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingCuboid(CuboidD{ 0, 0, 0, 15, 15, 15 },
+        &coordinate_query_clause,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAre(1, 2, 101, 102));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    Query3d,
+    Query3dWithAndWithoutSpatialIndexFixture2,
     testing::Values(true, false));
