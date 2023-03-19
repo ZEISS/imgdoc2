@@ -476,13 +476,13 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetReadDataQueryStatement(imgdoc2:
         << " = [" << this->document_->GetDataBaseConfiguration2d()->GetTableNameForBlobTableOrThrow() << "].[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration2D::kBlobTable_Column_Pk) << "]"
         << " WHERE [" << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesDataOrThrow() << "].[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration2D::kTilesDataTable_Column_Pk) << "] = ?1;";
 
-    //// we create a statement like this:
-    //// 
-    //// SELECT [Data] FROM [BLOBS] WHERE [BLOBS].[Pk] =
-    ////    (
-    ////        SELECT BinDataId FROM TILESDATA WHERE Pk = 1  AND BinDataStorageType = 1
-    ////    )
-    ////
+    // we create a statement like this:
+    // 
+    // SELECT [Data] FROM [BLOBS] WHERE [BLOBS].[Pk] =
+    //    (
+    //        SELECT BinDataId FROM TILESDATA WHERE Pk = 1  AND BinDataStorageType = 1
+    //    )
+    //
 
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     statement->BindInt64(1, idx);
@@ -498,7 +498,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryMinMaxStatement(const s
     ostringstream string_stream;
     string_stream << "SELECT ";
     bool first_iteration = true;
-    for (auto dimension : dimensions)
+    for (const auto dimension : dimensions)
     {
         if (!first_iteration)
         {
@@ -514,3 +514,4 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryMinMaxStatement(const s
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     return statement;
 }
+

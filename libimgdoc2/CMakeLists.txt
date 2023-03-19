@@ -71,7 +71,11 @@ set(LibImgDoc2_Srcfiles
          "src/doc/documentWrite3d.h" 
          "inc/BrickBaseInfo.h" 
          "src/doc/documentWrite3d.cpp"
-         "src/doc/documentRead3d.cpp" "src/db/database_utilities.h" "src/db/database_utilities.cpp")
+         "src/doc/documentRead3d.cpp" 
+         "src/db/database_utilities.h" 
+         "src/db/database_utilities.cpp" 
+         "src/doc/documentReadBase.h" 
+         "src/doc/documentReadBase.cpp")
 
 add_library(libimgdoc2 STATIC
                 ${LibImgDoc2_Srcfiles}

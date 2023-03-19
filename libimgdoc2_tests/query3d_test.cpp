@@ -61,13 +61,13 @@ static shared_ptr<IDoc> CreateCheckerboard3dDocument(bool use_spatial_index)
 /// \param [in]     reader          The reader object.
 /// \param          keys            The PKs of the tiles to query.
 /// \returns        The m index of items.
-static vector<int> GetMIndexOfItems(IDocRead2d* reader, const vector<dbIndex>& keys)
+static vector<int> GetMIndexOfItems(IDocRead3d* reader, const vector<dbIndex>& keys)
 {
     vector<int> m_indices;
     for (const auto pk : keys)
     {
         TileCoordinate tc;
-        reader->ReadTileInfo(pk, &tc, nullptr, nullptr);
+        reader->ReadBrickInfo(pk, &tc, nullptr, nullptr);
         int m_index;
         tc.TryGetCoordinate('M', &m_index);
         m_indices.push_back(m_index);
@@ -85,7 +85,7 @@ TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
 
     const CDimCoordinateQueryClause coordinate_query_clause;
 
-  /*  vector<dbIndex> result_indices;
+    vector<dbIndex> result_indices;
     reader->Query(
         &coordinate_query_clause,
         nullptr,
@@ -96,8 +96,8 @@ TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
         });
 
     // so, we expect to get all tiles in the document, and we check their correctness
-    EXPECT_EQ(result_indices.size(), 100ul);
-    std::array<int, 100> expected_result{};
+    EXPECT_EQ(result_indices.size(), 1000ul);
+    std::array<int, 1000> expected_result{};
     for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
     {
         expected_result[i] = 1 + i;
@@ -105,5 +105,4 @@ TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
-    */
 }

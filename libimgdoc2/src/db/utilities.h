@@ -32,6 +32,7 @@ public:
     };
 public:
     static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereStatement(const imgdoc2::IDimCoordinateQueryClause* dim_coordinate_query_clause, const imgdoc2::ITileInfoQueryClause* tileInfo_query_clause, const DatabaseConfiguration2D& database_configuration);
+    static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereStatement(const imgdoc2::IDimCoordinateQueryClause* dim_coordinate_query_clause, const imgdoc2::ITileInfoQueryClause* tileInfo_query_clause, const DatabaseConfiguration3D& database_configuration);
 
     static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereConditionForDimQueryClause(const imgdoc2::IDimCoordinateQueryClause* clause, const std::function<void(imgdoc2::Dimension, std::string&)>& funcGetColumnNameForDimension);
 
@@ -62,5 +63,15 @@ private:
     static const char* LogicalOperatorToString(imgdoc2::LogicalOperator logical_operator);
 
     static bool ProcessRangeClause(const std::string& column_name_for_dimension, const imgdoc2::IDimCoordinateQueryClause::RangeClause& rangeClause, std::vector<Utilities::DataBindInfo>& databind_info, std::ostringstream& string_stream);
+
+    struct CreateWhereInfo
+    {
+        std::string dimension_column_prefix;
+        std::string column_name_pyramid_level;
+    };
+    static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereStatement(
+        const imgdoc2::IDimCoordinateQueryClause* dim_coordinate_query_clause, 
+        const imgdoc2::ITileInfoQueryClause* tileInfo_query_clause, 
+        const CreateWhereInfo& create_where_info);
 };
 

@@ -101,21 +101,21 @@ using namespace imgdoc2;
 {
     switch (comparison_operator)
     {
-    case ComparisonOperation::Equal:
-        return "=";
-    case ComparisonOperation::NotEqual:
-        return "<>";
-    case ComparisonOperation::LessThan:
-        return "<";
-    case ComparisonOperation::LessThanOrEqual:
-        return "<=";
-    case ComparisonOperation::GreaterThan:
-        return ">";
-    case ComparisonOperation::GreaterThanOrEqual:
-        return ">=";
-    case ComparisonOperation::Invalid:
-    default:
-        throw invalid_argument("invalid operator encountered");
+        case ComparisonOperation::Equal:
+            return "=";
+        case ComparisonOperation::NotEqual:
+            return "<>";
+        case ComparisonOperation::LessThan:
+            return "<";
+        case ComparisonOperation::LessThanOrEqual:
+            return "<=";
+        case ComparisonOperation::GreaterThan:
+            return ">";
+        case ComparisonOperation::GreaterThanOrEqual:
+            return ">=";
+        case ComparisonOperation::Invalid:
+        default:
+            throw invalid_argument("invalid operator encountered");
     }
 }
 
@@ -123,51 +123,63 @@ using namespace imgdoc2;
 {
     switch (logical_operator)
     {
-    case LogicalOperator::And:
-        return "AND";
-    case LogicalOperator::Or:
-        return "OR";
-    case LogicalOperator::Invalid:
-    default:
-        throw invalid_argument("invalid operator encountered");
+        case LogicalOperator::And:
+            return "AND";
+        case LogicalOperator::Or:
+            return "OR";
+        case LogicalOperator::Invalid:
+        default:
+            throw invalid_argument("invalid operator encountered");
     }
 }
 
 /*static*/std::tuple<std::string, std::vector<Utilities::DataBindInfo>> Utilities::CreateWhereStatement(const imgdoc2::IDimCoordinateQueryClause* dim_coordinate_query_clause, const imgdoc2::ITileInfoQueryClause* tileInfo_query_clause, const DatabaseConfiguration2D& database_configuration)
 {
-    auto get_column_name_func =
-        [&](imgdoc2::Dimension dimension, std::string& column_name)->void
-    {
-        column_name = database_configuration.GetDimensionsColumnPrefix();
-        column_name += dimension;
-    };
+    return CreateWhereStatement(
+        dim_coordinate_query_clause,
+        tileInfo_query_clause,
+        { database_configuration.GetDimensionsColumnPrefix() , database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel) });
+    /* auto get_column_name_func =
+         [&](imgdoc2::Dimension dimension, std::string& column_name)->void
+     {
+         column_name = database_configuration.GetDimensionsColumnPrefix();
+         column_name += dimension;
+     };
 
-    std::tuple<std::string, std::vector<Utilities::DataBindInfo>> return_value;
+     std::tuple<std::string, std::vector<Utilities::DataBindInfo>> return_value;
 
-    if (dim_coordinate_query_clause != nullptr && tileInfo_query_clause != nullptr)
-    {
-        auto dimension_query = CreateWhereConditionForDimQueryClause(dim_coordinate_query_clause, get_column_name_func);
-        auto tileinfo_query = CreateWhereConditionForTileInfoQueryClause(tileInfo_query_clause, database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel));
-        ostringstream string_stream;
-        string_stream << get<0>(dimension_query) << " AND " << get<0>(tileinfo_query);
-        auto& databind_info = get<1>(dimension_query);
-        std::move(get<1>(tileinfo_query).begin(), get<1>(tileinfo_query).end(), std::back_inserter(databind_info));
-        return_value = make_tuple(string_stream.str(), databind_info);
-    }
-    else if (dim_coordinate_query_clause != nullptr && tileInfo_query_clause == nullptr)
-    {
-        return_value = CreateWhereConditionForDimQueryClause(dim_coordinate_query_clause, get_column_name_func);
-    }
-    else if (dim_coordinate_query_clause == nullptr && tileInfo_query_clause != nullptr)
-    {
-        return_value = CreateWhereConditionForTileInfoQueryClause(tileInfo_query_clause, database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel));
-    }
-    else
-    {
-        return_value = make_tuple(" (TRUE) ", std::vector<Utilities::DataBindInfo>{});
-    }
+     if (dim_coordinate_query_clause != nullptr && tileInfo_query_clause != nullptr)
+     {
+         auto dimension_query = CreateWhereConditionForDimQueryClause(dim_coordinate_query_clause, get_column_name_func);
+         auto tileinfo_query = CreateWhereConditionForTileInfoQueryClause(tileInfo_query_clause, database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel));
+         ostringstream string_stream;
+         string_stream << get<0>(dimension_query) << " AND " << get<0>(tileinfo_query);
+         auto& databind_info = get<1>(dimension_query);
+         std::move(get<1>(tileinfo_query).begin(), get<1>(tileinfo_query).end(), std::back_inserter(databind_info));
+         return_value = make_tuple(string_stream.str(), databind_info);
+     }
+     else if (dim_coordinate_query_clause != nullptr && tileInfo_query_clause == nullptr)
+     {
+         return_value = CreateWhereConditionForDimQueryClause(dim_coordinate_query_clause, get_column_name_func);
+     }
+     else if (dim_coordinate_query_clause == nullptr && tileInfo_query_clause != nullptr)
+     {
+         return_value = CreateWhereConditionForTileInfoQueryClause(tileInfo_query_clause, database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel));
+     }
+     else
+     {
+         return_value = make_tuple(" (TRUE) ", std::vector<Utilities::DataBindInfo>{});
+     }
 
-    return return_value;
+     return return_value;*/
+}
+
+/*static*/std::tuple<std::string, std::vector<Utilities::DataBindInfo>> Utilities::CreateWhereStatement(const imgdoc2::IDimCoordinateQueryClause* dim_coordinate_query_clause, const imgdoc2::ITileInfoQueryClause* tileInfo_query_clause, const DatabaseConfiguration3D& database_configuration)
+{
+    return CreateWhereStatement(
+        dim_coordinate_query_clause,
+        tileInfo_query_clause,
+        { database_configuration.GetDimensionsColumnPrefix() , database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel) });
 }
 
 /*static*/bool Utilities::TryReadStringFromPropertyBag(IDbConnection* db_connection, const std::string& table_name, const std::string& key_column_name, const std::string& value_column_name, const std::string& key, std::string* output)
@@ -241,4 +253,41 @@ using namespace imgdoc2;
     }
 
     return range_clause_processed;
+}
+
+/*static*/std::tuple<std::string, std::vector<Utilities::DataBindInfo>> Utilities::CreateWhereStatement(const imgdoc2::IDimCoordinateQueryClause* dim_coordinate_query_clause, const imgdoc2::ITileInfoQueryClause* tileInfo_query_clause, const CreateWhereInfo& create_where_info)
+{
+    auto get_column_name_func =
+        [&](imgdoc2::Dimension dimension, std::string& column_name)->void
+    {
+        column_name = create_where_info.dimension_column_prefix;
+        column_name += dimension;
+    };
+
+    std::tuple<std::string, std::vector<Utilities::DataBindInfo>> return_value;
+
+    if (dim_coordinate_query_clause != nullptr && tileInfo_query_clause != nullptr)
+    {
+        auto dimension_query = CreateWhereConditionForDimQueryClause(dim_coordinate_query_clause, get_column_name_func);
+        auto tileinfo_query = CreateWhereConditionForTileInfoQueryClause(tileInfo_query_clause, create_where_info.column_name_pyramid_level/*database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel)*/);
+        ostringstream string_stream;
+        string_stream << get<0>(dimension_query) << " AND " << get<0>(tileinfo_query);
+        auto& databind_info = get<1>(dimension_query);
+        std::move(get<1>(tileinfo_query).begin(), get<1>(tileinfo_query).end(), std::back_inserter(databind_info));
+        return_value = make_tuple(string_stream.str(), databind_info);
+    }
+    else if (dim_coordinate_query_clause != nullptr && tileInfo_query_clause == nullptr)
+    {
+        return_value = CreateWhereConditionForDimQueryClause(dim_coordinate_query_clause, get_column_name_func);
+    }
+    else if (dim_coordinate_query_clause == nullptr && tileInfo_query_clause != nullptr)
+    {
+        return_value = CreateWhereConditionForTileInfoQueryClause(tileInfo_query_clause, create_where_info.column_name_pyramid_level/*database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel)*/);
+    }
+    else
+    {
+        return_value = make_tuple(" (TRUE) ", std::vector<Utilities::DataBindInfo>{});
+    }
+
+    return return_value;
 }
