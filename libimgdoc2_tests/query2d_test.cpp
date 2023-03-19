@@ -22,7 +22,7 @@ static shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
     create_options->SetFilename(":memory:");
     //create_options->SetFilename("d:\\test.db");
     create_options->AddDimension('M');
-    create_options->SetUseSpatialIndex(true);
+    create_options->SetUseSpatialIndex(use_spatial_index);
     create_options->SetCreateBlobTable(true);
 
     auto doc = ClassFactory::CreateNew(create_options.get());

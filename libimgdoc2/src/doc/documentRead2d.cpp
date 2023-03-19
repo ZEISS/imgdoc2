@@ -119,7 +119,7 @@ using namespace imgdoc2;
 
     while (this->document_->GetDatabase_connection()->StepStatement(query_statement.get()))
     {
-        imgdoc2::dbIndex index = query_statement->GetResultInt64(0);
+        const imgdoc2::dbIndex index = query_statement->GetResultInt64(0);
         const bool continue_operation = func(index);
         if (!continue_operation)
         {

@@ -64,7 +64,7 @@ using namespace imgdoc2;
 
     while (this->document_->GetDatabase_connection()->StepStatement(query_statement.get()))
     {
-        imgdoc2::dbIndex index = query_statement->GetResultInt64(0);
+        const imgdoc2::dbIndex index = query_statement->GetResultInt64(0);
         const bool continue_operation = func(index);
         if (!continue_operation)
         {
@@ -72,6 +72,36 @@ using namespace imgdoc2;
         }
     }
 }
+
+/*virtual*/void DocumentRead3d::GetTilesIntersectingCuboid(const imgdoc2::CuboidD& cuboid, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause, const std::function<bool(imgdoc2::dbIndex)>& func)
+{
+    shared_ptr<IDbStatement> query_statement;
+    if (this->document_->GetDataBaseConfiguration3d()->GetIsUsingSpatialIndex())
+    {
+        query_statement = this->GetTilesIntersectingCuboidQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(cuboid, coordinate_clause, tileinfo_clause);
+    }
+    else
+    {
+        query_statement = this->GetTilesIntersectingCuboidQueryAndCoordinateAndInfoQueryClause(cuboid, coordinate_clause, tileinfo_clause);
+    }
+
+    while (this->document_->GetDatabase_connection()->StepStatement(query_statement.get()))
+    {
+        const imgdoc2::dbIndex index = query_statement->GetResultInt64(0);
+        const bool continue_operation = func(index);
+        if (!continue_operation)
+        {
+            break;
+        }
+    }
+}
+
+/*virtual*/void DocumentRead3d::GetTilesIntersectingPlane(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause, const std::function<bool(imgdoc2::dbIndex)>& func)
+{
+    
+}
+
+
 //void GetTilesIntersectingRect(const imgdoc2::RectangleD& rect, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause, const std::function<bool(imgdoc2::dbIndex)>& func) override;
 //void ReadTileData(imgdoc2::dbIndex idx, imgdoc2::IBlobOutput* data) override;
 
@@ -216,4 +246,189 @@ shared_ptr<IDbStatement> DocumentRead3d::CreateQueryStatement(const imgdoc2::IDi
     }
 
     return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQuery(const imgdoc2::CuboidD& cuboid)
+{
+    ostringstream string_stream;
+/*    string_stream << "SELECT " << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk) << " FROM " <<
+        this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << " WHERE " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW) << ">=?1 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX) << "<=?2 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH) << ">=?3 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY) << "<=?4"; */
+    string_stream << "SELECT " << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk) << " FROM " <<
+        this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << " WHERE " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW) << ">=?1 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX) << "<=?2 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH) << ">=?3 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY) << "<=?4 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD) << ">=?5 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ) << "<=?6";
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    statement->BindDouble(1, cuboid.x);
+    statement->BindDouble(2, cuboid.x + cuboid.w);
+    statement->BindDouble(3, cuboid.y);
+    statement->BindDouble(4, cuboid.y + cuboid.h);
+    statement->BindDouble(5, cuboid.z);
+    statement->BindDouble(6, cuboid.z + cuboid.d);
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryAndCoordinateAndInfoQueryClause(const imgdoc2::CuboidD& cuboid, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
+{
+    if (coordinate_clause == nullptr && tileinfo_clause == nullptr)
+    {
+        return this->GetTilesIntersectingCuboidQuery(cuboid);
+    }
+
+    ostringstream string_stream;
+ /* string_stream << "SELECT " << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_Pk) << " FROM "
+        << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << " WHERE (" <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << '+' <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) << ">=?1 AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "<=?2 AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << '+' <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH) << ">=?3 AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "<=?4)";*/
+
+    string_stream << "SELECT " << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk) << " FROM " <<
+        this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << " WHERE (" <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW) << ">=?1 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX) << "<=?2 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH) << ">=?3 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY) << "<=?4 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ) << '+' <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD) << ">=?5 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ) << "<=?6)";
+
+    const auto query_statement_and_binding_info = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->document_->GetDataBaseConfiguration3d());
+    string_stream << " AND " << get<0>(query_statement_and_binding_info) << ";";
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    int binding_index = 1;
+    statement->BindDouble(binding_index++, cuboid.x);
+    statement->BindDouble(binding_index++, cuboid.x + cuboid.w);
+    statement->BindDouble(binding_index++, cuboid.y);
+    statement->BindDouble(binding_index++, cuboid.y + cuboid.h);
+    statement->BindDouble(binding_index++, cuboid.z);
+    statement->BindDouble(binding_index++, cuboid.z + cuboid.d);
+
+    for (const auto& bind_info : get<1>(query_statement_and_binding_info))
+    {
+        if (holds_alternative<int>(bind_info.value))
+        {
+            statement->BindInt32(binding_index, get<int>(bind_info.value));
+        }
+        else if (holds_alternative<int64_t>(bind_info.value))
+        {
+            statement->BindInt64(binding_index, get<int64_t>(bind_info.value));
+        }
+        else if (holds_alternative<double>(bind_info.value))
+        {
+            statement->BindDouble(binding_index, get<double>(bind_info.value));
+        }
+        else
+        {
+            throw logic_error("invalid variant");
+        }
+
+        ++binding_index;
+    }
+
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::CuboidD& cuboid, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
+{
+    if (coordinate_clause == nullptr && tileinfo_clause == nullptr)
+    {
+        return this->GetTilesIntersectingCuboidQueryWithSpatialIndex(cuboid);
+    }
+
+    ostringstream string_stream;
+    string_stream << "SELECT spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk) << " FROM "
+        << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " spatialindex "
+        << "INNER JOIN " << this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << " info ON "
+        << "spatialindex." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk)
+        << " = info." << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_Pk)
+        << " WHERE (" <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxX) << ">=? AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MinX) << "<=? AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxY) << ">=? AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MinY) << "<=?) ";
+
+    const auto query_statement_and_binding_info = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->document_->GetDataBaseConfiguration2d());
+    string_stream << " AND " << get<0>(query_statement_and_binding_info) << ";";
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    int binding_index = 1;
+    statement->BindDouble(binding_index++, cuboid.x);
+    statement->BindDouble(binding_index++, cuboid.x + cuboid.w);
+    statement->BindDouble(binding_index++, cuboid.y);
+    statement->BindDouble(binding_index++, cuboid.y + cuboid.h);
+
+    for (const auto& bind_info : get<1>(query_statement_and_binding_info))
+    {
+        if (holds_alternative<int>(bind_info.value))
+        {
+            statement->BindInt32(binding_index, get<int>(bind_info.value));
+        }
+        else if (holds_alternative<int64_t>(bind_info.value))
+        {
+            statement->BindInt64(binding_index, get<int64_t>(bind_info.value));
+        }
+        else if (holds_alternative<double>(bind_info.value))
+        {
+            statement->BindDouble(binding_index, get<double>(bind_info.value));
+        }
+        else
+        {
+            throw logic_error("invalid variant");
+        }
+
+        ++binding_index;
+    }
+
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWithSpatialIndex(const imgdoc2::CuboidD& cuboid)
+{
+    ostringstream string_stream;
+/*  string_stream << "SELECT " << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
+        this->document_->GetDataBaseConfiguration2d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxX) << ">=?1 AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MinX) << "<=?2 AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MaxY) << ">=?3 AND " <<
+        this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration2D::kTilesSpatialIndexTable_Column_MinY) << "<=?4";*/
+
+    string_stream << "SELECT " << this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
+        this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxX) << ">=?1 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinX) << "<=?2 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxY) << ">=?3 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinY) << "<=?4 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxZ) << ">=?5 AND " <<
+        this->document_->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinZ) << "<=?6";
+
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    statement->BindDouble(1, cuboid.x);
+    statement->BindDouble(2, cuboid.x + cuboid.w);
+    statement->BindDouble(3, cuboid.y);
+    statement->BindDouble(4, cuboid.y + cuboid.h);
+    statement->BindDouble(5, cuboid.z);
+    statement->BindDouble(6, cuboid.z + cuboid.d);
+
+    return statement;
+
 }

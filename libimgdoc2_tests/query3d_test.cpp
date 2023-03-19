@@ -23,7 +23,7 @@ static shared_ptr<IDoc> CreateCheckerboard3dDocument(bool use_spatial_index)
     create_options->SetFilename(":memory:");
     //create_options->SetFilename("d:\\test.db");
     create_options->AddDimension('M');
-    create_options->SetUseSpatialIndex(true);
+    create_options->SetUseSpatialIndex(use_spatial_index);
     create_options->SetCreateBlobTable(true);
 
     auto doc = ClassFactory::CreateNew(create_options.get());
@@ -106,3 +106,33 @@ TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
 }
+
+struct WithAndWithoutSpatialIndexFixture1 : public testing::TestWithParam<bool> {};
+
+TEST_P(WithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckResult)
+{
+    // Using the 10x10x10 checkerboard-document, we query for tiles overlapping with the ROI (0,0,0,15,15,15).
+   // We expect to find 8 tiles, with M=1, 2, 11, 12, 101, 102, 111, 112.
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingCuboid(
+        CuboidD{ 0, 0, 0,15, 15 ,15 },
+        nullptr,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAre(1, 11, 2, 12, 101, 102, 111, 112));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    Query3d,
+    WithAndWithoutSpatialIndexFixture1,
+    testing::Values(true, false));
