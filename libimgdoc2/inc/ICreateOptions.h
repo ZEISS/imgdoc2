@@ -15,6 +15,9 @@ namespace imgdoc2
     class ICreateOptions
     {
     public:
+
+        /// Sets the document type. Note that a newly created instance will have the document type "kImage2d2".
+        /// \param  document_type   Type of the document.
         virtual void SetDocumentType(imgdoc2::DocumentType document_type) = 0;
 
         /// Sets the filename. For a Sqlite-based database, this string allows for additional functionality
@@ -46,6 +49,8 @@ namespace imgdoc2
         /// \param  create_blob_table True to create BLOB table.
         virtual void SetCreateBlobTable(bool create_blob_table) = 0;
 
+        /// Gets the document type.
+        /// \returns    The document type.
         [[nodiscard]] virtual imgdoc2::DocumentType GetDocumentType() const = 0;
 
         /// Whether the document should be created with a spatial index.

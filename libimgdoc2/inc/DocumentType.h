@@ -11,6 +11,6 @@ namespace imgdoc2
     {
         kInvalid = 0,    ///< An enum constant representing the invalid option.
         kImage2d,        ///< An enum constant representing the "image 2D" option.
-        kImage3d         ///< An enum constant representing the "image 3D" option. NOT YET IMPLEMENTED.
+        kImage3d         ///< An enum constant representing the "image 3D" option. NOT YET FULLY IMPLEMENTED.
     };
 }

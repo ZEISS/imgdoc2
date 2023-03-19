@@ -10,14 +10,13 @@
 #include <vector>
 #include <imgdoc2.h>
 #include "document.h"
+#include "documentReadBase.h"
 #include "ITileCoordinate.h"
 
-class DocumentRead2d : public imgdoc2::IDocRead2d
+class DocumentRead2d : public DocumentReadBase, public imgdoc2::IDocRead2d
 {
-private:
-    std::shared_ptr<Document> document_;
 public:
-    explicit DocumentRead2d(std::shared_ptr<Document> document) : document_(std::move(document))
+    explicit DocumentRead2d(std::shared_ptr<Document> document) : DocumentReadBase(std::move(document))
     {}
 
     // interface IDocQuery2d
@@ -41,6 +40,4 @@ private:
     std::shared_ptr<IDbStatement> GetReadDataQueryStatement(imgdoc2::dbIndex idx);
 
     std::shared_ptr<IDbStatement> CreateQueryMinMaxStatement(const std::vector<imgdoc2::Dimension>& dimensions);
-
-    [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->document_->GetHostingEnvironment(); }
 };

@@ -11,7 +11,7 @@
 namespace imgdoc2
 {
     /// This constitutes the "base information" of a tile. A tile in this respect is a rectangular
-    /// bitmap, characterized by it width and height and pixels and a pixeltype.
+    /// bitmap, characterized by its width and height and pixels and a pixeltype.
     /// Pixeltype is an opaque property as far as the "storage layer" is concerned.
     struct TileBaseInfo
     {
