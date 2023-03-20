@@ -133,12 +133,6 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, IndexQueryForCuboidAndCheckResu
     EXPECT_THAT(m_indices, UnorderedElementsAre(1, 11, 2, 12, 101, 102, 111, 112));
 }
 
-//INSTANTIATE_TEST_SUITE_P(
-//    Query3d,
-//    Query3dWithAndWithoutSpatialIndexFixture1,
-//    testing::Values(true, false));
-
-//struct Query3dWithAndWithoutSpatialIndexFixture2 : public testing::TestWithParam<bool> {};
 TEST_P(Query3dWithAndWithoutSpatialIndexFixture, IndexQueryForCuboidAndCoordinateQueryAndCheckResult)
 {
     // we use a combined "ROI and coordinate-query", we look for subblocks which intersect with the rectangle (0,0,0,15,15,15) and
@@ -166,12 +160,6 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, IndexQueryForCuboidAndCoordinat
     EXPECT_THAT(m_indices, UnorderedElementsAre(1, 2, 101, 102));
 }
 
-//INSTANTIATE_TEST_SUITE_P(
-//    Query3d,
-//    Query3dWithAndWithoutSpatialIndexFixture2,
-//    testing::Values(true, false));
-
-//struct Query3dWithAndWithoutSpatialIndexFixture3 : public testing::TestWithParam<bool> {};
 TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase1)
 {
     // we query with an empty coordinate-query-clause, and expect that an empty clause means
@@ -210,13 +198,6 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase1
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
 }
 
-//INSTANTIATE_TEST_SUITE_P(
-//    Query3d,
-//    Query3dWithAndWithoutSpatialIndexFixture3,
-//    testing::Values(true, false));
-
-
-//struct Query3dWithAndWithoutSpatialIndexFixture4 : public testing::TestWithParam<bool> {};
 TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase2)
 {
     const bool use_spatial_index = GetParam();
@@ -225,9 +206,9 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase2
 
     const CDimCoordinateQueryClause coordinate_query_clause;
 
-    // we construct a plane parallel to the X-Y-plane, and going through the point (0,0,51) -
-    //  so we expect to intersect with the bricks with z=[50,60], and there should be exactly 100 of them,
-    //  and they have an M-index from 501...600 (that's how we constructed the sample document)
+    // we construct a plane parallel to the X-Z-plane, and going through the point (0,51,0) -
+    //  so we expect to intersect with the bricks with Y=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index from 6, 16, 26, ... (that's how we constructed the sample document)
     const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 51, 0), Point3dD(100, 51, 0), Point3dD(100, 51, 100));
 
     vector<dbIndex> result_indices;
@@ -247,6 +228,42 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase2
     for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
     {
         expected_result[i] = 10 * i + 6;
+    }
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
+}
+
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase3)
+{
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    const CDimCoordinateQueryClause coordinate_query_clause;
+
+    // we construct a plane parallel to the Y-Z-plane, and going through the point (51,0,0) -
+    //  so we expect to intersect with the bricks with X=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index 51, 52, ..., 60, 151, 152, ..., 160, 251, 252, ..., 260, 351, ... ... 960 (that's how we constructed the sample document)
+    const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(51, 0, 0), Point3dD(51, 100, 0), Point3dD(51, 0, 100));
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingPlane(
+        plane,
+        nullptr,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    // so, we expect to get all tiles in the document, and we check their correctness
+    ASSERT_EQ(result_indices.size(), 100ul);
+    std::array<int, 100> expected_result{};
+    for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
+    {
+        expected_result[i] = (i / 10) * 100 + 51 + (i % 10);
     }
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
