@@ -196,7 +196,7 @@ TEST(Query3d, PlaneIntersectionTest1)
         });
 
     // so, we expect to get all tiles in the document, and we check their correctness
-    EXPECT_EQ(result_indices.size(), 100ul);
+    ASSERT_EQ(result_indices.size(), 100ul);
     std::array<int, 100> expected_result{};
     for (int i = 0; i <  static_cast<int>(expected_result.size()); ++i)
     {
