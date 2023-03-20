@@ -179,12 +179,14 @@ TEST(Query3d, PlaneIntersectionTest1)
 
     const CDimCoordinateQueryClause coordinate_query_clause;
 
+    // we construct a plane parallel to the X-Y-plane, and going through the point (0,0,51) -
+    //  so we expect to intersect with the bricks with z=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index from 501...600 (that's how we constructed the sample document)
     auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 0, 51), Point3dD(100, 0, 51), Point3dD(100, 100, 51));
-    Plane_NormalAndDistD plane2(Vector3dD(plane.normal.x, plane.normal.y, plane.normal.z), plane.distance);
 
     vector<dbIndex> result_indices;
     reader->GetTilesIntersectingPlane(
-        plane2,
+        plane,
         nullptr,
         nullptr,
         [&](dbIndex index)->bool
@@ -194,13 +196,13 @@ TEST(Query3d, PlaneIntersectionTest1)
         });
 
     // so, we expect to get all tiles in the document, and we check their correctness
-    //EXPECT_EQ(result_indices.size(), 1000ul);
-    //std::array<int, 1000> expected_result{};
-    //for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
-    //{
-    //    expected_result[i] = 1 + i;
-    //}
+    EXPECT_EQ(result_indices.size(), 100ul);
+    std::array<int, 100> expected_result{};
+    for (int i = 0; i <  static_cast<int>(expected_result.size()); ++i)
+    {
+        expected_result[i] = 501 + i;
+    }
 
-    //const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
-    //EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
 }
