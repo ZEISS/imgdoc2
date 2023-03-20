@@ -37,12 +37,38 @@ namespace Imgdoc2cmd
             using var document = Document.CreateNew(createOptions);
             using var writer = document.Get2dWriter();
 
+            var rowsColumns = options.TilesRowsColumnsCount;
+            float widthToSubtract = 0, heightToSubtract = 0;
+            if (options.TilesOverlapUnit == Options.OverlapUnit.Pixel)
+            {
+                widthToSubtract = heightToSubtract = options.TilesOverlap;
+            }
+            else if (options.TilesOverlapUnit == Options.OverlapUnit.Percentage)
+            {
+                widthToSubtract = options.TilesOverlap / 100 * tileSize.tileWidth;
+                heightToSubtract = options.TilesOverlap / 100 * tileSize.tileHeight;
+            }
+
             foreach (var tileCoordinate in Utilities.EnumerateCoordinatesInBounds(dimensionBounds))
             {
-                LogicalPosition logicalPosition = new LogicalPosition() { PositionX = 0, PositionY = 0, Width = tileSize.tileWidth, Height = tileSize.tileHeight, PyramidLevel = 0 };
-                Tile2dBaseInfo tile2dBaseInfo = new Tile2dBaseInfo(tileSize.tileWidth, tileSize.tileHeight, PixelType.Bgr24);
-                byte[] tileData = CreateTile(tileCoordinate, in logicalPosition, 1024, 1024);
-                long pk = writer.AddTile(tileCoordinate, logicalPosition, tile2dBaseInfo, DataType.UncompressedBitmap, tileData);
+                for (int y = 0; y < rowsColumns.tilesColumnCount; ++y)
+                {
+                    for (int x = 0; x < rowsColumns.tilesRowCount; ++x)
+                    {
+                        LogicalPosition logicalPosition = new LogicalPosition()
+                        {
+                            PositionX = (tileSize.tileWidth - widthToSubtract) * x,
+                            PositionY = (tileSize.tileHeight - heightToSubtract) * y,
+                            Width = tileSize.tileWidth,
+                            Height = tileSize.tileHeight,
+                            PyramidLevel = 0
+                        };
+
+                        Tile2dBaseInfo tile2dBaseInfo = new Tile2dBaseInfo(tileSize.tileWidth, tileSize.tileHeight, PixelType.Bgr24);
+                        byte[] tileData = CreateTile(tileCoordinate, in logicalPosition, 1024, 1024);
+                        long pk = writer.AddTile(tileCoordinate, logicalPosition, tile2dBaseInfo, DataType.UncompressedBitmap, tileData);
+                    }
+                }
             }
         }
     }

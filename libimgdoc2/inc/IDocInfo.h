@@ -7,14 +7,20 @@
 #include <vector>
 #include <map>
 #include <cstdint>
+#include <limits>
 
 namespace imgdoc2
 {
-    /// This structure gathers a minimum and maximum value.
+    /// This structure gathers a minimum and maximum value. If minimum is greater than maximum, this means 
+    /// that the bounds is invalid.
     struct CoordinateBounds
     {
-        int minimum_value;  ///< The minimum value.
-        int maximum_value;  ///< The maximum value.
+        std::int32_t minimum_value{ std::numeric_limits<std::int32_t>::max() };  ///< The minimum value.
+        std::int32_t maximum_value{ std::numeric_limits<std::int32_t>::min() };  ///< The maximum value.
+
+        bool IsValid() const {
+            return this->minimum_value <= this->maximum_value;
+        }
     };
 
     /// This interface is used for retrieving information about the document.

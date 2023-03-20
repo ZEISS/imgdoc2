@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <optional>
 #include <sqlite3.h>
 #include "../IDbConnection.h"
 #include "ISqlite_DbStatement.h"
@@ -35,7 +36,8 @@ public:
 
     sqlite3_stmt* GetSqliteSqlStatement() override;
 
-    int GetResultInt32(int column) override;
+    std::int32_t GetResultInt32(int column) override;
+    std::optional<std::int32_t> GetResultInt32OrNull(int column) override;
     std::int64_t GetResultInt64(int column) override;
     std::uint32_t GetResultUInt32(int column) override;
     std::uint8_t GetResultUInt8(int column) override;

@@ -57,8 +57,14 @@ using namespace imgdoc2;
     for (size_t i = 0; i < dimensions_to_query_for.size(); ++i)
     {
         CoordinateBounds coordinate_bounds;
-        coordinate_bounds.minimum_value = query_statement->GetResultInt32(i * 2);
-        coordinate_bounds.maximum_value = query_statement->GetResultInt32(i * 2 + 1);
+        auto min = query_statement->GetResultInt32OrNull(i * 2);
+        auto max = query_statement->GetResultInt32OrNull(i * 2 + 1);
+        if (min.has_value() && max.has_value())
+        {
+            coordinate_bounds.minimum_value = min.value();
+            coordinate_bounds.maximum_value = max.value();
+        }
+
         result[dimensions_to_query_for[i]] = coordinate_bounds;
     }
 
@@ -488,7 +494,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryMinMaxStatement(const s
     // preconditions:
     // - the dimensions specified must be valid
     // - the collection must not be empty
-    
+
     ostringstream string_stream;
     string_stream << "SELECT ";
     bool first_iteration = true;
