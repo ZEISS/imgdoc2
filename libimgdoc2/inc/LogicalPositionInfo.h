@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
+#include <limits>
 #include "utilities.h"
 
 namespace imgdoc2
@@ -33,23 +34,23 @@ namespace imgdoc2
         LogicalPositionInfo(double x, double y, double w, double h, int pyrLvl) : posX(x), posY(y), width(w), height(h), pyrLvl(pyrLvl)
         {}
 
-        double posX;    ///< The x coordinate of the top left point.
-        double posY;    ///< The y coordinate of the top left point.
-        double width;   ///< The width.
-        double height;  ///< The height.
-        int pyrLvl;     ///< The pyramid level.
+        double posX{ std::numeric_limits<double>::quiet_NaN() };    ///< The x coordinate of the top left point.
+        double posY{ std::numeric_limits<double>::quiet_NaN() };    ///< The y coordinate of the top left point.
+        double width{ std::numeric_limits<double>::quiet_NaN() };   ///< The width.
+        double height{ std::numeric_limits<double>::quiet_NaN() };  ///< The height.
+        int pyrLvl{ std::numeric_limits<int>::min() };              ///< The pyramid level.
 
         /// Equality operator (where the coordinates are compared with an epsilon).
         /// \param  rhs The right hand side.
         /// \returns True if the parameters are considered equivalent.
         bool operator==(const LogicalPositionInfo& rhs) const
         {
-            constexpr double DBLEPSILON = 1e-8;
+            constexpr double kDoubleEpsilon = 1e-8;
             return this->pyrLvl == rhs.pyrLvl &&
-                approximatelyEqual(this->posX, rhs.posX, DBLEPSILON) &&
-                approximatelyEqual(this->posY, rhs.posY, DBLEPSILON) &&
-                approximatelyEqual(this->width, rhs.width, DBLEPSILON) &&
-                approximatelyEqual(this->height, rhs.height, DBLEPSILON);
+                approximatelyEqual(this->posX, rhs.posX, kDoubleEpsilon) &&
+                approximatelyEqual(this->posY, rhs.posY, kDoubleEpsilon) &&
+                approximatelyEqual(this->width, rhs.width, kDoubleEpsilon) &&
+                approximatelyEqual(this->height, rhs.height, kDoubleEpsilon);
         }
 
         /// Inequality operator (where the coordinates are compared with an epsilon).
@@ -66,27 +67,27 @@ namespace imgdoc2
     /// the pyramid-level.
     struct LogicalPositionInfo3D
     {
-        double posX;        ///< The x coordinate of the top left point.
-        double posY;        ///< The y coordinate of the top left point.
-        double posZ;        ///< The z coordinate of the top left point.
-        double width;       ///< The width.
-        double height;      ///< The height.
-        double depth;       ///< The depth.
-        int pyrLvl;         ///< The pyramid level.
+        double posX{ std::numeric_limits<double>::quiet_NaN() };        ///< The x coordinate of the top left point.
+        double posY{ std::numeric_limits<double>::quiet_NaN() };        ///< The y coordinate of the top left point.
+        double posZ{ std::numeric_limits<double>::quiet_NaN() };        ///< The z coordinate of the top left point.
+        double width{ std::numeric_limits<double>::quiet_NaN() };       ///< The width.
+        double height{ std::numeric_limits<double>::quiet_NaN() };      ///< The height.
+        double depth{ std::numeric_limits<double>::quiet_NaN() };       ///< The depth.
+        int pyrLvl{ std::numeric_limits<int>::min() };                  ///< The pyramid level.
 
         /// Equality operator (where the coordinates are compared with an epsilon).
         /// \param  rhs The right hand side.
         /// \returns True if the parameters are considered equivalent.
         bool operator==(const LogicalPositionInfo3D& rhs) const
         {
-            constexpr double DBLEPSILON = 1e-8;
+            constexpr double kDoubleEpsilon = 1e-8;
             return this->pyrLvl == rhs.pyrLvl &&
-                approximatelyEqual(this->posX, rhs.posX, DBLEPSILON) &&
-                approximatelyEqual(this->posY, rhs.posY, DBLEPSILON) &&
-                approximatelyEqual(this->posZ, rhs.posZ, DBLEPSILON) &&
-                approximatelyEqual(this->width, rhs.width, DBLEPSILON) &&
-                approximatelyEqual(this->height, rhs.height, DBLEPSILON) &&
-                approximatelyEqual(this->depth, rhs.depth, DBLEPSILON);
+                imgdoc2::approximatelyEqual(this->posX, rhs.posX, kDoubleEpsilon) &&
+                imgdoc2::approximatelyEqual(this->posY, rhs.posY, kDoubleEpsilon) &&
+                imgdoc2::approximatelyEqual(this->posZ, rhs.posZ, kDoubleEpsilon) &&
+                imgdoc2::approximatelyEqual(this->width, rhs.width, kDoubleEpsilon) &&
+                imgdoc2::approximatelyEqual(this->height, rhs.height, kDoubleEpsilon) &&
+                imgdoc2::approximatelyEqual(this->depth, rhs.depth, kDoubleEpsilon);
         }
 
         /// Inequality operator (where the coordinates are compared with an epsilon).

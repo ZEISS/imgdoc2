@@ -25,6 +25,8 @@ using namespace std;
 /*static*/const char* const DbConstants::kTilesDataTable_Column_BinDataStorageType_DefaultName = "BinDataStorageType";
 /*static*/const char* const DbConstants::kTilesDataTable_Column_BinDataId_DefaultName = "BinDataId";
 
+/*static*/const char* const DbConstants::kTilesDataTable_Column_PixelDepth_DefaultName = "PixelDepth";
+
 /*static*/const char* const DbConstants::kTilesInfoTable_Column_Pk_DefaultName = "Pk";
 /*static*/const char* const DbConstants::kTilesInfoTable_Column_TileX_DefaultName = "TileX";
 /*static*/const char* const DbConstants::kTilesInfoTable_Column_TileY_DefaultName = "TileY";
@@ -32,6 +34,9 @@ using namespace std;
 /*static*/const char* const DbConstants::kTilesInfoTable_Column_TileH_DefaultName = "TileH";
 /*static*/const char* const DbConstants::kTilesInfoTable_Column_PyramidLevel_DefaultName = "PyramidLevel";
 /*static*/const char* const DbConstants::kTilesInfoTable_Column_TileDataId_DefaultName = "TileDataId";
+
+/*static*/const char* const DbConstants::kTilesInfoTable_Column_TileZ_DefaultName = "TileZ";
+/*static*/const char* const DbConstants::kTilesInfoTable_Column_TileD_DefaultName = "TileD";
 
 /*static*/const char* const DbConstants::kBlobTable_Column_Pk_DefaultName = "Pk";
 /*static*/const char* const DbConstants::kBlobTable_Column_Data_DefaultName = "Data";
@@ -41,6 +46,9 @@ using namespace std;
 /*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_maxX_DefaultName = "maxX";
 /*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_minY_DefaultName = "minY";
 /*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_maxY_DefaultName = "maxY";
+/*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_minZ_DefaultName = "minZ";
+/*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_maxZ_DefaultName = "maxZ";
+
 
 
 /*static*/const char* const DbConstants::kDimensionColumnPrefix_Default = "Dim_";

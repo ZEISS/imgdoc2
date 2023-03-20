@@ -11,6 +11,7 @@
 #include "IDbConnection.h"
 #include <exceptions.h>
 
+#include "database_utilities.h"
 #include "utilities.h"
 
 using namespace std;
@@ -32,13 +33,24 @@ void DbDiscovery::DoDiscovery()
         this->FillInformationForConfiguration2D(general_table_discovery_result, *configuration2d);
         this->configuration_ = configuration2d;
     }
+    else if (general_table_discovery_result.document_type == DocumentType::kImage3d)
+    {
+        const auto configuration3d = make_shared<DatabaseConfiguration3D>();
+        this->FillInformationForConfiguration3D(general_table_discovery_result, *configuration3d);
+        this->configuration_ = configuration3d;
+    }
     else
     {
-        throw runtime_error("only document_type='Image2d' supported currently");
+        throw runtime_error("only document_type='Image2d' or document_type='Image3d' supported currently");
     }
 }
 
-std::shared_ptr<DatabaseConfigurationCommon> DbDiscovery::GetDatabaseConfiguration()
+imgdoc2::DocumentType DbDiscovery::GetDocumentType() const
+{
+    return this->GetDatabaseConfigurationCommon()->GetDocumentType();
+}
+
+std::shared_ptr<DatabaseConfigurationCommon> DbDiscovery::GetDatabaseConfigurationCommon() const
 {
     auto configuration = this->configuration_;
     if (!configuration)
@@ -47,6 +59,38 @@ std::shared_ptr<DatabaseConfigurationCommon> DbDiscovery::GetDatabaseConfigurati
     }
 
     return configuration;
+}
+
+std::shared_ptr<DatabaseConfiguration2D> DbDiscovery::GetDatabaseConfiguration2DOrThrow() const
+{
+    auto configuration2d = this->GetDatabaseConfiguration2DOrNull();
+    if (!configuration2d)
+    {
+        throw internal_error_exception("No valid database-configuration for 2D.");
+    }
+
+    return configuration2d;
+}
+
+std::shared_ptr<DatabaseConfiguration3D> DbDiscovery::GetDatabaseConfiguration3DOrThrow() const
+{
+    auto configuration3d = this->GetDatabaseConfiguration3DOrNull();
+    if (!configuration3d)
+    {
+        throw internal_error_exception("No valid database-configuration for 3D.");
+    }
+
+    return configuration3d;
+}
+
+std::shared_ptr<DatabaseConfiguration2D> DbDiscovery::GetDatabaseConfiguration2DOrNull() const
+{
+    return std::static_pointer_cast<DatabaseConfiguration2D>(this->configuration_);
+}
+
+std::shared_ptr<DatabaseConfiguration3D> DbDiscovery::GetDatabaseConfiguration3DOrNull() const
+{
+    return std::static_pointer_cast<DatabaseConfiguration3D>(this->configuration_);
 }
 
 void DbDiscovery::FillInformationForConfiguration2D(const GeneralDataDiscoveryResult& general_data_discovery_result, DatabaseConfiguration2D& database_configuration_2d)
@@ -75,6 +119,29 @@ void DbDiscovery::FillInformationForConfiguration2D(const GeneralDataDiscoveryRe
     }
 }
 
+void DbDiscovery::FillInformationForConfiguration3D(const GeneralDataDiscoveryResult& general_data_discovery_result, DatabaseConfiguration3D& configuration_3d)
+{
+    configuration_3d.SetDimensionColumnPrefix(DbConstants::kDimensionColumnPrefix_Default/*"Dim_"*/);
+    configuration_3d.SetIndexForDimensionColumnPrefix(DbConstants::kIndexForDimensionColumnPrefix_Default/*"IndexForDim_"*/);
+    configuration_3d.SetTableName(DatabaseConfigurationCommon::TableTypeCommon::GeneralInfo, DbConstants::kGeneralTable_Name/*"GENERAL"*/);
+    configuration_3d.SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesData, general_data_discovery_result.tilesdatatable_name.c_str());
+    configuration_3d.SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesInfo, general_data_discovery_result.tileinfotable_name.c_str());
+    configuration_3d.SetDefaultColumnNamesForTilesInfoTable();
+    configuration_3d.SetTileDimensions(general_data_discovery_result.dimensions.cbegin(), general_data_discovery_result.dimensions.cend());
+    configuration_3d.SetIndexedTileDimensions(general_data_discovery_result.indexed_dimensions.cbegin(), general_data_discovery_result.indexed_dimensions.cend());
+    configuration_3d.SetDefaultColumnNamesForTilesDataTable();
+    if (!general_data_discovery_result.spatial_index_table_name.empty())
+    {
+        configuration_3d.SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesSpatialIndex, general_data_discovery_result.spatial_index_table_name.c_str());
+    }
+    if (!general_data_discovery_result.blobtable_name.empty())
+    {
+        configuration_3d.SetTableName(DatabaseConfigurationCommon::TableTypeCommon::Blobs, general_data_discovery_result.blobtable_name.c_str());
+        configuration_3d.SetColumnNameForBlobTable(DatabaseConfiguration3D::kBlobTable_Column_Pk, DbConstants::kBlobTable_Column_Pk_DefaultName); // TODO(JBL): I guess the presence of those columns should be tested for
+        configuration_3d.SetColumnNameForBlobTable(DatabaseConfiguration3D::kBlobTable_Column_Data, DbConstants::kBlobTable_Column_Data_DefaultName);
+    }
+}
+
 DbDiscovery::GeneralDataDiscoveryResult DbDiscovery::DiscoverGeneralTable()
 {
     const auto columns_of_general_table = this->db_connection_->GetTableInfo(DbConstants::kGeneralTable_Name);
@@ -82,7 +149,7 @@ DbDiscovery::GeneralDataDiscoveryResult DbDiscovery::DiscoverGeneralTable()
     // ok, if that worked, then we need to have two columns named "Key" and "ValueString"
     if (!
         (any_of(columns_of_general_table.cbegin(), columns_of_general_table.cend(), [](const IDbConnection::ColumnInfo& column_info)->bool {return column_info.column_name == DbConstants::kGeneralTable_KeyColumnName; }) &&
-            any_of(columns_of_general_table.cbegin(), columns_of_general_table.cend(), [](const IDbConnection::ColumnInfo& column_info)->bool {return column_info.column_name == DbConstants::kGeneralTable_ValueStringColumnName; }))
+        any_of(columns_of_general_table.cbegin(), columns_of_general_table.cend(), [](const IDbConnection::ColumnInfo& column_info)->bool {return column_info.column_name == DbConstants::kGeneralTable_ValueStringColumnName; }))
         )
     {
         throw discovery_exception("Unexpected content in the 'GENERAL'-table");
@@ -103,12 +170,15 @@ DbDiscovery::GeneralDataDiscoveryResult DbDiscovery::DiscoverGeneralTable()
         throw discovery_exception("Property 'DocType' not present, refusing to open this database.");
     }
 
-    if (str != "Tiles2D")
+    const DocumentType document_type = DbUtilities::GetDocumentTypeFromDocTypeField(str);
+    if (document_type != DocumentType::kImage2d && document_type != DocumentType::kImage3d)
     {
-        throw discovery_exception("Only 'DocType' = \"Tiles2D\" is supported at this time.");
+        ostringstream string_stream;
+        string_stream << "'DocType'=" << str << " is not supported at this time.";
+        throw discovery_exception(string_stream.str());
     }
 
-    general_discovery_result.document_type = DocumentType::kImage2d;
+    general_discovery_result.document_type = document_type;
 
     // ok, so now get the content for key=TilesInfoTable and key=TilesDataTable. Those will give us the name of the tables we are
     // to use. If the values are not present, we go with default-values.

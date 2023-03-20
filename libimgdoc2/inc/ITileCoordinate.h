@@ -38,7 +38,7 @@ namespace imgdoc2
 
         /// Gets a vector with the dimensions contained in this object.
         /// \returns The dimensions.
-        inline std::vector<imgdoc2::Dimension> GetDimensions() const
+        [[nodiscard]] std::vector<imgdoc2::Dimension> GetDimensions() const
         {
             std::vector<imgdoc2::Dimension> vec;
             this->EnumDimensions(
@@ -54,7 +54,7 @@ namespace imgdoc2
         /// Queries if the specified value is a legal dimension. Legal dimensions are a-z and A-Z.
         /// \param  dimension The dimension.
         /// \returns True if the dimension is valid, false if not.
-        inline static bool IsValidDimension(imgdoc2::Dimension dimension)
+        [[nodiscard]] inline static bool IsValidDimension(imgdoc2::Dimension dimension)
         {
             return imgdoc2::IsDimensionValid(dimension);
         }
@@ -72,6 +72,6 @@ namespace imgdoc2
         /// \param  value The value.
         virtual void Set(imgdoc2::Dimension d, int value) = 0;
 
-        virtual ~ITileCoordinateMutate() = default;
+        ~ITileCoordinateMutate() override = default;
     };
 }

@@ -16,13 +16,13 @@ using namespace testing;
 /// has an M-index, starting to count from 1.
 /// \param  use_spatial_index   True if the document is to use a spatial index.
 /// \returns                    The newly created in-memory "checkerboard document".
-shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
+static shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
 {
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
     create_options->SetFilename(":memory:");
     //create_options->SetFilename("d:\\test.db");
     create_options->AddDimension('M');
-    create_options->SetUseSpatialIndex(true);
+    create_options->SetUseSpatialIndex(use_spatial_index);
     create_options->SetCreateBlobTable(true);
 
     auto doc = ClassFactory::CreateNew(create_options.get());
@@ -54,7 +54,7 @@ shared_ptr<IDoc> CreateCheckerboardDocument(bool use_spatial_index)
 /// \param [in]     reader          The reader object.
 /// \param          keys            The PKs of the tiles to query.
 /// \returns        The m index of items.
-vector<int> GetMIndexOfItems(IDocRead2d* reader, const vector<dbIndex>& keys)
+static vector<int> GetMIndexOfItems(IDocRead2d* reader, const vector<dbIndex>& keys)
 {
     vector<int> m_indices;
     for (const auto pk : keys)
@@ -118,7 +118,8 @@ TEST_P(WithAndWithoutSpatialIndexFixture2, IndexQueryForRectAndCheckResult)
         nullptr,
         [&](dbIndex index)->bool
         {
-            result_indices.emplace_back(index); return true;
+            result_indices.emplace_back(index);
+            return true;
         });
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
@@ -147,7 +148,8 @@ TEST_P(WithAndWithoutSpatialIndexFixture3, IndexQueryForRectAndCheckResult)
         nullptr,
         [&](dbIndex index)->bool
         {
-            result_indices.emplace_back(index); return true;
+            result_indices.emplace_back(index);
+            return true;
         });
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);

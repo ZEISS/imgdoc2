@@ -60,11 +60,25 @@ set(LibImgDoc2_Srcfiles
          "inc/impl/BlobOutputImplementations.h"
          "inc/impl/DataObjectImplementations.h" 
          "inc/IEnvironment.h" 
-         "inc/TileInfoQueryClause.h" "inc/IDocInfo.h" "inc/IDocQuery2d.h")
+         "inc/TileInfoQueryClause.h" 
+         "inc/IDocInfo.h" 
+         "inc/IDocQuery2d.h" 
+         "inc/IDocQuery3d.h" 
+         "inc/IDocWrite3d.h" 
+         "inc/IDocRead3d.h" 
+         "inc/DocumentType.h" 
+         "src/doc/documentRead3d.h" 
+         "src/doc/documentWrite3d.h" 
+         "inc/BrickBaseInfo.h" 
+         "src/doc/documentWrite3d.cpp"
+         "src/doc/documentRead3d.cpp" 
+         "src/db/database_utilities.h" 
+         "src/db/database_utilities.cpp" 
+         "src/doc/documentReadBase.h" 
+         "src/doc/documentReadBase.cpp")
 
 add_library(libimgdoc2 STATIC
-                ${LibImgDoc2_Srcfiles}
-)
+                ${LibImgDoc2_Srcfiles})
 
 # shared libraries need PIC
 set_property(TARGET libimgdoc2 PROPERTY POSITION_INDEPENDENT_CODE ON)

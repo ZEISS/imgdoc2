@@ -90,6 +90,11 @@ public:
     void SetColumnNameForBlobTable(int column_identifier, const char* column_name);
     bool TryGetColumnNameOfBlobTable(int column_identifier, std::string* column_name) const;
 
+    /// Gets document type constant - which document-type is represented by this configuration.
+    ///
+    /// \returns    The document type constant.
+    [[nodiscard]] virtual imgdoc2::DocumentType GetDocumentType() const = 0;
+
     virtual ~DatabaseConfigurationCommon() = default;
 public:
     std::string GetTableNameOrThrow(TableTypeCommon table_type) const;
@@ -140,11 +145,61 @@ public:
     static constexpr int kTilesSpatialIndexTable_Column_MinY = 4;
     static constexpr int kTilesSpatialIndexTable_Column_MaxY = 5;
 
-    /// Gets document type constant - the string for the row "DocType" in the general-table which identifies
-    /// the data as "tiles-2D".
-    ///
-    /// \returns    The document type constant.
-    const std::string& GetDocTypeConstant() const;
+    [[nodiscard]] imgdoc2::DocumentType GetDocumentType() const override;
+
+    void SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name);
+    bool TryGetColumnNameOfTilesInfoTable(int columnIdentifier, std::string* column_name) const;
+
+    void SetColumnNameForTilesDataTable(int columnIdentifier, const char* column_name);
+    bool TryGetColumnNameOfTilesDataTable(int columnIdentifier, std::string* column_name) const;
+
+    void SetColumnNameForTilesSpatialIndexTable(int columnIdentifier, const char* column_name);
+    bool TryGetColumnNameOfTilesSpatialIndexTable(int columnIdentifier, std::string* column_name) const;
+
+    void SetDefaultColumnNamesForTilesInfoTable();
+    void SetDefaultColumnNamesForTilesDataTable();
+public:
+    [[nodiscard]] std::string GetColumnNameOfTilesInfoTableOrThrow(int columnIdentifier) const;
+    [[nodiscard]] std::string GetColumnNameOfTilesDataTableOrThrow(int column_identifier) const;
+    [[nodiscard]] std::string GetColumnNameOfTilesSpatialIndexTableOrThrow(int columnIdentifier) const;
+};
+
+/// This class is intended to capture the "state of the database configuration" for 3D-documents.
+class DatabaseConfiguration3D : public DatabaseConfigurationCommon
+{
+private:
+    std::map<int, std::string> map_tilesinfotable_columnids_to_columnname_;
+    std::map<int, std::string> map_tilesdatatable_columnids_to_columnname_;
+    std::map<int, std::string> map_tilespatialindextable_columnids_to_columnname_;
+public:
+    static constexpr int kTilesInfoTable_Column_Pk = 1;
+    static constexpr int kTilesInfoTable_Column_TileX = 2;  ///< (Immutable) The brick's X-position.
+    static constexpr int kTilesInfoTable_Column_TileY = 3;  ///< (Immutable) The brick's Y-position.
+    static constexpr int kTilesInfoTable_Column_TileZ = 4;  ///< (Immutable) The brick's Z-position.
+    static constexpr int kTilesInfoTable_Column_TileW = 5;  ///< (Immutable) The brick's width.
+    static constexpr int kTilesInfoTable_Column_TileH = 6;  ///< (Immutable) The brick's height.
+    static constexpr int kTilesInfoTable_Column_TileD = 7;  ///< (Immutable) The brick's depth.
+    static constexpr int kTilesInfoTable_Column_PyramidLevel = 8;
+    static constexpr int kTilesInfoTable_Column_TileDataId = 9;
+
+    static constexpr int kTilesDataTable_Column_Pk = 1;
+    static constexpr int kTilesDataTable_Column_PixelWidth = 2;
+    static constexpr int kTilesDataTable_Column_PixelHeight = 3;
+    static constexpr int kTilesDataTable_Column_PixelDepth = 4;
+    static constexpr int kTilesDataTable_Column_PixelType = 5;
+    static constexpr int kTilesDataTable_Column_TileDataType = 6;
+    static constexpr int kTilesDataTable_Column_BinDataStorageType = 7;
+    static constexpr int kTilesDataTable_Column_BinDataId = 8;
+
+    static constexpr int kTilesSpatialIndexTable_Column_Pk = 1;
+    static constexpr int kTilesSpatialIndexTable_Column_MinX = 2;
+    static constexpr int kTilesSpatialIndexTable_Column_MaxX = 3;
+    static constexpr int kTilesSpatialIndexTable_Column_MinY = 4;
+    static constexpr int kTilesSpatialIndexTable_Column_MaxY = 5;
+    static constexpr int kTilesSpatialIndexTable_Column_MinZ = 6;
+    static constexpr int kTilesSpatialIndexTable_Column_MaxZ = 7;
+
+    [[nodiscard]] imgdoc2::DocumentType GetDocumentType() const override;
 
     void SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name);
     bool TryGetColumnNameOfTilesInfoTable(int columnIdentifier, std::string* column_name) const;

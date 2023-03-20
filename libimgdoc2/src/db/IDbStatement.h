@@ -12,7 +12,7 @@
 /// This interface is representing a "prepared/compiled" database-statement. The life-cycle of a data-base statement is:
 /// - an instance is created (-> IDbConnection::PrepareStatement)  
 /// - if the statement is using literals which are to be replaced with parameters, then the appropriate Bind-methods are to be called  
-/// - now the statement is sent to executioln (-> IDbConnection::StepStatement)  
+/// - now the statement is sent to execution (-> IDbConnection::StepStatement)  
 /// - and results may then be retrieved by calling into the appropriate "GetResult"-methods.  
 /// This interface is intended to abstract different databases.
 class IDbStatement

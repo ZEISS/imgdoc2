@@ -11,14 +11,6 @@ namespace imgdoc2
     class IDocWrite2d;
     class IDocRead2d;
 
-    /// Values that represent different document types.
-    enum class DocumentType
-    {
-        kInvalid = 0,    ///< An enum constant representing the invalid option.
-        kImage2d,        ///< An enum constant representing the "image 2D" option.
-        kImage3d         ///< An enum constant representing the "image 3D" option. NOT YET IMPLEMENTED.
-    };
-
     /// This interface is representing a 'document'. The discovery phase of the document has been completed successfully.
     /// Depending on the type of the document, objects for interacting with it can be created.
     class IDoc
@@ -33,6 +25,16 @@ namespace imgdoc2
         /// if such an object cannot be constructed.
         /// \returns The read-object (for 2D-document).
         virtual std::shared_ptr<imgdoc2::IDocRead2d> GetReader2d() = 0;
+
+        /// Try to get a "write object" for a 3D-document. This method may return an empty shared_ptr
+        /// if such an object cannot be constructed.
+        /// \returns The writer-object (for 3D-document).
+        virtual std::shared_ptr<imgdoc2::IDocWrite3d> GetWriter3d() = 0;
+
+        /// Try to get a "read object" for a 3D-document. This method may return an empty shared_ptr
+        /// if such an object cannot be constructed.
+        /// \returns The read-object (for 3D-document).
+        virtual std::shared_ptr<imgdoc2::IDocRead3d> GetReader3d() = 0;
 
         virtual ~IDoc() = default;
 

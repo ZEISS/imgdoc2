@@ -10,14 +10,13 @@
 #include <vector>
 #include <imgdoc2.h>
 #include "document.h"
+#include "documentReadBase.h"
 #include "ITileCoordinate.h"
 
-class DocumentRead2d : public imgdoc2::IDocRead2d
+class DocumentRead2d : public DocumentReadBase, public imgdoc2::IDocRead2d
 {
-private:
-    std::shared_ptr<Document> document_;
 public:
-    explicit DocumentRead2d(std::shared_ptr<Document> document) : document_(std::move(document))
+    explicit DocumentRead2d(std::shared_ptr<Document> document) : DocumentReadBase(std::move(document))
     {}
 
     // interface IDocQuery2d
@@ -31,7 +30,6 @@ public:
     std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) override;
    
 private:
-    //std::shared_ptr<IDbStatement> GetReadTileInfo_Statement(bool include_tile_coordinates, bool include_logical_position_info);
     std::shared_ptr<IDbStatement> GetReadTileInfo_Statement(bool include_tile_coordinates, bool include_logical_position_info, bool include_tile_blob_info);
     std::shared_ptr<IDbStatement> CreateQueryStatement(const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause);
     std::shared_ptr<IDbStatement> GetTilesIntersectingRectQueryWithSpatialIndex(const imgdoc2::RectangleD& rect);
@@ -41,6 +39,4 @@ private:
     std::shared_ptr<IDbStatement> GetReadDataQueryStatement(imgdoc2::dbIndex idx);
 
     std::shared_ptr<IDbStatement> CreateQueryMinMaxStatement(const std::vector<imgdoc2::Dimension>& dimensions);
-
-    [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->document_->GetHostingEnvironment(); }
 };
