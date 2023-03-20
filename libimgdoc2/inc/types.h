@@ -413,7 +413,7 @@ namespace imgdoc2
         Vector3dD(double x, double y, double z) :Vector3dT<double>(x, y, z) {}
     };
 
-    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin (aka "Hesse normal form").
     /// The normal must be normalized.
     /// The equation of the plane is: dot( x, normal) = distance.
     template<typename T>
@@ -444,31 +444,14 @@ namespace imgdoc2
         }
     };
 
+    /// Defines an alias representing a parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// Coordinates are represented by floats.
     typedef Plane_NormalAndDist<float> Plane_NormalAndDistF;
 
-    typedef Plane_NormalAndDist<double> Plane_NormalAndDistD;
-
-/*    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
-    /// Coordinates are represented by floats.
-    /// The normal must be normalized.
-    /// The equation of the plane is: dot( x, normal) = distance.
-    struct Plane_NormalAndDistF : Plane_NormalAndDist<float>
-    {};
-
-    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// Defines an alias representing a parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
     /// Coordinates are represented by doubles.
-    /// The normal must be normalized.
-    /// The equation of the plane is: dot( x, normal) = distance.
-    struct Plane_NormalAndDistD : Plane_NormalAndDist<double>
-    {
-        Plane_NormalAndDistD() = default;
-
-        /// Constructor.
-        /// \param  n The normal.
-        /// \param  d The distance to the origin.
-        Plane_NormalAndDistD(const Vector3dD& n, double d) : Plane_NormalAndDist<double>(n, d) {}
-    };*/
-
+    typedef Plane_NormalAndDist<double> Plane_NormalAndDistD;
+    
     /*static*/template<typename t> inline bool CuboidT<t>::DoIntersect(const imgdoc2::CuboidT<t>& aabb, const imgdoc2::Plane_NormalAndDist<t>& plane)
     {
         // -> https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
