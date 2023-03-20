@@ -476,5 +476,4 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWit
     statement->BindDouble(6, cuboid.z + cuboid.d);
 
     return statement;
-
 }

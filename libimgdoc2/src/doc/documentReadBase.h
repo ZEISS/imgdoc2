@@ -10,6 +10,8 @@
 #include <functional>
 #include <sstream>
 #include <memory>
+#include <vector>
+#include <string>
 #include "document.h"
 
 /// This class contains common functionality and utilities for implementing the document-read-access classes.

@@ -4,6 +4,8 @@
 
 #include "documentReadBase.h"
 #include <algorithm>
+#include <vector>
+#include <string>
 
 using namespace std;
 using namespace imgdoc2;

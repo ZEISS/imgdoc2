@@ -15,7 +15,6 @@ namespace imgdoc2
     class ICreateOptions
     {
     public:
-
         /// Sets the document type. Note that a newly created instance will have the document type "kImage2d2".
         /// \param  document_type   Type of the document.
         virtual void SetDocumentType(imgdoc2::DocumentType document_type) = 0;

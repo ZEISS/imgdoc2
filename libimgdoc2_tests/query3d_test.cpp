@@ -118,7 +118,7 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckRes
 
     vector<dbIndex> result_indices;
     reader->GetTilesIntersectingCuboid(
-        CuboidD{ 0, 0, 0, 15, 15 ,15 },
+        CuboidD{ 0, 0, 0, 15, 15, 15 },
         nullptr,
         nullptr,
         [&](dbIndex index)->bool
