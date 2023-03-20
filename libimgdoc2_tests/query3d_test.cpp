@@ -107,8 +107,10 @@ TEST(Query3d, EmptyCoordinateQueryClauseCheckResult)
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
 }
 
-struct Query3dWithAndWithoutSpatialIndexFixture1 : public testing::TestWithParam<bool> {};
-TEST_P(Query3dWithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckResult)
+/// This fixture is used to pass in a single parameter to the test, which is whether to use a spatial index or not.
+struct Query3dWithAndWithoutSpatialIndexFixture : public testing::TestWithParam<bool> {};
+
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, IndexQueryForCuboidAndCheckResult)
 {
     // Using the 10x10x10 checkerboard-document, we query for tiles overlapping with the ROI (0,0,0,15,15,15).
    // We expect to find 8 tiles, with M=1, 2, 11, 12, 101, 102, 111, 112.
@@ -131,13 +133,13 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture1, IndexQueryForCuboidAndCheckRes
     EXPECT_THAT(m_indices, UnorderedElementsAre(1, 11, 2, 12, 101, 102, 111, 112));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    Query3d,
-    Query3dWithAndWithoutSpatialIndexFixture1,
-    testing::Values(true, false));
+//INSTANTIATE_TEST_SUITE_P(
+//    Query3d,
+//    Query3dWithAndWithoutSpatialIndexFixture1,
+//    testing::Values(true, false));
 
-struct Query3dWithAndWithoutSpatialIndexFixture2 : public testing::TestWithParam<bool> {};
-TEST_P(Query3dWithAndWithoutSpatialIndexFixture2, IndexQueryForCuboidAndCoordinateQueryAndCheckResult)
+//struct Query3dWithAndWithoutSpatialIndexFixture2 : public testing::TestWithParam<bool> {};
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, IndexQueryForCuboidAndCoordinateQueryAndCheckResult)
 {
     // we use a combined "ROI and coordinate-query", we look for subblocks which intersect with the rectangle (0,0,0,15,15,15) and
     // with the M-index in the range 0 to 5 or 100 to 105 (exclusive the borders), i.e. (M > 0 and M < 5) or (M > 100 and M<105).
@@ -164,17 +166,18 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture2, IndexQueryForCuboidAndCoordina
     EXPECT_THAT(m_indices, UnorderedElementsAre(1, 2, 101, 102));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    Query3d,
-    Query3dWithAndWithoutSpatialIndexFixture2,
-    testing::Values(true, false));
+//INSTANTIATE_TEST_SUITE_P(
+//    Query3d,
+//    Query3dWithAndWithoutSpatialIndexFixture2,
+//    testing::Values(true, false));
 
-
-TEST(Query3d, PlaneIntersectionTest1)
+//struct Query3dWithAndWithoutSpatialIndexFixture3 : public testing::TestWithParam<bool> {};
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase1)
 {
     // we query with an empty coordinate-query-clause, and expect that an empty clause means
     //  "no condition, all items are returned"
-    const auto doc = CreateCheckerboard3dDocument(true);
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
     const auto reader = doc->GetReader3d();
 
     const CDimCoordinateQueryClause coordinate_query_clause;
@@ -182,7 +185,7 @@ TEST(Query3d, PlaneIntersectionTest1)
     // we construct a plane parallel to the X-Y-plane, and going through the point (0,0,51) -
     //  so we expect to intersect with the bricks with z=[50,60], and there should be exactly 100 of them,
     //  and they have an M-index from 501...600 (that's how we constructed the sample document)
-    auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 0, 51), Point3dD(100, 0, 51), Point3dD(100, 100, 51));
+    const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 0, 51), Point3dD(100, 0, 51), Point3dD(100, 100, 51));
 
     vector<dbIndex> result_indices;
     reader->GetTilesIntersectingPlane(
@@ -198,7 +201,7 @@ TEST(Query3d, PlaneIntersectionTest1)
     // so, we expect to get all tiles in the document, and we check their correctness
     ASSERT_EQ(result_indices.size(), 100ul);
     std::array<int, 100> expected_result{};
-    for (int i = 0; i <  static_cast<int>(expected_result.size()); ++i)
+    for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
     {
         expected_result[i] = 501 + i;
     }
@@ -206,3 +209,51 @@ TEST(Query3d, PlaneIntersectionTest1)
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
 }
+
+//INSTANTIATE_TEST_SUITE_P(
+//    Query3d,
+//    Query3dWithAndWithoutSpatialIndexFixture3,
+//    testing::Values(true, false));
+
+
+//struct Query3dWithAndWithoutSpatialIndexFixture4 : public testing::TestWithParam<bool> {};
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase2)
+{
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    const CDimCoordinateQueryClause coordinate_query_clause;
+
+    // we construct a plane parallel to the X-Y-plane, and going through the point (0,0,51) -
+    //  so we expect to intersect with the bricks with z=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index from 501...600 (that's how we constructed the sample document)
+    const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 51, 0), Point3dD(100, 51, 0), Point3dD(100, 51, 100));
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingPlane(
+        plane,
+        nullptr,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    // so, we expect to get all tiles in the document, and we check their correctness
+    ASSERT_EQ(result_indices.size(), 100ul);
+    std::array<int, 100> expected_result{};
+    for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
+    {
+        expected_result[i] = 10 * i + 6;
+    }
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    Query3d,
+    Query3dWithAndWithoutSpatialIndexFixture,
+    testing::Values(true, false));
