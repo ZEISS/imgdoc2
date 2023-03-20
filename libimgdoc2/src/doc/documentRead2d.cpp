@@ -16,55 +16,18 @@ using namespace imgdoc2;
 /*virtual*/void DocumentRead2d::GetTileDimensions(imgdoc2::Dimension* dimensions, std::uint32_t& count)
 {
     DocumentReadBase::GetEntityDimensionsInternal(
-        this->GetDocument()->GetDataBaseConfiguration2d()->GetTileDimensions(), 
-        dimensions, 
+        this->GetDocument()->GetDataBaseConfiguration2d()->GetTileDimensions(),
+        dimensions,
         count);
 }
 
 /*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
 {
-    for (const auto dimension : dimensions_to_query_for)
-    {
-        const bool is_valid = this->GetDocument()->GetDataBaseConfiguration2d()->IsTileDimensionValid(dimension);
-        if (!is_valid)
-        {
-            ostringstream string_stream;
-            string_stream << "The dimension '" << dimension << "' is not valid.";
-            throw invalid_argument_exception(string_stream.str().c_str());
-        }
-    }
-
-    if (dimensions_to_query_for.empty())
-    {
-        return {};
-    }
-
-    const auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for);
-
-    map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> result;
-
-    // we expect exactly "2 * dimensions_to_query_for.size()" results
-    const bool is_done = this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get());
-    if (!is_done)
-    {
-        throw internal_error_exception("database-query gave no result, this is unexpected.");
-    }
-
-    for (size_t i = 0; i < dimensions_to_query_for.size(); ++i)
-    {
-        CoordinateBounds coordinate_bounds;
-        auto min = query_statement->GetResultInt32OrNull(i * 2);
-        auto max = query_statement->GetResultInt32OrNull(i * 2 + 1);
-        if (min.has_value() && max.has_value())
-        {
-            coordinate_bounds.minimum_value = min.value();
-            coordinate_bounds.maximum_value = max.value();
-        }
-
-        result[dimensions_to_query_for[i]] = coordinate_bounds;
-    }
-
-    return result;
+    return this->GetMinMaxForTileDimensionInternal(
+        dimensions_to_query_for,
+        [this](Dimension dimension)->bool { return this->GetDocument()->GetDataBaseConfiguration2d()->IsTileDimensionValid(dimension); },
+        [this](ostringstream& ss, imgdoc2::Dimension dimension)->void { ss << this->GetDocument()->GetDataBaseConfiguration2d()->GetDimensionsColumnPrefix() << dimension; },
+        this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow());
 }
 
 /*virtual*/void DocumentRead2d::ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info)

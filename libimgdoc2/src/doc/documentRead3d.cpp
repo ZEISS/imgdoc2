@@ -111,7 +111,11 @@ using namespace imgdoc2;
 
 /*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead3d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
 {
-    throw logic_error("The method or operation is not implemented.");
+    return this->GetMinMaxForTileDimensionInternal(
+        dimensions_to_query_for,
+        [this](Dimension dimension)->bool { return this->GetDocument()->GetDataBaseConfiguration3d()->IsTileDimensionValid(dimension); },
+        [this](ostringstream& ss, imgdoc2::Dimension dimension)->void { ss << this->GetDocument()->GetDataBaseConfiguration3d()->GetDimensionsColumnPrefix() << dimension; },
+        this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow());
 }
 
 /*virtual*/void DocumentRead3d::ReadBrickData(imgdoc2::dbIndex idx, imgdoc2::IBlobOutput* data)
@@ -412,7 +416,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryAnd
         this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxY) << ">=? AND " <<
         this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinY) << "<=? AND " <<
         this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxZ) << ">=? AND " <<
-        this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinZ) << "<=?) "; 
+        this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinZ) << "<=?) ";
 
     const auto query_statement_and_binding_info = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->GetDocument()->GetDataBaseConfiguration3d());
     string_stream << " AND " << get<0>(query_statement_and_binding_info) << ";";
@@ -462,7 +466,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWit
         this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinY) << "<=?4 AND " <<
         this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MaxZ) << ">=?5 AND " <<
         this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinZ) << "<=?6";
-    
+
     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
     statement->BindDouble(1, cuboid.x);
     statement->BindDouble(2, cuboid.x + cuboid.w);

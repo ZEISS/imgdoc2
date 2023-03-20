@@ -18,7 +18,8 @@ namespace imgdoc2
         std::int32_t minimum_value{ std::numeric_limits<std::int32_t>::max() };  ///< The minimum value.
         std::int32_t maximum_value{ std::numeric_limits<std::int32_t>::min() };  ///< The maximum value.
 
-        bool IsValid() const {
+        [[nodiscard]] bool IsValid() const
+        {
             return this->minimum_value <= this->maximum_value;
         }
     };
@@ -36,12 +37,14 @@ namespace imgdoc2
         virtual void GetTileDimensions(imgdoc2::Dimension* dimensions, std::uint32_t& count) = 0;
 
         /// Gets minimum and maximum value for specified tile dimension.
+        /// If the minimum/maximum cannot be determined (for a dimension), then the result will be
+        /// one where Minimum is greater than Maximum (=an invalid CoordinateBounds). This can happen
+        /// e.g. if the document is empty, or the coordinates are Null.
         ///
         /// \param  dimensions_to_query_for Vector containing the dimensions to be queried for.
         ///
         /// \returns    A map containing the min/max-information for the requested dimensions.
         virtual std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) = 0;
-
     public:
         std::vector<imgdoc2::Dimension> GetTileDimensions()
         {
@@ -51,5 +54,12 @@ namespace imgdoc2
             this->GetTileDimensions(dimensions.data(), count);
             return dimensions;
         }
+
+        // no copy and no move (-> https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all )
+        IDocInfo() = default;
+        IDocInfo(const IDocInfo&) = delete;             // copy constructor
+        IDocInfo& operator=(const IDocInfo&) = delete;  // copy assignment
+        IDocInfo(IDocInfo&&) = delete;                  // move constructor
+        IDocInfo& operator=(IDocInfo&&) = delete;       // move assignment
     };
 }
