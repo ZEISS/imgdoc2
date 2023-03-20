@@ -17,33 +17,6 @@
 using namespace std;
 using namespace imgdoc2;
 
-#if 0
-/*static*/std::shared_ptr<imgdoc2::IDoc> imgdoc2::ClassFactory::CreateNew(imgdoc2::ICreateOptions* create_options)
-{
-    // TODO(JBL): here would be the place where we'd allow for "other databases than Sqlite", for the time being,
-    //            we just deal with Sqlite here
-    auto db_connection = DbFactory::SqliteCreateNewDatabase(create_options->GetFilename().c_str());
-
-    // check pre-conditions
-    // TODO(JBL)
-
-    // tweak settings
-
-    DbCreator db_creator(db_connection);
-    const auto configuration = db_creator.CreateTables(create_options);
-
-    const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
-    if (database_configuration_2d)
-    {
-        return make_shared<Document>(db_connection, database_configuration_2d);
-    }
-
-    // TODO(JBL): 3D version should follow here
-
-    return {};
-}
-#endif
-
 std::shared_ptr<DatabaseConfiguration2D> DbCreator::CreateTables2d(const imgdoc2::ICreateOptions* create_options)
 {
     DbCreator::ThrowIfDocumentTypeIsNotAsSpecified(create_options, imgdoc2::DocumentType::kImage2d);

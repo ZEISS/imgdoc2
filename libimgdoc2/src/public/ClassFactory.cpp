@@ -116,7 +116,6 @@ public:
             DbCreator db_creator(db_connection);
             const auto database_configuration_2d = db_creator.CreateTables2d(create_options);
 
-            //const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
             if (database_configuration_2d)
             {
                 return make_shared<Document>(db_connection, database_configuration_2d);

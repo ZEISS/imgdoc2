@@ -171,7 +171,6 @@ DbDiscovery::GeneralDataDiscoveryResult DbDiscovery::DiscoverGeneralTable()
     }
 
     const DocumentType document_type = DbUtilities::GetDocumentTypeFromDocTypeField(str);
-    //if (str != "Tiles2D")
     if (document_type != DocumentType::kImage2d && document_type != DocumentType::kImage3d)
     {
         ostringstream string_stream;
