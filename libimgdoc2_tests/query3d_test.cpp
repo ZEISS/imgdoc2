@@ -168,3 +168,39 @@ INSTANTIATE_TEST_SUITE_P(
     Query3d,
     Query3dWithAndWithoutSpatialIndexFixture2,
     testing::Values(true, false));
+
+
+TEST(Query3d, PlaneIntersectionTest1)
+{
+    // we query with an empty coordinate-query-clause, and expect that an empty clause means
+    //  "no condition, all items are returned"
+    const auto doc = CreateCheckerboard3dDocument(true);
+    const auto reader = doc->GetReader3d();
+
+    const CDimCoordinateQueryClause coordinate_query_clause;
+
+    auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 0, 51), Point3dD(100, 0, 51), Point3dD(100, 100, 51));
+    Plane_NormalAndDistD plane2(Vector3dD(plane.normal.x, plane.normal.y, plane.normal.z), plane.distance);
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingPlane(
+        plane2,
+        nullptr,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    // so, we expect to get all tiles in the document, and we check their correctness
+    //EXPECT_EQ(result_indices.size(), 1000ul);
+    //std::array<int, 1000> expected_result{};
+    //for (int i = 0; i < static_cast<int>(expected_result.size()); ++i)
+    //{
+    //    expected_result[i] = 1 + i;
+    //}
+
+    //const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    //EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
+}

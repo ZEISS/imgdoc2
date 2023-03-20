@@ -9,6 +9,7 @@
 #include <vector>
 #include "documentRead3d.h"
 #include "../db/utilities.h"
+#include "../db/sqlite/custom_functions.h"
 
 using namespace std;
 using namespace imgdoc2;
@@ -97,7 +98,26 @@ using namespace imgdoc2;
 
 /*virtual*/void DocumentRead3d::GetTilesIntersectingPlane(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause, const std::function<bool(imgdoc2::dbIndex)>& func)
 {
-    throw logic_error("The method or operation is not implemented.");
+    shared_ptr<IDbStatement> query_statement;
+    if (this->GetDocument()->GetDataBaseConfiguration3d()->GetIsUsingSpatialIndex())
+    {
+        query_statement = this->GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(plane, coordinate_clause, tileinfo_clause);
+    }
+    else
+    {
+        throw logic_error("The method or operation is not implemented.");
+        //query_statement = this->GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(plane, coordinate_clause, tileinfo_clause);
+    }
+
+    while (this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get()))
+    {
+        const imgdoc2::dbIndex index = query_statement->GetResultInt64(0);
+        const bool continue_operation = func(index);
+        if (!continue_operation)
+        {
+            break;
+        }
+    }
 }
 
 // interface IDocInfo
@@ -474,6 +494,22 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWit
     statement->BindDouble(4, cuboid.y + cuboid.h);
     statement->BindDouble(5, cuboid.z);
     statement->BindDouble(6, cuboid.z + cuboid.d);
+
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
+{
+    stringstream string_stream;
+    string_stream << "SELECT " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
+        this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) <<
+        " MATCH "<< SqliteCustomFunctions::GetQueryFunctionName(SqliteCustomFunctions::Query::RTree_PlaneAabb3D) << "(?1,?2,?3,?4)";
+
+    auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    statement->BindDouble(1, plane.normal.x);
+    statement->BindDouble(2, plane.normal.y);
+    statement->BindDouble(3, plane.normal.z);
+    statement->BindDouble(4, plane.distance);
 
     return statement;
 }
