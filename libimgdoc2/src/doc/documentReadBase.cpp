@@ -17,8 +17,8 @@ using namespace imgdoc2;
 std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentReadBase::GetMinMaxForTileDimensionInternal(
         const std::vector<imgdoc2::Dimension>& dimensions_to_query_for,
         const std::function<bool(imgdoc2::Dimension)>& func_is_dimension_valid,
-        const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_tablename,
-        const std::string& table_name)
+        const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_table_name,
+        const std::string& table_name) const
 {
     for (const auto dimension : dimensions_to_query_for)
     {
@@ -36,7 +36,7 @@ std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentReadBase::GetMin
         return {};
     }
 
-    const auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for, func_add_dimension_tablename, table_name);
+    const auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for, func_add_dimension_table_name, table_name);
 
     map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> result;
 
@@ -66,12 +66,12 @@ std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentReadBase::GetMin
 
 std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxStatement(
     const std::vector<imgdoc2::Dimension>& dimensions,
-    const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_tablename,
-    const std::string& table_name)
+    const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_table_name,
+    const std::string& table_name) const
 {
     // preconditions:
-  // - the dimensions specified must be valid
-  // - the collection must not be empty
+    // - the dimensions specified must be valid
+    // - the collection must not be empty
 
     ostringstream string_stream;
     string_stream << "SELECT ";
@@ -82,11 +82,12 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxStatement(
         {
             string_stream << ',';
         }
+
         string_stream << "MIN([";
-        func_add_dimension_tablename(string_stream, dimension);
+        func_add_dimension_table_name(string_stream, dimension);
         string_stream << "]),";
         string_stream << "MAX([";
-        func_add_dimension_tablename(string_stream, dimension);
+        func_add_dimension_table_name(string_stream, dimension);
         string_stream << "])";
         first_iteration = false;
     }
