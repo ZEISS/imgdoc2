@@ -78,8 +78,7 @@ set(LibImgDoc2_Srcfiles
          "src/doc/documentReadBase.cpp")
 
 add_library(libimgdoc2 STATIC
-                ${LibImgDoc2_Srcfiles}
- "src/db/database_utilities.h")
+                ${LibImgDoc2_Srcfiles})
 
 # shared libraries need PIC
 set_property(TARGET libimgdoc2 PROPERTY POSITION_INDEPENDENT_CODE ON)

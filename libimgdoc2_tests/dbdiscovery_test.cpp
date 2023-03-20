@@ -29,7 +29,6 @@ TEST(DbDiscoveryTest, CreateAndDiscover2D)
         create_options->AddIndexForDimension('a');
         create_options->AddIndexForDimension('c');
         database_configuration_from_creation = db_creator.CreateTables2d(create_options.get());
-        //database_configuration_from_creation = dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
     }
 
     shared_ptr< DatabaseConfiguration2D> database_configuration_from_discovery;
@@ -68,8 +67,7 @@ TEST(DbDiscoveryTest, CreateWithSpatialIndexAndDiscover2D)
         create_options->AddIndexForDimension('a');
         create_options->AddIndexForDimension('c');
         create_options->SetUseSpatialIndex(true);   // request a spatial index
-        auto configuration = db_creator.CreateTables2d(create_options.get());
-        database_configuration_from_creation = dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
+        database_configuration_from_creation = db_creator.CreateTables2d(create_options.get());
     }
 
     shared_ptr< DatabaseConfiguration2D> database_configuration_from_discovery;
