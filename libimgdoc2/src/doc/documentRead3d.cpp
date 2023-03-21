@@ -499,6 +499,12 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWit
 
 std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
 {
+    if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
+    {
+        // we are not yet able to deal with "additional clauses" here
+        throw internal_error_exception("not (yet) implemented");
+    }
+
     stringstream string_stream;
     string_stream << "SELECT " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
         this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) <<
@@ -515,6 +521,12 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
 
 std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
 {
+    if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
+    {
+        // we are not yet able to deal with "additional clauses" here
+        throw internal_error_exception("not (yet) implemented");
+    }
+
     const auto column_name_tile_x = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX);
     const auto column_name_tile_y = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY);
     const auto column_name_tile_z = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ);
