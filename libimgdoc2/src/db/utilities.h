@@ -58,6 +58,7 @@ public:
 
     static void DeleteItemFromPropertyBag(IDbConnection* db_connection, const std::string& table_name, const std::string& key_column_name, const std::string& value_column_name, const std::string& key);
 
+    static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereConditionForIntersectingWithPlaneClause(const imgdoc2::Plane_NormalAndDistD& plane, const DatabaseConfiguration3D& database_configuration);
 private:
     static const char* ComparisonOperatorToString(imgdoc2::ComparisonOperation comparison_operator);
     static const char* LogicalOperatorToString(imgdoc2::LogicalOperator logical_operator);

@@ -168,8 +168,6 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase1
     const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
     const auto reader = doc->GetReader3d();
 
-    const CDimCoordinateQueryClause coordinate_query_clause;
-
     // we construct a plane parallel to the X-Y-plane, and going through the point (0,0,51) -
     //  so we expect to intersect with the bricks with z=[50,60], and there should be exactly 100 of them,
     //  and they have an M-index from 501...600 (that's how we constructed the sample document)
@@ -203,8 +201,6 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase2
     const bool use_spatial_index = GetParam();
     const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
     const auto reader = doc->GetReader3d();
-
-    const CDimCoordinateQueryClause coordinate_query_clause;
 
     // we construct a plane parallel to the X-Z-plane, and going through the point (0,51,0) -
     //  so we expect to intersect with the bricks with Y=[50,60], and there should be exactly 100 of them,
@@ -240,8 +236,6 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase3
     const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
     const auto reader = doc->GetReader3d();
 
-    const CDimCoordinateQueryClause coordinate_query_clause;
-
     // we construct a plane parallel to the Y-Z-plane, and going through the point (51,0,0) -
     //  so we expect to intersect with the bricks with X=[50,60], and there should be exactly 100 of them,
     //  and they have an M-index 51, 52, ..., 60, 151, 152, ..., 160, 251, 252, ..., 260, 351, ... ... 960 (that's how we constructed the sample document)
@@ -268,6 +262,128 @@ TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionTestCase3
 
     const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
     EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result));
+}
+
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionAndDimensionQueryTestCase1)
+{
+    // we query with an empty coordinate-query-clause, and expect that an empty clause means
+    //  "no condition, all items are returned"
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    // we construct a plane parallel to the X-Y-plane, and going through the point (0,0,51) -
+    //  so we expect to intersect with the bricks with z=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index from 501...600 (that's how we constructed the sample document).
+    // We use an additional dimension query to filter out the M-indexes that are in the range [500,558].
+    const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 0, 51), Point3dD(100, 0, 51), Point3dD(100, 100, 51));
+
+    CDimCoordinateQueryClause coordinate_query_clause;
+    coordinate_query_clause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 500, 558 });
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingPlane(
+        plane,
+        &coordinate_query_clause,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    std::vector<int> expected_result_m_indices{};
+    for (int i = 0; i < 100; ++i)
+    {
+        int expected_m = 500+i;
+        if (expected_m > 500 && expected_m < 558)
+        {
+            expected_result_m_indices.emplace_back(expected_m);
+        }
+    }
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result_m_indices));
+}
+
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionAndDimensionQueryTestCase2)
+{
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    // we construct a plane parallel to the X-Z-plane, and going through the point (0,51,0) -
+    //  so we expect to intersect with the bricks with Y=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index from 6, 16, 26, ... (that's how we constructed the sample document).
+    //  We use an additional dimension query to filter out the M-indexes that are in the range [0,358].
+    const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(0, 51, 0), Point3dD(100, 51, 0), Point3dD(100, 51, 100));
+
+    CDimCoordinateQueryClause coordinate_query_clause;
+    coordinate_query_clause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 0, 358 });
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingPlane(
+        plane,
+        &coordinate_query_clause,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    std::vector<int> expected_result_m_indices{};
+    for (int i = 0; i < 100; ++i)
+    {
+        int expected_m = 10 * i + 6;
+        if (expected_m > 0 && expected_m < 358)
+        {
+            expected_result_m_indices.emplace_back(expected_m);
+        }
+    }
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result_m_indices));
+}
+
+TEST_P(Query3dWithAndWithoutSpatialIndexFixture, PlaneBrickIntersectionAndDimensionQueryTestCase3)
+{
+    const bool use_spatial_index = GetParam();
+    const auto doc = CreateCheckerboard3dDocument(use_spatial_index);
+    const auto reader = doc->GetReader3d();
+
+    // we construct a plane parallel to the Y-Z-plane, and going through the point (51,0,0) -
+    //  so we expect to intersect with the bricks with X=[50,60], and there should be exactly 100 of them,
+    //  and they have an M-index 51, 52, ..., 60, 151, 152, ..., 160, 251, 252, ..., 260, 351, ... ... 960 (that's how we constructed the sample document).
+    //  We use an additional dimension query to filter out the M-indexes that are in the range [0,500].
+    const auto plane = Plane_NormalAndDistD::FromThreePoints(Point3dD(51, 0, 0), Point3dD(51, 100, 0), Point3dD(51, 0, 100));
+
+    CDimCoordinateQueryClause coordinate_query_clause;
+    coordinate_query_clause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 0, 500 });
+
+    vector<dbIndex> result_indices;
+    reader->GetTilesIntersectingPlane(
+        plane,
+        &coordinate_query_clause,
+        nullptr,
+        [&](dbIndex index)->bool
+        {
+            result_indices.emplace_back(index);
+            return true;
+        });
+
+    std::vector<int> expected_result_m_indices{};
+    for (int i = 0; i < 100; ++i)
+    {
+        int expected_m = (i / 10) * 100 + 51 + (i % 10);
+        if (expected_m > 0 && expected_m < 500)
+        {
+            expected_result_m_indices.emplace_back(expected_m);
+        }
+    }
+
+    const auto m_indices = GetMIndexOfItems(reader.get(), result_indices);
+    EXPECT_THAT(m_indices, UnorderedElementsAreArray(expected_result_m_indices));
 }
 
 INSTANTIATE_TEST_SUITE_P(

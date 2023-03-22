@@ -258,3 +258,40 @@ using namespace imgdoc2;
 
     return return_value;
 }
+
+/*static*/std::tuple<std::string, std::vector<Utilities::DataBindInfo>> Utilities::CreateWhereConditionForIntersectingWithPlaneClause(const imgdoc2::Plane_NormalAndDistD& plane, const DatabaseConfiguration3D& database_configuration)
+{
+    const auto column_name_tile_x = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX);
+    const auto column_name_tile_y = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY);
+    const auto column_name_tile_z = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ);
+    const auto column_name_tile_w = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW);
+    const auto column_name_tile_h = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH);
+    const auto column_name_tile_d = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD);
+
+    stringstream string_stream;
+    /*string_stream <<
+        "(2*abs(-?4+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?1+" <<
+        "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?2+" <<
+        "([" << column_name_tile_d << "]/2+[" + column_name_tile_z << "])*?3)" <<
+        "<=" <<
+        "abs(?3)*[" << column_name_tile_d << "]+abs(?2)*[" << column_name_tile_h << "]+abs(?1)*[" << column_name_tile_w << "])";*/
+    string_stream <<
+        "(2*abs(-?+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?+" <<
+        "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?+" <<
+        "([" << column_name_tile_d << "]/2+[" + column_name_tile_z << "])*?)" <<
+        "<=" <<
+        "abs(?)*[" << column_name_tile_d << "]+abs(?)*[" << column_name_tile_h << "]+abs(?)*[" << column_name_tile_w << "])";
+
+    return make_tuple(
+        string_stream.str(),
+        std::vector<Utilities::DataBindInfo>
+    {
+        DataBindInfo(plane.distance),
+        DataBindInfo(plane.normal.x),
+        DataBindInfo(plane.normal.y),
+        DataBindInfo(plane.normal.z),
+        DataBindInfo(plane.normal.z),
+        DataBindInfo(plane.normal.y),
+        DataBindInfo(plane.normal.x)
+    });
+}
