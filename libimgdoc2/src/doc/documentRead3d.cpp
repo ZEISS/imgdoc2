@@ -474,7 +474,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryAnd
     return statement;
 }
 
-std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWithSpatialIndex(const imgdoc2::CuboidD& cuboid)
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWithSpatialIndex(const imgdoc2::CuboidD& cuboid) const
 {
     ostringstream string_stream;
     string_stream << "SELECT " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
@@ -497,18 +497,18 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingCuboidQueryWit
     return statement;
 }
 
-std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const
 {
     const auto query_statement_and_binding_info_clause = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->GetDocument()->GetDataBaseConfiguration3d());
-    
+
     stringstream string_stream;
     string_stream << "SELECT spatialindex." << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM "
         << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " spatialindex "
         << "INNER JOIN " << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << " info ON "
         << "spatialindex." << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk)
         << " = info." << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk)
-        << " WHERE (" 
-        << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) 
+        << " WHERE ("
+        << "spatialindex." << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk)
         << " MATCH " << SqliteCustomFunctions::GetQueryFunctionName(SqliteCustomFunctions::Query::RTree_PlaneAabb3D) << "(?,?,?,?))"
         << " AND " << get<0>(query_statement_and_binding_info_clause) << ";";
 
@@ -543,30 +543,30 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     }
 
     return statement;
-   /* if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
-    {
-        // we are not yet able to deal with "additional clauses" here
-        throw internal_error_exception("not (yet) implemented");
-    }
+    /* if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
+     {
+         // we are not yet able to deal with "additional clauses" here
+         throw internal_error_exception("not (yet) implemented");
+     }
 
-    stringstream string_stream;
-    string_stream << "SELECT " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
-        this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) <<
-        " MATCH " << SqliteCustomFunctions::GetQueryFunctionName(SqliteCustomFunctions::Query::RTree_PlaneAabb3D) << "(?1,?2,?3,?4)";
+     stringstream string_stream;
+     string_stream << "SELECT " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
+         this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) <<
+         " MATCH " << SqliteCustomFunctions::GetQueryFunctionName(SqliteCustomFunctions::Query::RTree_PlaneAabb3D) << "(?1,?2,?3,?4)";
 
-    auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
-    statement->BindDouble(1, plane.normal.x);
-    statement->BindDouble(2, plane.normal.y);
-    statement->BindDouble(3, plane.normal.z);
-    statement->BindDouble(4, plane.distance);
+     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+     statement->BindDouble(1, plane.normal.x);
+     statement->BindDouble(2, plane.normal.y);
+     statement->BindDouble(3, plane.normal.z);
+     statement->BindDouble(4, plane.distance);
 
-    return statement;*/
+     return statement;*/
 }
 
-std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause)
+std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const
 {
-    auto intersect_with_plane_clause = Utilities::CreateWhereConditionForIntersectingWithPlaneClause(plane, *this->GetDocument()->GetDataBaseConfiguration3d());
-    auto query_statement_and_binding_info_clause = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->GetDocument()->GetDataBaseConfiguration3d());
+    const auto intersect_with_plane_clause = Utilities::CreateWhereConditionForIntersectingWithPlaneClause(plane, *this->GetDocument()->GetDataBaseConfiguration3d());
+    const auto query_statement_and_binding_info_clause = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->GetDocument()->GetDataBaseConfiguration3d());
 
     stringstream string_stream;
     string_stream << "SELECT [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk) << "] FROM " <<
