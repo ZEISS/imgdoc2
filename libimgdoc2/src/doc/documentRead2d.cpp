@@ -243,28 +243,7 @@ shared_ptr<IDbStatement> DocumentRead2d::CreateQueryStatement(const imgdoc2::IDi
 
     int binding_index = 1;
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
-    /*for (const auto& bind_info : get<1>(query_statement_and_binding_info))
-    {
-        if (holds_alternative<int>(bind_info.value))
-        {
-            statement->BindInt32(binding_index, get<int>(bind_info.value));
-        }
-        else if (holds_alternative<int64_t>(bind_info.value))
-        {
-            statement->BindInt64(binding_index, get<int64_t>(bind_info.value));
-        }
-        else if (holds_alternative<double>(bind_info.value))
-        {
-            statement->BindDouble(binding_index, get<double>(bind_info.value));
-        }
-        else
-        {
-            throw logic_error("invalid variant");
-        }
-
-        ++binding_index;
-    }*/
-
+   
     return statement;
 }
 
@@ -336,27 +315,6 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     statement->BindDouble(binding_index++, rect.y + rect.h);
 
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
-    /*for (const auto& bind_info : get<1>(query_statement_and_binding_info))
-    {
-        if (holds_alternative<int>(bind_info.value))
-        {
-            statement->BindInt32(binding_index, get<int>(bind_info.value));
-        }
-        else if (holds_alternative<int64_t>(bind_info.value))
-        {
-            statement->BindInt64(binding_index, get<int64_t>(bind_info.value));
-        }
-        else if (holds_alternative<double>(bind_info.value))
-        {
-            statement->BindDouble(binding_index, get<double>(bind_info.value));
-        }
-        else
-        {
-            throw logic_error("invalid variant");
-        }
-
-        ++binding_index;
-    }*/
 
     return statement;
 }
@@ -389,27 +347,6 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     statement->BindDouble(binding_index++, rect.y + rect.h);
 
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
-    /*for (const auto& bind_info : get<1>(query_statement_and_binding_info))
-    {
-        if (holds_alternative<int>(bind_info.value))
-        {
-            statement->BindInt32(binding_index, get<int>(bind_info.value));
-        }
-        else if (holds_alternative<int64_t>(bind_info.value))
-        {
-            statement->BindInt64(binding_index, get<int64_t>(bind_info.value));
-        }
-        else if (holds_alternative<double>(bind_info.value))
-        {
-            statement->BindDouble(binding_index, get<double>(bind_info.value));
-        }
-        else
-        {
-            throw logic_error("invalid variant");
-        }
-
-        ++binding_index;
-    }*/
 
     return statement;
 }

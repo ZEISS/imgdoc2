@@ -521,27 +521,6 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     statement->BindDouble(binding_index++, plane.distance);
 
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
-    //for (const auto& binding_info : get<1>(query_statement_and_binding_info_clause))
-    //{
-    //    if (holds_alternative<int>(binding_info.value))
-    //    {
-    //        statement->BindInt32(binding_index, get<int>(binding_info.value));
-    //    }
-    //    else if (holds_alternative<int64_t>(binding_info.value))
-    //    {
-    //        statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
-    //    }
-    //    else if (holds_alternative<double>(binding_info.value))
-    //    {
-    //        statement->BindDouble(binding_index, get<double>(binding_info.value));
-    //    }
-    //    else
-    //    {
-    //        throw logic_error("invalid variant");
-    //    }
-
-    //    ++binding_index;
-    //}
 
     return statement;
     /* if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
@@ -578,50 +557,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
 
     int binding_index = 1;
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(intersect_with_plane_clause), statement.get(), binding_index);
-    /*for (const auto& binding_info : get<1>(intersect_with_plane_clause))
-    {
-        if (holds_alternative<int>(binding_info.value))
-        {
-            statement->BindInt32(binding_index, get<int>(binding_info.value));
-        }
-        else if (holds_alternative<int64_t>(binding_info.value))
-        {
-            statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
-        }
-        else if (holds_alternative<double>(binding_info.value))
-        {
-            statement->BindDouble(binding_index, get<double>(binding_info.value));
-        }
-        else
-        {
-            throw logic_error("invalid variant");
-        }
-
-        ++binding_index;
-    }*/
-
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
-    /*for (const auto& binding_info : get<1>(query_statement_and_binding_info_clause))
-    {
-        if (holds_alternative<int>(binding_info.value))
-        {
-            statement->BindInt32(binding_index, get<int>(binding_info.value));
-        }
-        else if (holds_alternative<int64_t>(binding_info.value))
-        {
-            statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
-        }
-        else if (holds_alternative<double>(binding_info.value))
-        {
-            statement->BindDouble(binding_index, get<double>(binding_info.value));
-        }
-        else
-        {
-            throw logic_error("invalid variant");
-        }
-
-        ++binding_index;
-    }*/
 
     return statement;
 
