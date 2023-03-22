@@ -242,7 +242,8 @@ shared_ptr<IDbStatement> DocumentRead2d::CreateQueryStatement(const imgdoc2::IDi
     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
 
     int binding_index = 1;
-    for (const auto& bind_info : get<1>(query_statement_and_binding_info))
+    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
+    /*for (const auto& bind_info : get<1>(query_statement_and_binding_info))
     {
         if (holds_alternative<int>(bind_info.value))
         {
@@ -262,7 +263,7 @@ shared_ptr<IDbStatement> DocumentRead2d::CreateQueryStatement(const imgdoc2::IDi
         }
 
         ++binding_index;
-    }
+    }*/
 
     return statement;
 }
@@ -334,7 +335,8 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     statement->BindDouble(binding_index++, rect.y);
     statement->BindDouble(binding_index++, rect.y + rect.h);
 
-    for (const auto& bind_info : get<1>(query_statement_and_binding_info))
+    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
+    /*for (const auto& bind_info : get<1>(query_statement_and_binding_info))
     {
         if (holds_alternative<int>(bind_info.value))
         {
@@ -354,7 +356,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
         }
 
         ++binding_index;
-    }
+    }*/
 
     return statement;
 }
@@ -386,7 +388,8 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     statement->BindDouble(binding_index++, rect.y);
     statement->BindDouble(binding_index++, rect.y + rect.h);
 
-    for (const auto& bind_info : get<1>(query_statement_and_binding_info))
+    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
+    /*for (const auto& bind_info : get<1>(query_statement_and_binding_info))
     {
         if (holds_alternative<int>(bind_info.value))
         {
@@ -406,7 +409,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
         }
 
         ++binding_index;
-    }
+    }*/
 
     return statement;
 }

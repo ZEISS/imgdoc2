@@ -520,27 +520,28 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     statement->BindDouble(binding_index++, plane.normal.z);
     statement->BindDouble(binding_index++, plane.distance);
 
-    for (const auto& binding_info : get<1>(query_statement_and_binding_info_clause))
-    {
-        if (holds_alternative<int>(binding_info.value))
-        {
-            statement->BindInt32(binding_index, get<int>(binding_info.value));
-        }
-        else if (holds_alternative<int64_t>(binding_info.value))
-        {
-            statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
-        }
-        else if (holds_alternative<double>(binding_info.value))
-        {
-            statement->BindDouble(binding_index, get<double>(binding_info.value));
-        }
-        else
-        {
-            throw logic_error("invalid variant");
-        }
+    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
+    //for (const auto& binding_info : get<1>(query_statement_and_binding_info_clause))
+    //{
+    //    if (holds_alternative<int>(binding_info.value))
+    //    {
+    //        statement->BindInt32(binding_index, get<int>(binding_info.value));
+    //    }
+    //    else if (holds_alternative<int64_t>(binding_info.value))
+    //    {
+    //        statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
+    //    }
+    //    else if (holds_alternative<double>(binding_info.value))
+    //    {
+    //        statement->BindDouble(binding_index, get<double>(binding_info.value));
+    //    }
+    //    else
+    //    {
+    //        throw logic_error("invalid variant");
+    //    }
 
-        ++binding_index;
-    }
+    //    ++binding_index;
+    //}
 
     return statement;
     /* if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
@@ -576,7 +577,8 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
 
     int binding_index = 1;
-    for (const auto& binding_info : get<1>(intersect_with_plane_clause))
+    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(intersect_with_plane_clause), statement.get(), binding_index);
+    /*for (const auto& binding_info : get<1>(intersect_with_plane_clause))
     {
         if (holds_alternative<int>(binding_info.value))
         {
@@ -596,9 +598,10 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
         }
 
         ++binding_index;
-    }
+    }*/
 
-    for (const auto& binding_info : get<1>(query_statement_and_binding_info_clause))
+    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
+    /*for (const auto& binding_info : get<1>(query_statement_and_binding_info_clause))
     {
         if (holds_alternative<int>(binding_info.value))
         {
@@ -618,7 +621,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
         }
 
         ++binding_index;
-    }
+    }*/
 
     return statement;
 

@@ -295,3 +295,30 @@ using namespace imgdoc2;
         DataBindInfo(plane.normal.x)
     });
 }
+
+/*static*/int Utilities::AddDataBindInfoListToDbStatement(const std::vector<Utilities::DataBindInfo>& data_bind_info, IDbStatement* db_statement, int binding_index)
+{
+    for (const auto& binding_info : data_bind_info)
+    {
+        if (holds_alternative<int>(binding_info.value))
+        {
+            db_statement->BindInt32(binding_index, get<int>(binding_info.value));
+        }
+        else if (holds_alternative<int64_t>(binding_info.value))
+        {
+            db_statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
+        }
+        else if (holds_alternative<double>(binding_info.value))
+        {
+            db_statement->BindDouble(binding_index, get<double>(binding_info.value));
+        }
+        else
+        {
+            throw logic_error("invalid variant");
+        }
+
+        ++binding_index;
+    }
+
+    return binding_index;
+}

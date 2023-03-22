@@ -13,6 +13,7 @@
 #include "ITIleInfoQueryClause.h"
 #include "database_configuration.h"
 #include "IDbConnection.h"
+#include "IDbStatement.h"
 
 class Utilities
 {
@@ -59,6 +60,17 @@ public:
     static void DeleteItemFromPropertyBag(IDbConnection* db_connection, const std::string& table_name, const std::string& key_column_name, const std::string& value_column_name, const std::string& key);
 
     static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereConditionForIntersectingWithPlaneClause(const imgdoc2::Plane_NormalAndDistD& plane, const DatabaseConfiguration3D& database_configuration);
+
+    /// <summary>   
+    /// Add the data from the specified 'data_bind_info'-list to the specified Db-statement, starting with the index  given
+    /// with 'binding_index'. The method returns the index of the next free binding-index (or - it returns the binding-index
+    /// for the next parameter, in other words "binding-index + data_bind_info.size()).
+    /// </summary>
+    /// <param name="data_bind_info">   Information describing the data bind. </param>
+    /// <param name="db_statement">     [in] The database statement where the data is to be bound to. </param>
+    /// <param name="binding_index">    The index where to start the binding. </param>
+    /// <returns>   The index for the next binding, or - the specified 'binding_index' incremented as many times as we bound data. </returns>
+    static int AddDataBindInfoListToDbStatement(const std::vector<DataBindInfo>& data_bind_info, IDbStatement* db_statement, int binding_index);
 private:
     static const char* ComparisonOperatorToString(imgdoc2::ComparisonOperation comparison_operator);
     static const char* LogicalOperatorToString(imgdoc2::LogicalOperator logical_operator);
