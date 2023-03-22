@@ -22,9 +22,9 @@ using namespace imgdoc2;
     // we are expecting exactly one result, or zero in case of "not found"
     if (!this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get()))
     {
-        // this means that the tile with the specified index ('idx') was not found
+        // this means that the brick with the specified index ('idx') was not found
         ostringstream ss;
-        ss << "Request for reading brickinfo for an non-existing tile (with pk=" << idx << ")";
+        ss << "Request for reading brickinfo for an non-existing brick (with pk=" << idx << ")";
         throw non_existing_tile_exception(ss.str(), idx);
     }
 
@@ -501,6 +501,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
 {
     const auto query_statement_and_binding_info_clause = Utilities::CreateWhereStatement(coordinate_clause, tileinfo_clause, *this->GetDocument()->GetDataBaseConfiguration3d());
 
+    // TODO(JBL): this is SQLite-specific, so best case would be - "somehow" move this to the SQLite-specific implementation of IDbStatement
     stringstream string_stream;
     string_stream << "SELECT spatialindex." << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM "
         << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " spatialindex "
@@ -523,24 +524,6 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
 
     return statement;
-    /* if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
-     {
-         // we are not yet able to deal with "additional clauses" here
-         throw internal_error_exception("not (yet) implemented");
-     }
-
-     stringstream string_stream;
-     string_stream << "SELECT " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << " FROM " <<
-         this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesSpatialIndexTableOrThrow() << " WHERE " << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) <<
-         " MATCH " << SqliteCustomFunctions::GetQueryFunctionName(SqliteCustomFunctions::Query::RTree_PlaneAabb3D) << "(?1,?2,?3,?4)";
-
-     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
-     statement->BindDouble(1, plane.normal.x);
-     statement->BindDouble(2, plane.normal.y);
-     statement->BindDouble(3, plane.normal.z);
-     statement->BindDouble(4, plane.distance);
-
-     return statement;*/
 }
 
 std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const
@@ -560,43 +543,4 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
 
     return statement;
-
-    /*
-    if (coordinate_clause != nullptr || tileinfo_clause != nullptr)
-    {
-        // we are not yet able to deal with "additional clauses" here
-        throw internal_error_exception("not (yet) implemented");
-    }
-
-    const auto column_name_tile_x = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX);
-    const auto column_name_tile_y = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY);
-    const auto column_name_tile_z = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ);
-    const auto column_name_tile_w = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW);
-    const auto column_name_tile_h = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH);
-    const auto column_name_tile_d = this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD);
-
-    // The following SQL-statement is doing an intersection test between a plane and an axis-aligned-cuboid. The cuboid's coordinates
-    // are read from the DB-table, and the plane's normal-representation are passed as parameters ?1-?4.
-    // http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/
-    //
-    // What comes out is something like this:
-    // SELECT [Pk] FROM [TILESINFO] WHERE 2*abs(-?4+([TileW]/2+[TileX])*?1+([TileH]/2+[TileY])*?2+([TileD]/2+[TileZ])*?3)<=abs(?3)*[TileD]+abs(?2)*[TileH]+abs(?1)*[TileW];
-    stringstream string_stream;
-    string_stream << "SELECT [" << this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_Pk) << "] FROM " <<
-        '[' << this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << "] WHERE " <<
-        "2*abs(-?4+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?1+" <<
-        "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?2+" <<
-        "([" << column_name_tile_d << "]/2+[" + column_name_tile_z << "])*?3)" <<
-        "<=" <<
-        "abs(?3)*[" << column_name_tile_d << "]+abs(?2)*[" << column_name_tile_h << "]+abs(?1)*[" << column_name_tile_w << "];";
-
-    auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
-
-    statement->BindDouble(1, plane.normal.x);
-    statement->BindDouble(2, plane.normal.y);
-    statement->BindDouble(3, plane.normal.z);
-    statement->BindDouble(4, plane.distance);
-
-    return statement;
-    */
 }

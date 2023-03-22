@@ -268,13 +268,17 @@ using namespace imgdoc2;
     const auto column_name_tile_h = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH);
     const auto column_name_tile_d = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD);
 
-    stringstream string_stream;
-    /*string_stream <<
-        "(2*abs(-?4+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?1+" <<
-        "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?2+" <<
-        "([" << column_name_tile_d << "]/2+[" + column_name_tile_z << "])*?3)" <<
-        "<=" <<
-        "abs(?3)*[" << column_name_tile_d << "]+abs(?2)*[" << column_name_tile_h << "]+abs(?1)*[" << column_name_tile_w << "])";*/
+    ostringstream string_stream;
+
+    // The following SQL-statement is doing an intersection test between a plane and an axis-aligned-cuboid. The cuboid's coordinates
+    // are read from the DB-table, and the plane's normal-representation are passed as parameters ?1-?4.
+    // http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/
+    //
+    // What comes out is something like this:
+    // SELECT [Pk] FROM [TILESINFO] WHERE 2*abs(-?4+([TileW]/2+[TileX])*?1+([TileH]/2+[TileY])*?2+([TileD]/2+[TileZ])*?3)<=abs(?3)*[TileD]+abs(?2)*[TileH]+abs(?1)*[TileW];
+    //
+    // where ?1=plane_normal.x, ?2=plane_normal.y, ?3=plane_normal.z and ?4=plane_normal.distance
+    // (in the code below, we use '?' instead of '?1..' and add the parameters multiple times).
     string_stream <<
         "(2*abs(-?+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?+" <<
         "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?+" <<
@@ -287,12 +291,12 @@ using namespace imgdoc2;
         std::vector<Utilities::DataBindInfo>
     {
         DataBindInfo(plane.distance),
-        DataBindInfo(plane.normal.x),
-        DataBindInfo(plane.normal.y),
-        DataBindInfo(plane.normal.z),
-        DataBindInfo(plane.normal.z),
-        DataBindInfo(plane.normal.y),
-        DataBindInfo(plane.normal.x)
+            DataBindInfo(plane.normal.x),
+            DataBindInfo(plane.normal.y),
+            DataBindInfo(plane.normal.z),
+            DataBindInfo(plane.normal.z),
+            DataBindInfo(plane.normal.y),
+            DataBindInfo(plane.normal.x)
     });
 }
 

@@ -59,6 +59,14 @@ public:
 
     static void DeleteItemFromPropertyBag(IDbConnection* db_connection, const std::string& table_name, const std::string& key_column_name, const std::string& value_column_name, const std::string& key);
 
+    /// <summary>   
+    /// Creates a condition-clause for "does the tile intersect with the specified plane". The condition is constructed for
+    /// the tiles-info-table. Note that this condition does **not** leverage the spatial index (so - this clause is to be used
+    /// if there is no spatial-index available).
+    /// </summary>
+    /// <param name="plane">                    The plane. </param>
+    /// <param name="database_configuration">   The database configuration. </param>
+    /// <returns>   SQL-fragment containing the conditional clause, and the corresponding data-binding-values. </returns>
     static std::tuple<std::string, std::vector<DataBindInfo>> CreateWhereConditionForIntersectingWithPlaneClause(const imgdoc2::Plane_NormalAndDistD& plane, const DatabaseConfiguration3D& database_configuration);
 
     /// <summary>   
