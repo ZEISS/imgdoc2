@@ -8,12 +8,14 @@
 #include <map>
 #include <cstdint>
 #include <limits>
+#include "Intervals.h"
 
 namespace imgdoc2
 {
+    /*
     /// This structure gathers a minimum and maximum value. If minimum is greater than maximum, this means 
     /// that the bounds is invalid.
-    struct CoordinateBounds
+    struct Int32Interval
     {
         std::int32_t minimum_value{ std::numeric_limits<std::int32_t>::max() };  ///< The minimum value.
         std::int32_t maximum_value{ std::numeric_limits<std::int32_t>::min() };  ///< The maximum value.
@@ -29,7 +31,7 @@ namespace imgdoc2
         /// <remarks>   In case the both are 'not valid', then they are considered equal (irrespective of the actual values). </remarks>
         /// <param name="rhs">  The right hand side. </param>
         /// <returns>   True if the parameters are considered equivalent. </returns>
-        bool operator==(const CoordinateBounds& rhs) const
+        bool operator==(const Int32Interval& rhs) const
         {
             if (this->minimum_value == rhs.minimum_value && this->maximum_value == rhs.maximum_value)
             {
@@ -44,11 +46,12 @@ namespace imgdoc2
         /// <remarks>   In case the both are 'not valid', then they are considered equal (irrespective of the actual values). </remarks>
         /// <param name="rhs">  The right hand side. </param>
         /// <returns>   True if the parameters are not considered equivalent. </returns>
-        bool operator!=(const CoordinateBounds& rhs) const
+        bool operator!=(const Int32Interval& rhs) const
         {
             return !(*this == rhs);
         }
     };
+    */
 
     /// This interface is used for retrieving information about the document.
     class IDocInfo
@@ -64,13 +67,13 @@ namespace imgdoc2
 
         /// Gets minimum and maximum value for specified tile dimension.
         /// If the minimum/maximum cannot be determined (for a dimension), then the result will be
-        /// one where Minimum is greater than Maximum (=an invalid CoordinateBounds). This can happen
+        /// one where Minimum is greater than Maximum (=an invalid Int32Interval). This can happen
         /// e.g. if the document is empty, or the coordinates are Null.
         ///
         /// \param  dimensions_to_query_for Vector containing the dimensions to be queried for.
         ///
         /// \returns    A map containing the min/max-information for the requested dimensions.
-        virtual std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) = 0;
+        virtual std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) = 0;
     public:
         std::vector<imgdoc2::Dimension> GetTileDimensions()
         {

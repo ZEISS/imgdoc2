@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <gsl/assert>
 
 using namespace std;
 using namespace imgdoc2;
@@ -20,7 +21,7 @@ using namespace imgdoc2;
     count = static_cast<uint32_t>(tile_dimensions.size());
 }
 
-std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentReadBase::GetMinMaxForTileDimensionInternal(
+std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentReadBase::GetMinMaxForTileDimensionInternal(
         const std::vector<imgdoc2::Dimension>& dimensions_to_query_for,
         const std::function<bool(imgdoc2::Dimension)>& func_is_dimension_valid,
         const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_table_name,
@@ -44,7 +45,7 @@ std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentReadBase::GetMin
 
     const auto query_statement = this->CreateQueryMinMaxStatement(dimensions_to_query_for, func_add_dimension_table_name, table_name);
 
-    map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> result;
+    map<imgdoc2::Dimension, imgdoc2::Int32Interval> result;
 
     // we expect exactly "2 * dimensions_to_query_for.size()" results
     const bool is_done = this->GetDocument()->GetDatabase_connection()->StepStatement(query_statement.get());
@@ -55,7 +56,7 @@ std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentReadBase::GetMin
 
     for (size_t i = 0; i < dimensions_to_query_for.size(); ++i)
     {
-        CoordinateBounds coordinate_bounds;
+        Int32Interval coordinate_bounds;
         auto min = query_statement->GetResultInt32OrNull(i * 2);
         auto max = query_statement->GetResultInt32OrNull(i * 2 + 1);
         if (min.has_value() && max.has_value())
@@ -102,4 +103,55 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxStatement(
 
     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
     return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const std::string& table_name, std::vector<QueryMinMaxForXyzInfo> query_info)
+{
+    Expects(!query_info.empty());
+
+    ostringstream string_stream;
+    string_stream << "SELECT ";
+    bool first_iteration = true;
+    for (const auto& info : query_info)
+    {
+        if (!first_iteration)
+        {
+            string_stream << ',';
+        }
+
+        string_stream << "MIN([";
+        string_stream << info.column_name_coordinate;
+        string_stream << "]),";
+        string_stream << "MAX([";
+        string_stream << info.column_name_coordinate << "]+[" << info.column_name_coordinate_extent;
+        string_stream << "])";
+
+        first_iteration = false;
+    }
+
+    string_stream << " FROM [" << table_name << "];";
+
+    auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+
+    return statement;
+}
+
+int DocumentReadBase::SetCoordinateBoundsValueIfNonNull(imgdoc2::Int32Interval* bounds, IDbStatement* statement, int result_index)
+{
+    if (bounds != nullptr)
+    {
+        auto min = statement->GetResultInt32OrNull(result_index++);
+        auto max = statement->GetResultInt32OrNull(result_index++);
+        if (min.has_value() && max.has_value())
+        {
+            bounds->minimum_value = min.value();
+            bounds->maximum_value = max.value();
+        }
+        else
+        {
+            *bounds = Int32Interval{};
+        }
+    }
+
+    return result_index;
 }

@@ -35,11 +35,21 @@ protected:
     /// \param  table_name                      Name of the table to be queried.
     ///
     /// \returns    A map containing the min/max-information for the requested dimensions.
-    std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> GetMinMaxForTileDimensionInternal(
+    std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimensionInternal(
         const std::vector<imgdoc2::Dimension>& dimensions_to_query_for,
         const std::function<bool(imgdoc2::Dimension)>& func_is_dimension_valid,
-        const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_table_name, 
+        const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_table_name,
         const std::string& table_name) const;
+
+    struct QueryMinMaxForXyzInfo
+    {
+        std::string column_name_coordinate;
+        std::string column_name_coordinate_extent;
+    };
+
+    std::shared_ptr<IDbStatement> CreateQueryMinMaxForXyz(const std::string& table_name, std::vector< QueryMinMaxForXyzInfo> query_info);
+    int SetCoordinateBoundsValueIfNonNull(imgdoc2::Int32Interval* bounds, IDbStatement* statement, int result_index);
+
 
     [[nodiscard]] const std::shared_ptr<Document>& GetDocument() const { return this->document_; }
     [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->document_->GetHostingEnvironment(); }

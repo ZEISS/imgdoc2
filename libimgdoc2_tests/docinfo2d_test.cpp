@@ -309,7 +309,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    CoordinateBounds bounds_x, bounds_y;
+    Int32Interval bounds_x, bounds_y;
     reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
 
     // assert
@@ -334,7 +334,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForEmptyDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    CoordinateBounds bounds_x{ 1,3 }, bounds_y{ 7,8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
+    Int32Interval bounds_x{ 1,3 }, bounds_y{ 7,8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
     reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
 
     // assert
@@ -379,8 +379,8 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentUseOnlyXOrOnlyYAndCheckResul
     const auto reader = doc->GetReader2d();
 
     // act
-    CoordinateBounds bounds_x, bounds_y;
-    CoordinateBounds bounds_x_all, bounds_y_all;
+    Int32Interval bounds_x, bounds_y;
+    Int32Interval bounds_x_all, bounds_y_all;
     reader->GetTilesBoundingBox(&bounds_x, nullptr);
     reader->GetTilesBoundingBox(nullptr, &bounds_y);
     reader->GetTilesBoundingBox(&bounds_x_all, &bounds_y_all);

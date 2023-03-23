@@ -92,3 +92,63 @@ TEST(DocInfo3d, GetMinMaxForTileDimensionForRandomDocumentAndCheckResult)
     ASSERT_EQ(min_max['p'].minimum_value, min_p);
     ASSERT_EQ(min_max['p'].maximum_value, max_p);
 }
+
+TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetDocumentType(DocumentType::kImage3d);
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('x');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto writer = doc->GetWriter3d();
+
+    random_device rd;
+    mt19937 rng(rd());
+    uniform_real_distribution<double> distribution(numeric_limits<double>::min(), numeric_limits<double>::max() - 5000);
+
+    double min_x = numeric_limits<double>::max();
+    double max_x = numeric_limits<double>::min();
+    //int min_p = numeric_limits<int>::max();
+    //int max_x = numeric_limits<int>::min();
+    //int max_p = numeric_limits<int>::min();
+    for (int i = 0; i < 100; ++i)
+    {
+        LogicalPositionInfo3D position_info;
+        BrickBaseInfo brick_info;
+        int x_coordinate = i;
+        TileCoordinate tc({ { 'x', i} });
+        position_info.posX = distribution(rng);
+        position_info.posY = distribution(rng);
+        position_info.posZ = distribution(rng);
+        position_info.width = 10;
+        position_info.height = 10;
+        position_info.depth = 10;
+        position_info.pyrLvl = 0;
+        brick_info.pixelWidth = 10;
+        brick_info.pixelHeight = 10;
+        brick_info.pixelDepth = 10;
+        brick_info.pixelType = 0;
+        writer->AddBrick(&tc, &position_info, &brick_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+        min_x = min(min_x, position_info.posX);
+        max_x = max(max_x, position_info.posX + position_info.width);
+    }
+
+    const auto reader = doc->GetReader3d();
+
+    // act
+    //auto min_max = reader->GetMinMaxForTileDimension({ 'p', 'x' });
+
+    // assert
+    /*
+    ASSERT_EQ(min_max.size(), 2);
+    ASSERT_TRUE(min_max.find('x') != min_max.cend());
+    ASSERT_TRUE(min_max.find('p') != min_max.cend());
+    ASSERT_EQ(min_max['x'].minimum_value, min_x);
+    ASSERT_EQ(min_max['x'].maximum_value, max_x);
+    ASSERT_EQ(min_max['p'].minimum_value, min_p);
+    ASSERT_EQ(min_max['p'].maximum_value, max_p);
+    */
+}

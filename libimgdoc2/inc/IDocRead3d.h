@@ -4,12 +4,12 @@
 
 #pragma once
 #include "IDocQuery3d.h"
-#include "IDocInfo.h"
+#include "IDocInfo3d.h"
 
 namespace imgdoc2
 {
     /// This interface is providing read-only access to a 3D-document.
-    class IDocRead3d : public IDocQuery3d, public IDocInfo
+    class IDocRead3d : public imgdoc2::IDocQuery3d, public imgdoc2::IDocInfo3d
     {
     public:
         virtual ~IDocRead3d() = default;

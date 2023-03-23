@@ -22,7 +22,7 @@ using namespace imgdoc2;
         count);
 }
 
-/*virtual*/void DocumentRead2d::GetTilesBoundingBox(imgdoc2::CoordinateBounds* bounds_x, imgdoc2::CoordinateBounds* bounds_y)
+/*virtual*/void DocumentRead2d::GetTilesBoundingBox(imgdoc2::Int32Interval* bounds_x, imgdoc2::Int32Interval* bounds_y)
 {
     if (bounds_x == nullptr && bounds_y == nullptr)
     {
@@ -31,45 +31,18 @@ using namespace imgdoc2;
     }
 
     // case "no spatial index"
-    const auto statement = this->CreateQueryTilesBoundingBoxStatement(bounds_x!=nullptr, bounds_y!=nullptr);
+    const auto statement = this->CreateQueryTilesBoundingBoxStatement(bounds_x != nullptr, bounds_y != nullptr);
     if (!this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get()))
     {
         throw internal_error_exception("database-query gave no result, this is unexpected.");
     }
 
     int result_index = 0;
-    if (bounds_x != nullptr)
-    {
-        auto min = statement->GetResultInt32OrNull(result_index++);
-        auto max = statement->GetResultInt32OrNull(result_index++);
-        if (min.has_value() && max.has_value())
-        {
-            bounds_x->minimum_value = min.value();
-            bounds_x->maximum_value = max.value();
-        }
-        else
-        {
-            *bounds_x = CoordinateBounds{};
-        }
-    }
-
-    if (bounds_y != nullptr)
-    {
-        auto min = statement->GetResultInt32OrNull(result_index++);
-        auto max = statement->GetResultInt32OrNull(result_index++);
-        if (min.has_value() && max.has_value())
-        {
-            bounds_y->minimum_value = min.value();
-            bounds_y->maximum_value = max.value();
-        }
-        else
-        {
-            *bounds_y = CoordinateBounds{};
-        }
-    }
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
 }
 
-/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
+/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
 {
     return this->GetMinMaxForTileDimensionInternal(
         dimensions_to_query_for,
@@ -466,28 +439,50 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryTilesBoundingBoxStateme
 {
     Expects(include_x == true || include_y == true);
 
-    ostringstream string_stream;
-    string_stream << "SELECT ";
+    vector< QueryMinMaxForXyzInfo> query_min_max_for_xyz_info_list;
     if (include_x)
     {
-        string_stream << "MIN([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "]),"
-            << "MAX([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "]+["
-            << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) << "])";
-        if (include_y)
-        {
-            string_stream << ',';
-        }
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            { 
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX),
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) 
+            });
     }
 
     if (include_y)
     {
-        string_stream << "MIN([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "]),"
-            << "MAX([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "]+["
-            << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH) << "])";
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            {
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY),
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH)
+            });
     }
 
-    string_stream << " FROM ["<<this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow()<<"];";
-    
-    auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
-    return statement;
+    return this->CreateQueryMinMaxForXyz(this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow(), query_min_max_for_xyz_info_list);
+    /* ostringstream string_stream;
+     string_stream << "SELECT ";
+     if (include_x)
+     {
+         string_stream << "MIN([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "]),"
+             << "MAX([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "]+["
+             << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) << "])";
+         if (include_y)
+         {
+             string_stream << ',';
+         }
+     }
+
+     if (include_y)
+     {
+         string_stream << "MIN([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "]),"
+             << "MAX([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "]+["
+             << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH) << "])";
+     }
+
+     string_stream << " FROM [" << this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << "];";
+
+     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+     return statement;*/
 }
