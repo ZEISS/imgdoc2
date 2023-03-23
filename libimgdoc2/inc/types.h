@@ -413,7 +413,7 @@ namespace imgdoc2
         Vector3dD(double x, double y, double z) :Vector3dT<double>(x, y, z) {}
     };
 
-    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin (aka "Hesse normal form").
     /// The normal must be normalized.
     /// The equation of the plane is: dot( x, normal) = distance.
     template<typename T>
@@ -431,6 +431,7 @@ namespace imgdoc2
         Plane_NormalAndDist(const Vector3dT<T>& n, T d) :normal(n), distance(d) {}
 
         /// Create the normal-representation of a plane for a plane defined by three points.
+        /// Precondition (not checked currently) is that the points are distinct.
         /// \param  a The first point on the plane.
         /// \param  b The second point on the plane.
         /// \param  c The third point on the plane.
@@ -443,27 +444,14 @@ namespace imgdoc2
         }
     };
 
-    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// Defines an alias representing a parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
     /// Coordinates are represented by floats.
-    /// The normal must be normalized.
-    /// The equation of the plane is: dot( x, normal) = distance.
-    struct Plane_NormalAndDistF : Plane_NormalAndDist<float>
-    {};
+    typedef Plane_NormalAndDist<float> Plane_NormalAndDistF;
 
-    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// Defines an alias representing a parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
     /// Coordinates are represented by doubles.
-    /// The normal must be normalized.
-    /// The equation of the plane is: dot( x, normal) = distance.
-    struct Plane_NormalAndDistD : Plane_NormalAndDist<double>
-    {
-        Plane_NormalAndDistD() = default;
-
-        /// Constructor.
-        /// \param  n The normal.
-        /// \param  d The distance to the origin.
-        Plane_NormalAndDistD(const Vector3dD& n, double d) : Plane_NormalAndDist<double>(n, d) {}
-    };
-
+    typedef Plane_NormalAndDist<double> Plane_NormalAndDistD;
+    
     /*static*/template<typename t> inline bool CuboidT<t>::DoIntersect(const imgdoc2::CuboidT<t>& aabb, const imgdoc2::Plane_NormalAndDist<t>& plane)
     {
         // -> https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html

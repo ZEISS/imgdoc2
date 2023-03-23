@@ -258,3 +258,71 @@ using namespace imgdoc2;
 
     return return_value;
 }
+
+/*static*/std::tuple<std::string, std::vector<Utilities::DataBindInfo>> Utilities::CreateWhereConditionForIntersectingWithPlaneClause(const imgdoc2::Plane_NormalAndDistD& plane, const DatabaseConfiguration3D& database_configuration)
+{
+    const auto column_name_tile_x = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX);
+    const auto column_name_tile_y = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY);
+    const auto column_name_tile_z = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ);
+    const auto column_name_tile_w = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW);
+    const auto column_name_tile_h = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH);
+    const auto column_name_tile_d = database_configuration.GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD);
+
+    ostringstream string_stream;
+
+    // The following SQL-statement is doing an intersection test between a plane and an axis-aligned-cuboid. The cuboid's coordinates
+    // are read from the DB-table, and the plane's normal-representation are passed as parameters ?1-?4.
+    // http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/
+    //
+    // What comes out is something like this:
+    // SELECT [Pk] FROM [TILESINFO] WHERE 2*abs(-?4+([TileW]/2+[TileX])*?1+([TileH]/2+[TileY])*?2+([TileD]/2+[TileZ])*?3)<=abs(?3)*[TileD]+abs(?2)*[TileH]+abs(?1)*[TileW];
+    //
+    // where ?1=plane_normal.x, ?2=plane_normal.y, ?3=plane_normal.z and ?4=plane_normal.distance
+    // (in the code below, we use '?' instead of '?1..' and add the parameters multiple times).
+    string_stream <<
+        "(2*abs(-?+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?+" <<
+        "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?+" <<
+        "([" << column_name_tile_d << "]/2+[" + column_name_tile_z << "])*?)" <<
+        "<=" <<
+        "abs(?)*[" << column_name_tile_d << "]+abs(?)*[" << column_name_tile_h << "]+abs(?)*[" << column_name_tile_w << "])";
+
+    return make_tuple(
+        string_stream.str(),
+        std::vector<Utilities::DataBindInfo>
+    {
+        DataBindInfo(plane.distance),
+            DataBindInfo(plane.normal.x),
+            DataBindInfo(plane.normal.y),
+            DataBindInfo(plane.normal.z),
+            DataBindInfo(plane.normal.z),
+            DataBindInfo(plane.normal.y),
+            DataBindInfo(plane.normal.x)
+    });
+}
+
+/*static*/int Utilities::AddDataBindInfoListToDbStatement(const std::vector<Utilities::DataBindInfo>& data_bind_info, IDbStatement* db_statement, int binding_index)
+{
+    for (const auto& binding_info : data_bind_info)
+    {
+        if (holds_alternative<int>(binding_info.value))
+        {
+            db_statement->BindInt32(binding_index, get<int>(binding_info.value));
+        }
+        else if (holds_alternative<int64_t>(binding_info.value))
+        {
+            db_statement->BindInt64(binding_index, get<int64_t>(binding_info.value));
+        }
+        else if (holds_alternative<double>(binding_info.value))
+        {
+            db_statement->BindDouble(binding_index, get<double>(binding_info.value));
+        }
+        else
+        {
+            throw logic_error("invalid variant");
+        }
+
+        ++binding_index;
+    }
+
+    return binding_index;
+}
