@@ -215,5 +215,56 @@ namespace ImgDoc2Net_UnitTests
 
             Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
         }
+
+        [Fact]
+        public void CreateDocument1AndCallGetBoundingBoxAndCheck()
+        {
+            var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
+            {
+                using var createOptions = new CreateOptions() {Filename = ":memory:", UseBlobTable = true};
+                createOptions.AddDimension(new Dimension('o'));
+                using var document = Document.CreateNew(createOptions);
+                using var reader2d = document.Get2dReader();
+                using var writer2d = document.Get2dWriter();
+
+                LogicalPosition logicalPosition = new LogicalPosition()
+                {
+                    PositionX = 10,
+                    PositionY = 20,
+                    Width = 100,
+                    Height = 111,
+                    PyramidLevel = 0
+                };
+
+                var tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 11)});
+
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 141)});
+
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                var extent = reader2d.GetBoundingBox();
+
+                extent.MinX.Should().Be(10);
+                extent.MaxX.Should().Be(110);
+                extent.MinY.Should().Be(20);
+                extent.MaxY.Should().Be(131);
+            }
+
+            Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
+        }
     }
 }

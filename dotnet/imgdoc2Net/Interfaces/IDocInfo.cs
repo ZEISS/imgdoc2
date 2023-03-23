@@ -30,5 +30,7 @@ namespace ImgDoc2Net.Interfaces
         /// greater than the maximum means that the value is indeterminate.
         /// </returns>
         Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions);
+
+        Extent2d GetBoundingBox();
     }
 }

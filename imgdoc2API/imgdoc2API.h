@@ -169,3 +169,11 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetMinMaxForTileDimensions(
     std::uint32_t count,
     MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
+    HandleDocRead2D handle,
+    double* min_x,
+    double* max_x,
+    double* min_y,
+    double* max_y,
+    ImgDoc2ErrorInformation* error_information);
