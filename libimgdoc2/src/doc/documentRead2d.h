@@ -42,5 +42,5 @@ private:
 
     std::shared_ptr<IDbStatement> CreateQueryMinMaxStatement(const std::vector<imgdoc2::Dimension>& dimensions);
 
-    std::shared_ptr<IDbStatement> CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y);
+    std::shared_ptr<IDbStatement> CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y) const;
 };

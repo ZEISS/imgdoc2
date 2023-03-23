@@ -41,15 +41,27 @@ protected:
         const std::function<void(std::ostringstream&, imgdoc2::Dimension)>& func_add_dimension_table_name,
         const std::string& table_name) const;
 
+    /// Information about columns for the position and the associated extent.
     struct QueryMinMaxForXyzInfo
     {
-        std::string column_name_coordinate;
-        std::string column_name_coordinate_extent;
+        std::string column_name_coordinate;         /// Name of the column for the coordinate.
+        std::string column_name_coordinate_extent;  /// Name of the column for the coordinate extent.
     };
 
-    std::shared_ptr<IDbStatement> CreateQueryMinMaxForXyz(const std::string& table_name, std::vector<QueryMinMaxForXyzInfo> query_info);
-    int SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index);
+    /// Creates a statement which queries for the bounding box/cuboid of all tiles/bricks. 
+    /// \param  table_name  Name of the table to query (the 'TILESINFO'-table).
+    /// \param  query_info  Information listing the columns for the position and the associated extent.
+    /// \returns    A statement for retrieving the bounding box/cuboid of all tiles/bricks.
+    [[nodiscard]] std::shared_ptr<IDbStatement> CreateQueryMinMaxForXyz(const std::string& table_name, const std::vector<QueryMinMaxForXyzInfo>& query_info) const;
 
+    /// A utility which reads two doubles from the specified statement and sets the values in the specified interval. It uses the specified result index
+    /// for reading from the statement. If the pointer 'interval' is null, the function will not read from the statement and do nothing.
+    /// The returned integer is the next index to read from, or in other words - the argument 'result_index' plus two (if the pointer 'interval' is not null).
+    /// \param [in,out] interval        If non-null, the interval which will be set.
+    /// \param [in,out] statement       The database-result statement.
+    /// \param          result_index    The index where to start to read from the database-result statement.
+    /// \returns    The index (into the database-result statement) where to read the next value from.
+    static int SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index);
 
     [[nodiscard]] const std::shared_ptr<Document>& GetDocument() const { return this->document_; }
     [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->document_->GetHostingEnvironment(); }

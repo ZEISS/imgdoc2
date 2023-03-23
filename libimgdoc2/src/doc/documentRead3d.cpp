@@ -567,7 +567,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     return statement;
 }
 
-std::shared_ptr<IDbStatement> DocumentRead3d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z)
+std::shared_ptr<IDbStatement> DocumentRead3d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z) const
 {
     Expects(include_x == true || include_y == true || include_z == true);
 

@@ -9,7 +9,7 @@ namespace imgdoc2
     class IDocInfo3d : public IDocInfo
     {
     public:
-        /// <summary>   Gets the extents of an axis-aligned bounding box for all bricks. </summary>
+        /// <summary>   Gets the extents of an axis-aligned bounding cuboid for all bricks. </summary>
         /// <param name="bounds_x"> [in,out] If non-null, the extent for the x-coordinate is put here. </param>
         /// <param name="bounds_y"> [in,out] If non-null, the extent for the y-coordinate is put here. </param>
         /// <param name="bounds_z"> [in,out] If non-null, the extent for the z-coordinate is put here. </param>

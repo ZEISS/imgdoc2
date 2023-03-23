@@ -435,7 +435,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryMinMaxStatement(const s
     return statement;
 }
 
-std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y)
+std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y) const
 {
     Expects(include_x == true || include_y == true);
 

@@ -105,7 +105,7 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxStatement(
     return statement;
 }
 
-std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const std::string& table_name, std::vector<QueryMinMaxForXyzInfo> query_info)
+std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const std::string& table_name, const std::vector<QueryMinMaxForXyzInfo>& query_info) const
 {
     Expects(!query_info.empty());
 
@@ -136,7 +136,7 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const st
     return statement;
 }
 
-int DocumentReadBase::SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index)
+/*static*/int DocumentReadBase::SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index)
 {
     if (interval != nullptr)
     {

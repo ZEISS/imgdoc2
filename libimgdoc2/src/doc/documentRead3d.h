@@ -44,5 +44,5 @@ private:
     std::shared_ptr<IDbStatement> GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const; 
     std::shared_ptr<IDbStatement> GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const;
 
-    std::shared_ptr<IDbStatement> CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z);
+    std::shared_ptr<IDbStatement> CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z) const;
 };
