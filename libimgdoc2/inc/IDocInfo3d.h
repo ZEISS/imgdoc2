@@ -15,6 +15,8 @@ namespace imgdoc2
         /// <param name="bounds_z"> [in,out] If non-null, the extent for the z-coordinate is put here. </param>
         virtual void GetBricksBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y, imgdoc2::DoubleInterval* bounds_z) = 0;
 
+        ~IDocInfo3d() override = default;
+
         // no copy and no move (-> https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all )
         IDocInfo3d() = default;
         IDocInfo3d(const IDocInfo3d&) = delete;             // copy constructor

@@ -22,7 +22,7 @@ using namespace imgdoc2;
         count);
 }
 
-/*virtual*/void DocumentRead2d::GetTilesBoundingBox(imgdoc2::Int32Interval* bounds_x, imgdoc2::Int32Interval* bounds_y)
+/*virtual*/void DocumentRead2d::GetTilesBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y)
 {
     if (bounds_x == nullptr && bounds_y == nullptr)
     {
@@ -439,7 +439,8 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryTilesBoundingBoxStateme
 {
     Expects(include_x == true || include_y == true);
 
-    vector< QueryMinMaxForXyzInfo> query_min_max_for_xyz_info_list;
+    vector<QueryMinMaxForXyzInfo> query_min_max_for_xyz_info_list;
+    query_min_max_for_xyz_info_list.reserve(2);
     if (include_x)
     {
         query_min_max_for_xyz_info_list.push_back(
@@ -461,28 +462,4 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryTilesBoundingBoxStateme
     }
 
     return this->CreateQueryMinMaxForXyz(this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow(), query_min_max_for_xyz_info_list);
-    /* ostringstream string_stream;
-     string_stream << "SELECT ";
-     if (include_x)
-     {
-         string_stream << "MIN([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "]),"
-             << "MAX([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX) << "]+["
-             << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) << "])";
-         if (include_y)
-         {
-             string_stream << ',';
-         }
-     }
-
-     if (include_y)
-     {
-         string_stream << "MIN([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "]),"
-             << "MAX([" << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY) << "]+["
-             << this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH) << "])";
-     }
-
-     string_stream << " FROM [" << this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow() << "];";
-
-     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
-     return statement;*/
 }

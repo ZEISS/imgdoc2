@@ -12,7 +12,9 @@ namespace imgdoc2
         /// <summary>   Gets the extents of an axis-aligned bounding box for all tiles. </summary>
         /// <param name="bounds_x"> [in,out] If non-null, the extent for the x-coordinate is put here. </param>
         /// <param name="bounds_y"> [in,out] If non-null, the extent for the y-coordinate is put here. </param>
-        virtual void GetTilesBoundingBox(imgdoc2::Int32Interval* bounds_x, imgdoc2::Int32Interval* bounds_y) = 0;
+        virtual void GetTilesBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y) = 0;
+
+        ~IDocInfo2d() override = default;
 
         // no copy and no move (-> https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all )
         IDocInfo2d() = default;

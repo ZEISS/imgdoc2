@@ -30,7 +30,7 @@ public:
     std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) override;
 
     // interface IDocInfo2d
-    void GetTilesBoundingBox(imgdoc2::Int32Interval* bounds_x, imgdoc2::Int32Interval* bounds_y) override;
+    void GetTilesBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y) override;
 private:
     std::shared_ptr<IDbStatement> GetReadTileInfo_Statement(bool include_tile_coordinates, bool include_logical_position_info, bool include_tile_blob_info);
     std::shared_ptr<IDbStatement> CreateQueryStatement(const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause);

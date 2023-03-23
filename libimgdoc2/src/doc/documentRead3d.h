@@ -31,7 +31,7 @@ public:
     std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) override;
 
     // interface IDocInfo3d
-    void GetBricksBoundingBox(imgdoc2::Int32Interval* bounds_x, imgdoc2::Int32Interval* bounds_y, imgdoc2::Int32Interval* bounds_z) override;
+    void GetBricksBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y, imgdoc2::DoubleInterval* bounds_z) override;
 private:
     std::shared_ptr<IDbStatement> GetReadBrickInfo_Statement(bool include_brick_coordinates, bool include_logical_position_info, bool include_brick_blob_info);
     std::shared_ptr<IDbStatement> CreateQueryStatement(const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause);
@@ -44,5 +44,5 @@ private:
     std::shared_ptr<IDbStatement> GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClauseWithSpatialIndex(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const; 
     std::shared_ptr<IDbStatement> GetTilesIntersectingWithPlaneQueryAndCoordinateAndInfoQueryClause(const imgdoc2::Plane_NormalAndDistD& plane, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause) const;
 
-    std::shared_ptr<IDbStatement> DocumentRead3d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z);
+    std::shared_ptr<IDbStatement> CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z);
 };

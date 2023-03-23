@@ -107,13 +107,14 @@ TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
 
     random_device rd;
     mt19937 rng(rd());
-    uniform_real_distribution<double> distribution(numeric_limits<double>::min(), numeric_limits<double>::max() - 5000);
+    uniform_real_distribution<double> distribution(-1e6, 1e6);
 
     double min_x = numeric_limits<double>::max();
     double max_x = numeric_limits<double>::min();
-    //int min_p = numeric_limits<int>::max();
-    //int max_x = numeric_limits<int>::min();
-    //int max_p = numeric_limits<int>::min();
+    double min_y = numeric_limits<double>::max();
+    double max_y = numeric_limits<double>::min();
+    double min_z = numeric_limits<double>::max();
+    double max_z = numeric_limits<double>::min();
     for (int i = 0; i < 100; ++i)
     {
         LogicalPositionInfo3D position_info;
@@ -134,21 +135,24 @@ TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
         writer->AddBrick(&tc, &position_info, &brick_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
         min_x = min(min_x, position_info.posX);
         max_x = max(max_x, position_info.posX + position_info.width);
+        min_y = min(min_y, position_info.posY);
+        max_y = max(max_y, position_info.posY + position_info.height);
+        min_z = min(min_z, position_info.posZ);
+        max_z = max(max_z, position_info.posZ + position_info.depth);
     }
 
     const auto reader = doc->GetReader3d();
 
     // act
-    //auto min_max = reader->GetMinMaxForTileDimension({ 'p', 'x' });
+    DoubleInterval interval_x, interval_y, interval_z;
+    reader->GetBricksBoundingBox(&interval_x, &interval_y, &interval_z);
 
     // assert
-    /*
-    ASSERT_EQ(min_max.size(), 2);
-    ASSERT_TRUE(min_max.find('x') != min_max.cend());
-    ASSERT_TRUE(min_max.find('p') != min_max.cend());
-    ASSERT_EQ(min_max['x'].minimum_value, min_x);
-    ASSERT_EQ(min_max['x'].maximum_value, max_x);
-    ASSERT_EQ(min_max['p'].minimum_value, min_p);
-    ASSERT_EQ(min_max['p'].maximum_value, max_p);
-    */
+    ASSERT_DOUBLE_EQ(interval_x.minimum_value, min_x);
+    ASSERT_DOUBLE_EQ(interval_x.maximum_value, max_x);
+    ASSERT_DOUBLE_EQ(interval_y.minimum_value, min_y);
+    ASSERT_DOUBLE_EQ(interval_y.maximum_value, max_y);
+    ASSERT_DOUBLE_EQ(interval_z.minimum_value, min_z);
+    ASSERT_DOUBLE_EQ(interval_z.maximum_value, max_z);
+
 }

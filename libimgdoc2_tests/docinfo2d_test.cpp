@@ -309,7 +309,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    Int32Interval bounds_x, bounds_y;
+    DoubleInterval bounds_x, bounds_y;
     reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
 
     // assert
@@ -334,7 +334,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForEmptyDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    Int32Interval bounds_x{ 1,3 }, bounds_y{ 7,8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
+    DoubleInterval bounds_x{ 1,3 }, bounds_y{ 7,8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
     reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
 
     // assert
@@ -354,7 +354,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentUseOnlyXOrOnlyYAndCheckResul
     const auto doc = ClassFactory::CreateNew(create_options.get());
     const auto writer = doc->GetWriter2d();
 
-    // we place two tiles - one with (0,0,10,10) and one with (10,8,5,5), so the bounding box should be (0,0,15,13)
+    // we place two tiles - one with (0,0,10,10) and one with (10.5,8,5,5), so the bounding box should be (0,0,15.5,13)
     LogicalPositionInfo position_info;
     TileBaseInfo tileInfo;
     TileCoordinate tc({ { 'l', 5 }, { 'u', 3} });
@@ -368,7 +368,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentUseOnlyXOrOnlyYAndCheckResul
     tileInfo.pixelType = 0;
     writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
 
-    position_info.posX = 10;
+    position_info.posX = 10.5;
     position_info.posY = 8;
     position_info.width = 5;
     position_info.height = 5;
@@ -379,15 +379,15 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentUseOnlyXOrOnlyYAndCheckResul
     const auto reader = doc->GetReader2d();
 
     // act
-    Int32Interval bounds_x, bounds_y;
-    Int32Interval bounds_x_all, bounds_y_all;
+    DoubleInterval bounds_x, bounds_y;
+    DoubleInterval bounds_x_all, bounds_y_all;
     reader->GetTilesBoundingBox(&bounds_x, nullptr);
     reader->GetTilesBoundingBox(nullptr, &bounds_y);
     reader->GetTilesBoundingBox(&bounds_x_all, &bounds_y_all);
 
     // assert
     EXPECT_EQ(bounds_x.minimum_value, 0);
-    EXPECT_EQ(bounds_x.maximum_value, 15);
+    EXPECT_EQ(bounds_x.maximum_value, 15.5);
     EXPECT_EQ(bounds_y.minimum_value, 0);
     EXPECT_EQ(bounds_y.maximum_value, 13);
     EXPECT_EQ(bounds_x_all, bounds_x_all);

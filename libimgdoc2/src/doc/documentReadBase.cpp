@@ -136,20 +136,20 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const st
     return statement;
 }
 
-int DocumentReadBase::SetCoordinateBoundsValueIfNonNull(imgdoc2::Int32Interval* bounds, IDbStatement* statement, int result_index)
+int DocumentReadBase::SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index)
 {
-    if (bounds != nullptr)
+    if (interval != nullptr)
     {
-        auto min = statement->GetResultInt32OrNull(result_index++);
-        auto max = statement->GetResultInt32OrNull(result_index++);
+        const auto min = statement->GetResultDoubleOrNull(result_index++);
+        const auto max = statement->GetResultDoubleOrNull(result_index++);
         if (min.has_value() && max.has_value())
         {
-            bounds->minimum_value = min.value();
-            bounds->maximum_value = max.value();
+            interval->minimum_value = min.value();
+            interval->maximum_value = max.value();
         }
         else
         {
-            *bounds = Int32Interval{};
+            *interval = DoubleInterval{};
         }
     }
 

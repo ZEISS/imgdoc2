@@ -47,8 +47,8 @@ protected:
         std::string column_name_coordinate_extent;
     };
 
-    std::shared_ptr<IDbStatement> CreateQueryMinMaxForXyz(const std::string& table_name, std::vector< QueryMinMaxForXyzInfo> query_info);
-    int SetCoordinateBoundsValueIfNonNull(imgdoc2::Int32Interval* bounds, IDbStatement* statement, int result_index);
+    std::shared_ptr<IDbStatement> CreateQueryMinMaxForXyz(const std::string& table_name, std::vector<QueryMinMaxForXyzInfo> query_info);
+    int SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index);
 
 
     [[nodiscard]] const std::shared_ptr<Document>& GetDocument() const { return this->document_; }

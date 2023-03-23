@@ -42,6 +42,7 @@ public:
     std::uint32_t GetResultUInt32(int column) override;
     std::uint8_t GetResultUInt8(int column) override;
     double GetResultDouble(int column) override;
+    std::optional<double> GetResultDoubleOrNull(int column) override;
     std::string GetResultString(int column) override;
     void GetResultBlob(int column, imgdoc2::IBlobOutput* blobOutput) override;
 

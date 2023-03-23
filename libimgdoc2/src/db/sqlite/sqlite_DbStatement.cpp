@@ -101,6 +101,21 @@ SqliteDbStatement::SqliteDbStatement(sqlite3_stmt* sql_statement)  :
     return value;
 }
 
+/*virtual*/std::optional<double> SqliteDbStatement::GetResultDoubleOrNull(int column)
+{
+    const auto result = this->GetResultDouble(column);
+    if (result == 0.0)
+    {
+        // a value of 0 **could** mean that we actually read a NULL (and it got coalesced into a 0) -> https://www.sqlite.org/c3ref/column_blob.html
+        if (sqlite3_column_type(this->sql_statement_, column) == SQLITE_NULL)
+        {
+            return {};
+        }
+    }
+
+    return result;
+}
+
 /*virtual*/std::uint32_t SqliteDbStatement::GetResultUInt32(int column)
 {
     const uint32_t value = static_cast<uint32_t>(sqlite3_column_int(this->sql_statement_, column));

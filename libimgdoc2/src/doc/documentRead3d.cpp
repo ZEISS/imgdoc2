@@ -138,7 +138,7 @@ using namespace imgdoc2;
         this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow());
 }
 
-/*virtual*/void DocumentRead3d::GetBricksBoundingBox(imgdoc2::Int32Interval* bounds_x, imgdoc2::Int32Interval* bounds_y, imgdoc2::Int32Interval* bounds_z)
+/*virtual*/void DocumentRead3d::GetBricksBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y, imgdoc2::DoubleInterval* bounds_z)
 {
     if (bounds_x == nullptr && bounds_y == nullptr && bounds_z == nullptr)
     {
@@ -572,6 +572,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::CreateQueryTilesBoundingBoxStateme
     Expects(include_x == true || include_y == true || include_z == true);
 
     vector<QueryMinMaxForXyzInfo> query_min_max_for_xyz_info_list;
+    query_min_max_for_xyz_info_list.reserve(3);
     if (include_x)
     {
         query_min_max_for_xyz_info_list.push_back(
