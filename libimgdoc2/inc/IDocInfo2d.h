@@ -1,0 +1,25 @@
+#pragma once
+
+#include "IDocInfo.h"
+
+namespace imgdoc2
+{
+ /*   struct Extent2d
+    {
+    }*/
+
+    /// This interface is used for retrieving global information (about the document (i.e. usually aggregated from
+    /// the individual tiles) specific to the 2d-document.
+    class IDocInfo2d : public IDocInfo
+    {
+    public:
+        virtual void GetTilesBoundingBox(imgdoc2::CoordinateBounds* bounds_x, imgdoc2::CoordinateBounds* bounds_y) = 0;
+
+        // no copy and no move (-> https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all )
+        IDocInfo2d() = default;
+        IDocInfo2d(const IDocInfo2d&) = delete;             // copy constructor
+        IDocInfo2d& operator=(const IDocInfo2d&) = delete;  // copy assignment
+        IDocInfo2d(IDocInfo2d&&) = delete;                  // move constructor
+        IDocInfo2d& operator=(IDocInfo2d&&) = delete;       // move assignment
+    };
+}

@@ -75,7 +75,7 @@ set(LibImgDoc2_Srcfiles
          "src/db/database_utilities.h" 
          "src/db/database_utilities.cpp" 
          "src/doc/documentReadBase.h" 
-         "src/doc/documentReadBase.cpp")
+         "src/doc/documentReadBase.cpp" "inc/IDocInfo2d.h")
 
 add_library(libimgdoc2 STATIC
                 ${LibImgDoc2_Srcfiles})

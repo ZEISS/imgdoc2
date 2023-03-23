@@ -5,11 +5,12 @@
 #pragma once
 #include "IDocQuery2d.h"
 #include "IDocInfo.h"
+#include "IDocInfo2d.h"
 
 namespace imgdoc2
 {
     /// This interface is providing read-only access to a 2D-document.
-    class IDocRead2d : public IDocQuery2d, public IDocInfo
+    class IDocRead2d : public IDocQuery2d, public IDocInfo2d
     {
     public:
         virtual ~IDocRead2d() = default;

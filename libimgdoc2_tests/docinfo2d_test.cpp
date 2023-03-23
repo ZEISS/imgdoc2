@@ -225,7 +225,7 @@ TEST(DocInfo2d, GetMinMaxForTileDimensionCallWithEmptyArrayOfDimensionsAndCheckR
     create_options->SetUseSpatialIndex(false);
     create_options->SetCreateBlobTable(false);
     const auto doc = ClassFactory::CreateNew(create_options.get());
-    
+
     const auto writer = doc->GetWriter2d();
     LogicalPositionInfo position_info;
     TileBaseInfo tileInfo;
@@ -262,12 +262,134 @@ TEST(DocInfo2d, GetMinMaxForTileDimensionWithEmptyDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    auto result = reader->GetMinMaxForTileDimension({'w'});
+    auto result = reader->GetMinMaxForTileDimension({ 'w' });
 
     // assert
-    
+
     // we expect to get a coordinate-bounds for 'w', but it should be invalid
     ASSERT_EQ(result.size(), 1);
     ASSERT_TRUE(result.find('w') != result.cend());
     ASSERT_FALSE(result['w'].IsValid());
+}
+
+TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->AddDimension('u');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto writer = doc->GetWriter2d();
+
+    // we place two tiles - one with (0,0,10,10) and one with (10,8,5,5), so the bounding box should be (0,0,15,13)
+    LogicalPositionInfo position_info;
+    TileBaseInfo tileInfo;
+    TileCoordinate tc({ { 'l', 5 }, { 'u', 3} });
+    position_info.posX = 0;
+    position_info.posY = 0;
+    position_info.width = 10;
+    position_info.height = 10;
+    position_info.pyrLvl = 0;
+    tileInfo.pixelWidth = 10;
+    tileInfo.pixelHeight = 10;
+    tileInfo.pixelType = 0;
+    writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+
+    position_info.posX = 10;
+    position_info.posY = 8;
+    position_info.width = 5;
+    position_info.height = 5;
+
+    tc = { { 'l', 2 }, { 'u', 31} };
+    writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    CoordinateBounds bounds_x, bounds_y;
+    reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
+
+    // assert
+    EXPECT_EQ(bounds_x.minimum_value, 0);
+    EXPECT_EQ(bounds_x.maximum_value, 15);
+    EXPECT_EQ(bounds_y.minimum_value, 0);
+    EXPECT_EQ(bounds_y.maximum_value, 13);
+}
+
+TEST(DocInfo2d, GetTilesBoundingBoxForEmptyDocumentAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->AddDimension('u');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto writer = doc->GetWriter2d();
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    CoordinateBounds bounds_x{ 1,3 }, bounds_y{ 7,8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
+    reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
+
+    // assert
+    EXPECT_FALSE(bounds_x.IsValid());
+    EXPECT_FALSE(bounds_y.IsValid());
+}
+
+TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentUseOnlyXOrOnlyYAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->AddDimension('u');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto writer = doc->GetWriter2d();
+
+    // we place two tiles - one with (0,0,10,10) and one with (10,8,5,5), so the bounding box should be (0,0,15,13)
+    LogicalPositionInfo position_info;
+    TileBaseInfo tileInfo;
+    TileCoordinate tc({ { 'l', 5 }, { 'u', 3} });
+    position_info.posX = 0;
+    position_info.posY = 0;
+    position_info.width = 10;
+    position_info.height = 10;
+    position_info.pyrLvl = 0;
+    tileInfo.pixelWidth = 10;
+    tileInfo.pixelHeight = 10;
+    tileInfo.pixelType = 0;
+    writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+
+    position_info.posX = 10;
+    position_info.posY = 8;
+    position_info.width = 5;
+    position_info.height = 5;
+
+    tc = { { 'l', 2 }, { 'u', 31} };
+    writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    CoordinateBounds bounds_x, bounds_y;
+    CoordinateBounds bounds_x_all, bounds_y_all;
+    reader->GetTilesBoundingBox(&bounds_x, nullptr);
+    reader->GetTilesBoundingBox(nullptr, &bounds_y);
+    reader->GetTilesBoundingBox(&bounds_x_all, &bounds_y_all);
+
+    // assert
+    EXPECT_EQ(bounds_x.minimum_value, 0);
+    EXPECT_EQ(bounds_x.maximum_value, 15);
+    EXPECT_EQ(bounds_y.minimum_value, 0);
+    EXPECT_EQ(bounds_y.maximum_value, 13);
+    EXPECT_EQ(bounds_x_all, bounds_x_all);
+    EXPECT_EQ(bounds_y, bounds_y);
 }
