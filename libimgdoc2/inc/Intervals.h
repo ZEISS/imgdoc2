@@ -9,7 +9,7 @@ namespace imgdoc2
     struct DoubleInterval
     {
         double minimum_value{ std::numeric_limits<double>::max() };  ///< The minimum value.
-        double maximum_value{ std::numeric_limits<double>::min() };  ///< The maximum value.
+        double maximum_value{ std::numeric_limits<double>::lowest() };  ///< The maximum value.
 
         /// <summary>   Query if this object is valid. </summary>
         /// <returns>   True if valid, false if not. </returns>

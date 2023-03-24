@@ -985,11 +985,18 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        /// <summary>   
+        /// Retrieve the minimum axis aligned bounding box (of all tiles in the document). 
+        /// If the values cannot be retrieved (e.g. if the document is empty), the min-values
+        /// will be set to double.MaxValue and the max-values to double.MinValue.
+        /// </summary>
+        /// <param name="read2dHandle"> The reader-2d-object.</param>
+        /// <returns>   A tuple containing the respective intervals. </returns>
         public (double minX, double maxX, double minY, double maxY) DocInfoGetTilesBoundingBox(IntPtr read2dHandle)
         {
             this.ThrowIfNotInitialized();
             unsafe
-            {
+            { 
                 ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
                 double minX = 0.0;
                 double maxX = 0.0;

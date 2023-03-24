@@ -811,22 +811,22 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
 
     if (min_x != nullptr)
     {
-        *min_x = interval_x.minimum_value;
+        *min_x = interval_x.IsValid() ? interval_x.minimum_value : std::numeric_limits<double>::max();
     }
 
     if (max_x != nullptr)
     {
-        *max_x = interval_x.maximum_value;
+        *max_x = interval_x.IsValid() ? interval_x.maximum_value : std::numeric_limits<double>::lowest();
     }
 
     if (min_y != nullptr)
     {
-        *min_y = interval_y.minimum_value;
+        *min_y = interval_y.IsValid() ? interval_y.minimum_value : std::numeric_limits<double>::max();
     }
 
     if (max_y != nullptr)
     {
-        *max_y = interval_y.maximum_value;
+        *max_y = interval_y.IsValid() ? interval_y.maximum_value : std::numeric_limits<double>::lowest();
     }
 
     return ImgDoc2_ErrorCode_OK;

@@ -31,6 +31,9 @@ namespace ImgDoc2Net.Interfaces
         /// </returns>
         Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions);
 
+        /// <summary>   
+        /// Gets an axis aligned bounding box (of all tiles in the document). </summary>
+        /// <returns>   The bounding box. </returns>
         Extent2d GetBoundingBox();
     }
 }

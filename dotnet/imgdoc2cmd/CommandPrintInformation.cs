@@ -30,6 +30,9 @@ namespace Imgdoc2cmd
             Console.WriteLine($"Information on file {options.SourceDocument}:");
             Console.WriteLine();
 
+            var boundingBox = reader2d.GetBoundingBox();
+            Console.WriteLine($"Bounding-box:     {FormatBoundingBox(boundingBox)}");
+
             var dimensions = reader2d.GetTileDimensions();
             Console.WriteLine($"Tile-dimensions:  {FormatTileDimensions(dimensions)}");
 
@@ -40,6 +43,16 @@ namespace Imgdoc2cmd
 
     internal partial class CommandPrintInformation
     {
+        private static string FormatBoundingBox(Extent2d boundingBox)
+        {
+            if (boundingBox.IsValid)
+            {
+                return $"({boundingBox.MinX}, {boundingBox.MinY}) - ({boundingBox.MaxX}, {boundingBox.MaxY})";
+            }
+
+            return "<invalid>";
+        }
+
         private static string FormatTileDimensions(IEnumerable<Dimension> dimensions)
         {
             StringBuilder sb = new StringBuilder(100);
