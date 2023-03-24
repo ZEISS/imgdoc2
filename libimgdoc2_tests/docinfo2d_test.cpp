@@ -334,7 +334,7 @@ TEST(DocInfo2d, GetTilesBoundingBoxForEmptyDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    DoubleInterval bounds_x{ 1,3 }, bounds_y{ 7,8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
+    DoubleInterval bounds_x{ 1, 3 }, bounds_y{ 7, 8 };  // put some valid values in there, in order to be sure that the arguments are actually written to
     reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
 
     // assert

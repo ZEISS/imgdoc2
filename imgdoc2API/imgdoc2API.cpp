@@ -6,6 +6,8 @@
 #include <memory>
 #include <algorithm>
 #include <atomic>
+#include <map>
+#include <limits>
 #include <utility>
 #include <string>
 #include <vector>

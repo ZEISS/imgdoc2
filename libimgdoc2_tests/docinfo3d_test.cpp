@@ -154,5 +154,4 @@ TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
     ASSERT_DOUBLE_EQ(interval_y.maximum_value, max_y);
     ASSERT_DOUBLE_EQ(interval_z.minimum_value, min_z);
     ASSERT_DOUBLE_EQ(interval_z.maximum_value, max_z);
-
 }
