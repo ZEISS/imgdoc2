@@ -119,7 +119,6 @@ TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
     {
         LogicalPositionInfo3D position_info;
         BrickBaseInfo brick_info;
-        int x_coordinate = i;
         TileCoordinate tc({ { 'x', i} });
         position_info.posX = distribution(rng);
         position_info.posY = distribution(rng);
