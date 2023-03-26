@@ -63,6 +63,9 @@ protected:
     /// \returns    The index (into the database-result statement) where to read the next value from.
     static int SetCoordinateBoundsValueIfNonNull(imgdoc2::DoubleInterval* interval, IDbStatement* statement, int result_index);
 
+    std::uint64_t GetTotalTileCount(const std::string& table_name);
+    std::map<int, std::uint64_t> GetTileCountPerLayer(const std::string& table_name, const std::string& pyramid_level_column_name);
+
     [[nodiscard]] const std::shared_ptr<Document>& GetDocument() const { return this->document_; }
     [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->document_->GetHostingEnvironment(); }
 private:

@@ -155,3 +155,36 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const st
 
     return result_index;
 }
+
+std::uint64_t DocumentReadBase::GetTotalTileCount(const std::string& table_name)
+{
+    ostringstream string_stream;
+    string_stream << "SELECT COUNT(*) FROM [" << table_name << "];";
+    const auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+
+    const bool is_done = this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get());
+    if (!is_done)
+    {
+        throw internal_error_exception("database-query gave no result, this is unexpected.");
+    }
+
+    const auto result = statement->GetResultInt64(0);
+    return result;
+}
+
+std::map<int, std::uint64_t> DocumentReadBase::GetTileCountPerLayer(const std::string& table_name, const std::string& pyramid_level_column_name)
+{
+    ostringstream string_stream;
+    string_stream << "SELECT [" << pyramid_level_column_name << "], COUNT(*) FROM [" << table_name << "] GROUP BY [" << pyramid_level_column_name << "];";
+    const auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+
+    map<int, uint64_t> result;
+    while (this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        const auto layer = statement->GetResultInt32(0);
+        const auto count = statement->GetResultInt64(1);
+        result[layer] = count;
+    }
+
+    return result;
+}

@@ -12,6 +12,11 @@
 
 namespace imgdoc2
 {
+    struct LayerInfo
+    {
+        std::uint32_t tile_count;
+    };
+
     /// This interface is used for retrieving information about the document.
     class IDocInfo
     {
@@ -33,6 +38,9 @@ namespace imgdoc2
         ///
         /// \returns    A map containing the min/max-information for the requested dimensions.
         virtual std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) = 0;
+
+        virtual std::uint64_t GetTotalTileCount() = 0;
+        virtual std::map<int, std::uint64_t> GetTileCountPerLayer() = 0;
     public:
         std::vector<imgdoc2::Dimension> GetTileDimensions()
         {

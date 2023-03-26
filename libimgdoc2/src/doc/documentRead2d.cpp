@@ -51,6 +51,18 @@ using namespace imgdoc2;
         this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow());
 }
 
+/*virtual*/std::uint64_t DocumentRead2d::GetTotalTileCount()    
+{
+    return DocumentReadBase::GetTotalTileCount(this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow());
+}
+
+/*virtual*/std::map<int, std::uint64_t> DocumentRead2d::GetTileCountPerLayer()
+{
+       return DocumentReadBase::GetTileCountPerLayer(
+           this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow(),
+           this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel));
+}
+
 /*virtual*/void DocumentRead2d::ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info)
 {
     const auto query_statement = this->GetReadTileInfo_Statement(coord != nullptr, info != nullptr, tile_blob_info != nullptr);

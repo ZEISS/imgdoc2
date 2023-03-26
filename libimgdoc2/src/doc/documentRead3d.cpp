@@ -138,6 +138,18 @@ using namespace imgdoc2;
         this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow());
 }
 
+/*virtual*/std::uint64_t DocumentRead3d::GetTotalTileCount()
+{
+    return DocumentReadBase::GetTotalTileCount(this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow());
+}
+
+/*virtual*/std::map<int, std::uint64_t> DocumentRead3d::GetTileCountPerLayer()
+{
+    return DocumentReadBase::GetTileCountPerLayer(
+        this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow(),
+        this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_PyramidLevel));
+}
+
 /*virtual*/void DocumentRead3d::GetBricksBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y, imgdoc2::DoubleInterval* bounds_z)
 {
     if (bounds_x == nullptr && bounds_y == nullptr && bounds_z == nullptr)
