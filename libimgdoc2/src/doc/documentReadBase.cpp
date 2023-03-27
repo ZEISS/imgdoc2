@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 #include <gsl/assert>
-#include <gsl/narrow>l
+#include <gsl/narrow>
 
 using namespace std;
 using namespace imgdoc2;
