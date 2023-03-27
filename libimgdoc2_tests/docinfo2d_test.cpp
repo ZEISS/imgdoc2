@@ -8,6 +8,7 @@
 #include <array>
 #include <random>
 #include <algorithm>
+#include "utilities.h"
 
 using namespace std;
 using namespace imgdoc2;
@@ -392,4 +393,163 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentUseOnlyXOrOnlyYAndCheckResul
     EXPECT_EQ(bounds_y.maximum_value, 13);
     EXPECT_EQ(bounds_x_all, bounds_x_all);
     EXPECT_EQ(bounds_y, bounds_y);
+}
+
+struct VariousNumberOfTilesFixture : public testing::TestWithParam<int> {};
+
+TEST_P(VariousNumberOfTilesFixture, GetTotalTileCountForSimpleDocumentAndCheckResult)
+{
+    // arrange
+    const int num_tiles = GetParam();
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto writer = doc->GetWriter2d();
+
+    // we just add the specified number of tiles to the document (at layer 0)
+    for (int l = 0; l < num_tiles; ++l)
+    {
+        LogicalPositionInfo position_info;
+        TileBaseInfo tileInfo;
+        TileCoordinate tc({ { 'l', l } });
+        position_info.posX = 0;
+        position_info.posY = 0;
+        position_info.width = 10;
+        position_info.height = 10;
+        position_info.pyrLvl = 0;
+        tileInfo.pixelWidth = 10;
+        tileInfo.pixelHeight = 10;
+        tileInfo.pixelType = 0;
+        writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    }
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    auto number_of_tiles = reader->GetTotalTileCount();
+
+    // assert
+    EXPECT_EQ(number_of_tiles, num_tiles);
+}
+
+TEST_P(VariousNumberOfTilesFixture, GetTilePerLayerCountForSimpleDocumentAndCheckResult)
+{
+    // arrange
+    const int num_tiles = GetParam();
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto writer = doc->GetWriter2d();
+
+    // we just add the specified number of tiles to the document on layer 0
+    for (int l = 0; l < num_tiles; ++l)
+    {
+        LogicalPositionInfo position_info;
+        TileBaseInfo tileInfo;
+        TileCoordinate tc({ { 'l', l } });
+        position_info.posX = 0;
+        position_info.posY = 0;
+        position_info.width = 10;
+        position_info.height = 10;
+        position_info.pyrLvl = 0;
+        tileInfo.pixelWidth = 10;
+        tileInfo.pixelHeight = 10;
+        tileInfo.pixelType = 0;
+        writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    }
+
+    // ...and, half of them on layer 1
+    for (int l = 0; l < num_tiles / 2; ++l)
+    {
+        LogicalPositionInfo position_info;
+        TileBaseInfo tileInfo;
+        TileCoordinate tc({ { 'l', l } });
+        position_info.posX = 0;
+        position_info.posY = 0;
+        position_info.width = 10;
+        position_info.height = 10;
+        position_info.pyrLvl = 1;
+        tileInfo.pixelWidth = 10;
+        tileInfo.pixelHeight = 10;
+        tileInfo.pixelType = 0;
+        writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    }
+
+    // ...and, a quarter of them on layer 2
+    for (int l = 0; l < num_tiles / 4; ++l)
+    {
+        LogicalPositionInfo position_info;
+        TileBaseInfo tileInfo;
+        TileCoordinate tc({ { 'l', l } });
+        position_info.posX = 0;
+        position_info.posY = 0;
+        position_info.width = 10;
+        position_info.height = 10;
+        position_info.pyrLvl = 2;
+        tileInfo.pixelWidth = 10;
+        tileInfo.pixelHeight = 10;
+        tileInfo.pixelType = 0;
+        writer->AddTile(&tc, &position_info, &tileInfo, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    }
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    auto number_of_tiles = reader->GetTotalTileCount();
+    auto tile_count_per_layer = reader->GetTileCountPerLayer();
+
+    // assert
+    EXPECT_EQ(number_of_tiles, num_tiles + num_tiles / 2 + num_tiles / 4);
+
+    // we expect the number of tiles per layer to be correct
+    map<int, std::uint64_t> expected_tile_count_per_layer = { { 0, num_tiles }, { 1, num_tiles / 2 }, { 2, num_tiles / 4 } };
+    ASSERT_TRUE(mapsEqual(tile_count_per_layer, expected_tile_count_per_layer));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    DocInfo2d,
+    VariousNumberOfTilesFixture,
+    testing::Values(5, 13, 27));
+
+TEST(DocInfo2d, GetTotalTileCountForEmptyDocumentAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+
+    const auto reader = doc->GetReader2d();
+
+    // act
+    auto number_of_tiles = reader->GetTotalTileCount();
+
+    // assert
+    EXPECT_EQ(number_of_tiles, 0);
+}
+
+TEST(DocInfo2d, GetTilePerLayerCountForEmptyDocumentAndCheckResult)
+{
+    // arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('l');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto reader = doc->GetReader2d();
+
+    // act
+    auto tile_count_per_layer = reader->GetTileCountPerLayer();
+
+    // assert
+    EXPECT_TRUE(tile_count_per_layer.empty());
 }
