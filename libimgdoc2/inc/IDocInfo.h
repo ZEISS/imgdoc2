@@ -12,11 +12,6 @@
 
 namespace imgdoc2
 {
-    struct LayerInfo
-    {
-        std::uint32_t tile_count;
-    };
-
     /// This interface is used for retrieving information about the document.
     class IDocInfo
     {
