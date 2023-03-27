@@ -17,6 +17,7 @@
 #include "statisticsinterop.h"
 #include "rectangledoubleinterop.h"
 #include "minmaxfortiledimensioninterop.h"
+#include "tilecountperlayerinterop.h"
 
 typedef std::intptr_t ObjectHandle;
 
@@ -191,3 +192,33 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
     double* min_y,
     double* max_y,
     ImgDoc2ErrorInformation* error_information);
+
+/// Get the total number of tiles in the document. This function is corresponding to the method
+/// 'IDocInfo::GetTotalTileCount'.
+///
+/// \param          handle              he handle of the read2d-object.
+/// \param [out]    total_tile_count    The total number of tiles (must be non-null).
+/// \param [in,out] error_information   If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns    An ImgDoc2ErrorCode.
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTotalTileCount(
+        HandleDocRead2D handle,
+        std::uint64_t* total_tile_count, 
+        ImgDoc2ErrorInformation* error_information);
+
+/// Get the number of tiles per layer. This function is corresponding to the method 'IDocInfo::GetTileCountPerLayer'.
+/// On input, the field 'element_count_allocated' of the 'tile_count_per_layer_interop' must be set to the number of elements
+/// allocated in the structure, i.e. how many elements can be set in the array 'tile_count_per_layer_interop->tile_count_per_layer'.
+/// On output, the field 'element_count_available' is set to the actual number of elements available. If this number is greater than
+/// 'element_count_allocated' it means that not all results could be returned. In this case, only 'element_count_allocated' elements
+/// are written to the array. The caller can then allocate a larger array and call this function again. 
+///
+/// \param          handle                          The handle.
+/// \param [in,out] tile_count_per_layer_interop    If non-null, the tile count per layer interop.
+/// \param [in,out] error_information               If non-null, information describing the error.
+///
+/// \returns    An ImgDoc2ErrorCode.
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTileCountPerLayer(
+        HandleDocRead2D handle,
+        TileCountPerLayerInterop* tile_count_per_layer_interop,
+        ImgDoc2ErrorInformation* error_information);

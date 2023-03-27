@@ -779,7 +779,7 @@ ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
     return ImgDoc2_ErrorCode_OK;
 }
 
-EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
+ImgDoc2ErrorCode IDocInfo_GetBoundingBoxForTiles(
     HandleDocRead2D handle,
     double* min_x,
     double* max_x,
@@ -829,6 +829,68 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
     if (max_y != nullptr)
     {
         *max_y = interval_y.IsValid() ? interval_y.maximum_value : std::numeric_limits<double>::lowest();
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
+        HandleDocRead2D handle,
+        std::uint64_t* total_tile_count,
+        ImgDoc2ErrorInformation* error_information)
+{
+    if (total_tile_count == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("total_tile_count", "must not be null", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    try
+    {
+        *total_tile_count = reader2d->GetTotalTileCount();
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocInfo_GetTileCountPerLayer(
+        HandleDocRead2D handle,
+        TileCountPerLayerInterop* tile_count_per_layer_interop,
+        ImgDoc2ErrorInformation* error_information)
+{
+    if (tile_count_per_layer_interop == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("tile_count_per_layer_interop", "must not be null", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    try
+    {
+        const auto tile_count_per_layer = reader2d->GetTileCountPerLayer();
+        tile_count_per_layer_interop->element_count_available = 0;
+        for (const auto& item : tile_count_per_layer)
+        {
+            if (tile_count_per_layer_interop->element_count_available < tile_count_per_layer_interop->element_count_allocated)
+            {
+                PerLayerTileCountInterop* per_layer_tile_count_interop = tile_count_per_layer_interop->pyramid_layer_and_tile_count + tile_count_per_layer_interop->element_count_available;
+                per_layer_tile_count_interop->layer_index = item.first;
+                per_layer_tile_count_interop->tile_count = item.second;
+            }
+
+            ++tile_count_per_layer_interop->element_count_available;
+        }
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
     }
 
     return ImgDoc2_ErrorCode_OK;
