@@ -143,6 +143,10 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo_GetMinMaxForTileDimensions");
                 this.idocinfoGetBoundingBoxForTiles =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetBoundingBoxForTilesDelegate>("IDocInfo_GetBoundingBoxForTiles");
+                this.idocinfoGetTotalTileCount =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetTotalTileCountDelegate>("IDocInfo_GetTotalTileCount");
+                this.idocinfoGetTileCountPerLayer =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileCountPerLayerDelegate>("IDocInfo_GetTileCountPerLayer");
 
                 this.funcPtrBlobOutputSetSizeForwarder =
                     Marshal.GetFunctionPointerForDelegate<BlobOutputSetSizeDelegate>(ImgDoc2ApiInterop.BlobOutputSetSizeDelegateObj);
@@ -996,7 +1000,7 @@ namespace ImgDoc2Net.Interop
         {
             this.ThrowIfNotInitialized();
             unsafe
-            { 
+            {
                 ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
                 double minX = 0.0;
                 double maxX = 0.0;
@@ -1007,7 +1011,69 @@ namespace ImgDoc2Net.Interop
                 return (minX, maxX, minY, maxY);
             }
         }
-        
+
+        /// <summary> Gets total number of tiles in the document.</summary>
+        /// <param name="read2dHandle"> The reader-2d-object.</param>
+        /// <returns> The total number of tiles in the document.</returns>
+        public long DocInfoGetTotalTileCount(IntPtr read2dHandle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                ulong totalTileCount = 0;
+                int returnCode = this.idocinfoGetTotalTileCount(read2dHandle, &totalTileCount, &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                return (long)totalTileCount;
+            }
+        }
+
+        /// <summary> Gets the total number of tiles per pyramid layer.</summary>
+        /// <param name="read2dHandle"> The reader-2d-object.</param>
+        /// <returns> A dictionary, where key is the pyramid layer number, and value is the total number of tiles (on this layer) in the document. </returns>
+        public Dictionary<int, long> GetTileCountPerPyramidLayer(IntPtr read2dHandle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                const int initialArraySize = 20;    // number of elements for the initial buffer we supply (which should be enough in most cases)
+                byte* tileCountPerLayerInteropData = stackalloc byte[TileCountPerLayerInterop.CalculateSize(initialArraySize)];
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                TileCountPerLayerInterop* tileCountPerLayerInterop = (TileCountPerLayerInterop*)tileCountPerLayerInteropData;
+                tileCountPerLayerInterop->ElementCountAllocated = initialArraySize;
+                int returnCode = this.idocinfoGetTileCountPerLayer(read2dHandle, tileCountPerLayerInterop, &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                if (tileCountPerLayerInterop->ElementCountAvailable > initialArraySize)
+                {
+                    // if the buffer size was too small, we allocate a larger one (with the size reported, this time on the heap) and try again
+                    var elementCountRequired = (int)tileCountPerLayerInterop->ElementCountAvailable;
+                    byte[] tileCountPerLayerInteropArray = new byte[TileCountPerLayerInterop.CalculateSize(elementCountRequired)];
+                    fixed (byte* pointerTileCountPerLayerInteropArray = tileCountPerLayerInteropArray)
+                    {
+                        tileCountPerLayerInterop = (TileCountPerLayerInterop*)pointerTileCountPerLayerInteropArray;
+                        tileCountPerLayerInterop->ElementCountAllocated = (uint)elementCountRequired;
+                        returnCode = this.idocinfoGetTileCountPerLayer(read2dHandle, tileCountPerLayerInterop, &errorInformation);
+                        this.HandleErrorCases(returnCode, errorInformation);
+                        // we do not expect that the size was insufficient in this case, and if so we throw an exception
+                        if (tileCountPerLayerInterop->ElementCountAvailable > tileCountPerLayerInterop->ElementCountAllocated)
+                        {
+                            throw new InvalidOperationException("The buffer size was insufficient for the tile count per layer information, which is unexpected.");
+                        }
+                    }
+                }
+
+                Dictionary<int, long> result = new Dictionary<int, long>((int)tileCountPerLayerInterop->ElementCountAvailable);
+                PerLayerTileCountInterop* perLayerTileCount = &tileCountPerLayerInterop->PyramidLayerAndTileCount;
+                for (int i = 0; i < tileCountPerLayerInterop->ElementCountAvailable; ++i)
+                {
+                    result.Add(perLayerTileCount->LayerIndex, (long)perLayerTileCount->TileCount);
+                    ++perLayerTileCount;
+                }
+
+                return result;
+            }
+        }
+
         /// <summary> Helper method that handles the interop with functions which return a string (using a semantic like with 
         ///           "createOptionsGetFilename" or "openExistingOptionsGetFilename").</summary>
         /// <exception cref="Exception"> Thrown when an exception error condition occurs.</exception>
@@ -1373,6 +1439,8 @@ namespace ImgDoc2Net.Interop
         private readonly IDocInfo_GetTileDimensionsDelegate idocinfoGetTileDimensions;
         private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfoGetMinMaxForTileDimensions;
         private readonly IDocInfo_GetBoundingBoxForTilesDelegate idocinfoGetBoundingBoxForTiles;
+        private readonly IDocInfo_GetTotalTileCountDelegate idocinfoGetTotalTileCount;
+        private readonly IDocInfo_GetTileCountPerLayerDelegate idocinfoGetTileCountPerLayer;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate void GetStatisticsDelegate(ImgDoc2StatisticsInterop* statisticsInterop);
@@ -1511,6 +1579,18 @@ namespace ImgDoc2Net.Interop
             double* maxY,
             ImgDoc2ErrorInformation* errorInformation);
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocInfo_GetTotalTileCountDelegate(
+            IntPtr read2dHandle,
+            ulong* totalTileCount,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocInfo_GetTileCountPerLayerDelegate(
+            IntPtr read2dHandle,
+            TileCountPerLayerInterop* tileCountPerLayerInterop,
+            ImgDoc2ErrorInformation* errorInformation);
+
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         private unsafe struct ImgDoc2ErrorInformation
         {
@@ -1606,6 +1686,26 @@ namespace ImgDoc2Net.Interop
         {
             public int Minimum;
             public int Maximum;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct PerLayerTileCountInterop
+        {
+            public int LayerIndex;
+            public ulong TileCount;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct TileCountPerLayerInterop
+        {
+            public uint ElementCountAllocated;
+            public uint ElementCountAvailable;
+            public PerLayerTileCountInterop PyramidLayerAndTileCount;
+
+            public static int CalculateSize(int numberOfElements)
+            {
+                return (numberOfElements * Marshal.SizeOf<PerLayerTileCountInterop>()) + (2 * Marshal.SizeOf<uint>());
+            }
         }
     }
 

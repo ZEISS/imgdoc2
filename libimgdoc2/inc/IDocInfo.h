@@ -39,7 +39,7 @@ namespace imgdoc2
         /// \returns The total tile count.
         virtual std::uint64_t GetTotalTileCount() = 0;
 
-        /// Gets the total number of tile (or bricks) count per pyramid layer.
+        /// Gets the total number of tiles (or bricks) per pyramid layer.
         ///
         /// \returns A map, where key is the pyramid layer number, and value is the total number of tiles (on this layer) in the document.
         virtual std::map<int, std::uint64_t> GetTileCountPerLayer() = 0;

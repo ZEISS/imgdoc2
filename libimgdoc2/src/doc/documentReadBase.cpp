@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <gsl/assert>
+#include <gsl/narrow>l
 
 using namespace std;
 using namespace imgdoc2;
@@ -54,7 +55,7 @@ std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentReadBase::GetMinMax
         throw internal_error_exception("database-query gave no result, this is unexpected.");
     }
 
-    for (size_t i = 0; i < dimensions_to_query_for.size(); ++i)
+    for (int i = 0; i < gsl::narrow<int>(dimensions_to_query_for.size()); ++i)
     {
         Int32Interval coordinate_bounds;
         auto min = query_statement->GetResultInt32OrNull(i * 2);
