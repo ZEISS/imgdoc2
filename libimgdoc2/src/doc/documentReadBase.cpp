@@ -16,10 +16,10 @@ using namespace imgdoc2;
 {
     if (dimensions != nullptr)
     {
-        copy_n(tile_dimensions.cbegin(), min(count, static_cast<uint32_t>(tile_dimensions.size())), dimensions);
+        copy_n(tile_dimensions.cbegin(), min(count, gsl::narrow<uint32_t>(tile_dimensions.size())), dimensions);
     }
 
-    count = static_cast<uint32_t>(tile_dimensions.size());
+    count = gsl::narrow<uint32_t>(tile_dimensions.size());
 }
 
 std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentReadBase::GetMinMaxForTileDimensionInternal(
