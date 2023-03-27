@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <gsl/assert>
 #include "documentRead3d.h"
 #include "../db/utilities.h"
 #include "../db/sqlite/custom_functions.h"
@@ -128,13 +129,34 @@ using namespace imgdoc2;
         count);
 }
 
-/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead3d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
+/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentRead3d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
 {
     return this->GetMinMaxForTileDimensionInternal(
         dimensions_to_query_for,
         [this](Dimension dimension)->bool { return this->GetDocument()->GetDataBaseConfiguration3d()->IsTileDimensionValid(dimension); },
         [this](ostringstream& ss, imgdoc2::Dimension dimension)->void { ss << this->GetDocument()->GetDataBaseConfiguration3d()->GetDimensionsColumnPrefix() << dimension; },
         this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow());
+}
+
+/*virtual*/void DocumentRead3d::GetBricksBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y, imgdoc2::DoubleInterval* bounds_z)
+{
+    if (bounds_x == nullptr && bounds_y == nullptr && bounds_z == nullptr)
+    {
+        // nothing to do here
+        return;
+    }
+
+    // case "no spatial index"
+    const auto statement = this->CreateQueryTilesBoundingBoxStatement(bounds_x != nullptr, bounds_y != nullptr, bounds_z != nullptr);
+    if (!this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        throw internal_error_exception("database-query gave no result, this is unexpected.");
+    }
+
+    int result_index = 0;
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_z, statement.get(), result_index);
 }
 
 /*virtual*/void DocumentRead3d::ReadBrickData(imgdoc2::dbIndex idx, imgdoc2::IBlobOutput* data)
@@ -543,4 +565,43 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
 
     return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentRead3d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y, bool include_z) const
+{
+    Expects(include_x == true || include_y == true || include_z == true);
+
+    vector<QueryMinMaxForXyzInfo> query_min_max_for_xyz_info_list;
+    query_min_max_for_xyz_info_list.reserve(3);
+    if (include_x)
+    {
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            {
+                this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileX),
+                this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileW)
+            });
+    }
+
+    if (include_y)
+    {
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            {
+                this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileY),
+                this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileH)
+            });
+    }
+
+    if (include_z)
+    {
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            {
+                this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileZ),
+                this->GetDocument()->GetDataBaseConfiguration3d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration3D::kTilesInfoTable_Column_TileD)
+            });
+    }
+
+    return this->CreateQueryMinMaxForXyz(this->GetDocument()->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow(), query_min_max_for_xyz_info_list);
 }

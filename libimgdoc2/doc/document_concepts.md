@@ -20,7 +20,7 @@ For the time being, two document types are implemented:
 As far as the persistence layer is concerned, the functionality provided here is:
 
 * storage of blob data (containing the pixel information of a tile)
-* a tile is a rectangular and axis-aligned image, and it is described by information describing its bitmap-content 
+* a tile is a rectangular and axis-aligned image, and it is characterized by information describing its bitmap-content 
    (width/height/pixeltype), its logical position, its pyramid-level and a _coordinate_
 * the document can be queried for tiles with certain conditions (including spatial queries)
 
@@ -41,6 +41,24 @@ Every tile comes with the following mandatory geometric information:
 It is important to note that width and height in this context is **not** the same as the width/height in pixels of the tile. The width
 and height is conceptually only refering to the _pixel coordinate system_ and states the extent of the tile in it - independent of the actual
 pixel width and height. It is also called the _logical width and height_.
+
+## Image3D
+
+The concept of a 3D image is similar to the concept of a 2D image, but with the following differences:
+* Instead of 2D-tiles, the Image3D-document contains 3D-tiles, which are axis-aligned and rectangular. We refer to those 3D-tiles as _bricks_.
+* The coordinate system is 3D, and a brick is associated with a 3D-coordinate. A brick has the following mandatory geometric information:
+  * the X-, Y- and Z-coordinate of the left-front-lower corner of the brick (in _pixel coordinate system_)
+  * the width, height and depth of the brick (in _pixel coordinate system_)
+  * the pyramid layer
+
+The coordinate system used is this:
+![image3d_coordinate_system](images/document_concepts_Image3d_cs.PNG "Image3D coordinate system")
+
+The position of a brick is given as shown here - the left-front-lower edge point and its width, height and depth (where width, height and
+depth are always positive here):
+
+![image3d_geometry_of_brick](images/document_concepts_Image3d_brickposition.PNG "Image3D brick position")
+
 
 ### pyramid layer
 

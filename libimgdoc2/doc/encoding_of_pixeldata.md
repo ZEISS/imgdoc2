@@ -31,4 +31,9 @@ The blob contaings a valid Jpeg-XR aka HDP-file (ISO/IEC 29199-2). The blob is s
 
 ### Uncompressed Brick
 
-to be done
+The binary layout of an uncompressed brick is as depicted here:
+
+![brick_binary_data_layout](images/encoding_of_pixeldata_bricks_binarylayout.PNG "binary layout of brick")
+
+The first voxel is at the left-front-lower position, the next is then to the right of it. At the end of the line, the next voxel is then
+at the left side and adds one unit in y-direction. If the last line is reached, it starts again at the left-front-lower position and adds one unit in z-direction.

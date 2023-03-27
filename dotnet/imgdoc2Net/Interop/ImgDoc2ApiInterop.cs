@@ -141,6 +141,8 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo_GetTileDimensions");
                 this.idocinfoGetMinMaxForTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo_GetMinMaxForTileDimensions");
+                this.idocinfoGetBoundingBoxForTiles =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetBoundingBoxForTilesDelegate>("IDocInfo_GetBoundingBoxForTiles");
 
                 this.funcPtrBlobOutputSetSizeForwarder =
                     Marshal.GetFunctionPointerForDelegate<BlobOutputSetSizeDelegate>(ImgDoc2ApiInterop.BlobOutputSetSizeDelegateObj);
@@ -605,6 +607,7 @@ namespace ImgDoc2Net.Interop
             IntPtr pointerData,
             long dataSize)
         {
+            this.ThrowIfNotInitialized();
             byte[] tileCoordinateInterop = ConvertToTileCoordinateInterop(coordinate);
             LogicalPositionInfoInterop logicalPositionInfoInterop = new LogicalPositionInfoInterop(in logicalPosition);
             TileBaseInfoInterop tileBaseInfoInterop = ConvertToTileBaseInfoInterop(tile2dBaseInfo);
@@ -636,6 +639,7 @@ namespace ImgDoc2Net.Interop
 
         public QueryResult Reader2dQuery(IntPtr read2dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
         {
+            this.ThrowIfNotInitialized();
             byte[] dimensionQueryClauseInterop = (clause != null) ? ConvertToTileCoordinateInterop(clause) : null;
             byte[] tileInfoQueryClauseInterop = (tileInfoQueryClause != null)
                 ? ConvertToTileInfoQueryInterop(tileInfoQueryClause)
@@ -719,6 +723,7 @@ namespace ImgDoc2Net.Interop
             ITileInfoQueryClause tileInfoQueryClause,
             int maxNumberOfResults)
         {
+            this.ThrowIfNotInitialized();
             byte[] dimensionQueryClauseInterop = dimensionQueryClause != null
                 ? ConvertToTileCoordinateInterop(dimensionQueryClause)
                 : null;
@@ -805,6 +810,7 @@ namespace ImgDoc2Net.Interop
 
         public byte[] Reader2dReadTileData(IntPtr read2dHandle, long pk)
         {
+            this.ThrowIfNotInitialized();
             int returnCode;
             ImgDoc2ErrorInformation errorInformation;
 
@@ -838,6 +844,7 @@ namespace ImgDoc2Net.Interop
             out LogicalPosition logicalPosition,
             out TileBlobInfo tileBlobInfo)
         {
+            this.ThrowIfNotInitialized();
             coordinate = null;
             logicalPosition = default(LogicalPosition);
             tileBlobInfo = default(TileBlobInfo);
@@ -910,6 +917,7 @@ namespace ImgDoc2Net.Interop
         /// <returns> An array with the dimensions used in the document.</returns>
         public Dimension[] DocInfoGetTileDimensions(IntPtr read2dHandle)
         {
+            this.ThrowIfNotInitialized();
             unsafe
             {
                 const int initialArraySize = 20;    // number of elements for the initial buffer we supply
@@ -938,6 +946,7 @@ namespace ImgDoc2Net.Interop
 
         public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfoGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
         {
+            this.ThrowIfNotInitialized();
             int dimensionCount = dimensions.Count();
             unsafe
             {
@@ -976,6 +985,29 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        /// <summary>   
+        /// Retrieve the minimum axis aligned bounding box (of all tiles in the document). 
+        /// If the values cannot be retrieved (e.g. if the document is empty), the min-values
+        /// will be set to double.MaxValue and the max-values to double.MinValue.
+        /// </summary>
+        /// <param name="read2dHandle"> The reader-2d-object.</param>
+        /// <returns>   A tuple containing the respective intervals. </returns>
+        public (double minX, double maxX, double minY, double maxY) DocInfoGetTilesBoundingBox(IntPtr read2dHandle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            { 
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                double minX = 0.0;
+                double maxX = 0.0;
+                double minY = 0.0;
+                double maxY = 0.0;
+                int returnCode = this.idocinfoGetBoundingBoxForTiles(read2dHandle, &minX, &maxX, &minY, &maxY, &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                return (minX, maxX, minY, maxY);
+            }
+        }
+        
         /// <summary> Helper method that handles the interop with functions which return a string (using a semantic like with 
         ///           "createOptionsGetFilename" or "openExistingOptionsGetFilename").</summary>
         /// <exception cref="Exception"> Thrown when an exception error condition occurs.</exception>
@@ -1340,6 +1372,7 @@ namespace ImgDoc2Net.Interop
 
         private readonly IDocInfo_GetTileDimensionsDelegate idocinfoGetTileDimensions;
         private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfoGetMinMaxForTileDimensions;
+        private readonly IDocInfo_GetBoundingBoxForTilesDelegate idocinfoGetBoundingBoxForTiles;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate void GetStatisticsDelegate(ImgDoc2StatisticsInterop* statisticsInterop);
@@ -1467,6 +1500,15 @@ namespace ImgDoc2Net.Interop
             IntPtr pointerToDimensionsArray,
             uint pointerToCount,
             IntPtr pointerToMinMaxArray,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocInfo_GetBoundingBoxForTilesDelegate(
+            IntPtr read2dHandle,
+            double* minX,
+            double* maxX,
+            double* minY,
+            double* maxY,
             ImgDoc2ErrorInformation* errorInformation);
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]

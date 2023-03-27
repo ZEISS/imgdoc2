@@ -122,6 +122,19 @@ namespace ImgDoc2Net.Implementation
         {
             return ImgDoc2ApiInterop.Instance.DocInfoGetMinMaxForTileDimensions(this.reader2dObjectHandle, dimensions);
         }
+
+        /// <inheritdoc/>
+        public Extent2d GetBoundingBox()
+        {
+            var extent = ImgDoc2ApiInterop.Instance.DocInfoGetTilesBoundingBox(this.reader2dObjectHandle);
+            return new Extent2d
+            {
+                MinX = extent.minX,
+                MaxX = extent.maxX,
+                MinY = extent.minY,
+                MaxY = extent.maxY,
+            };
+        }
     }
 
     /// <content>

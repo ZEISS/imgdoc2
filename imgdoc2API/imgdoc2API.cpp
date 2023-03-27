@@ -6,6 +6,8 @@
 #include <memory>
 #include <algorithm>
 #include <atomic>
+#include <map>
+#include <limits>
 #include <utility>
 #include <string>
 #include <vector>
@@ -331,7 +333,7 @@ ImgDoc2ErrorCode CreateOptions_GetFilename(HandleCreateOptions handle, char* fil
         [=]()->std::string
         {
             const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    return object->GetFilename();
+            return object->GetFilename();
         },
         filename_utf8,
             size,
@@ -344,7 +346,7 @@ ImgDoc2ErrorCode OpenExistingOptions_GetFilename(HandleOpenExistingOptions handl
         [=]()->std::string
         {
             const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    return object->GetFilename();
+            return object->GetFilename();
         },
         filename_utf8,
             size,
@@ -755,13 +757,78 @@ ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
     const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const vector<Dimension> dimensions_array(dimensions, dimensions + count);
-    const auto min_max = reader2d->GetMinMaxForTileDimension(dimensions_array);
+    std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> min_max;
+
+    try
+    {
+        min_max = reader2d->GetMinMaxForTileDimension(dimensions_array);
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
 
     for (uint32_t i = 0; i < count; ++i)
     {
         const auto& item = min_max.at(dimensions[i]);
         (result + i)->minimum_value = item.minimum_value;
         (result + i)->maximum_value = item.maximum_value;
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
+    HandleDocRead2D handle,
+    double* min_x,
+    double* max_x,
+    double* min_y,
+    double* max_y,
+    ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
+    DoubleInterval interval_x, interval_y;
+    DoubleInterval* pointer_interval_x{ nullptr }, * pointer_interval_y{ nullptr };
+    if (min_x != nullptr || max_x != nullptr)
+    {
+        pointer_interval_x = &interval_x;
+    }
+
+    if (min_y != nullptr || max_y != nullptr)
+    {
+        pointer_interval_y = &interval_y;
+    }
+
+    try
+    {
+        reader2d->GetTilesBoundingBox(pointer_interval_x, pointer_interval_y);
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
+
+    if (min_x != nullptr)
+    {
+        *min_x = interval_x.IsValid() ? interval_x.minimum_value : std::numeric_limits<double>::max();
+    }
+
+    if (max_x != nullptr)
+    {
+        *max_x = interval_x.IsValid() ? interval_x.maximum_value : std::numeric_limits<double>::lowest();
+    }
+
+    if (min_y != nullptr)
+    {
+        *min_y = interval_y.IsValid() ? interval_y.minimum_value : std::numeric_limits<double>::max();
+    }
+
+    if (max_y != nullptr)
+    {
+        *max_y = interval_y.IsValid() ? interval_y.maximum_value : std::numeric_limits<double>::lowest();
     }
 
     return ImgDoc2_ErrorCode_OK;

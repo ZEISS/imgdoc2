@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <gsl/assert>
 #include "documentRead2d.h"
 #include "../db/utilities.h"
 
@@ -21,7 +22,27 @@ using namespace imgdoc2;
         count);
 }
 
-/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::CoordinateBounds> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
+/*virtual*/void DocumentRead2d::GetTilesBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y)
+{
+    if (bounds_x == nullptr && bounds_y == nullptr)
+    {
+        // nothing to do here
+        return;
+    }
+
+    // case "no spatial index"
+    const auto statement = this->CreateQueryTilesBoundingBoxStatement(bounds_x != nullptr, bounds_y != nullptr);
+    if (!this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        throw internal_error_exception("database-query gave no result, this is unexpected.");
+    }
+
+    int result_index = 0;
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
+    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
+}
+
+/*virtual*/std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
 {
     return this->GetMinMaxForTileDimensionInternal(
         dimensions_to_query_for,
@@ -243,7 +264,7 @@ shared_ptr<IDbStatement> DocumentRead2d::CreateQueryStatement(const imgdoc2::IDi
 
     int binding_index = 1;
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
-   
+
     return statement;
 }
 
@@ -414,3 +435,31 @@ std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryMinMaxStatement(const s
     return statement;
 }
 
+std::shared_ptr<IDbStatement> DocumentRead2d::CreateQueryTilesBoundingBoxStatement(bool include_x, bool include_y) const
+{
+    Expects(include_x == true || include_y == true);
+
+    vector<QueryMinMaxForXyzInfo> query_min_max_for_xyz_info_list;
+    query_min_max_for_xyz_info_list.reserve(2);
+    if (include_x)
+    {
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            { 
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX),
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW) 
+            });
+    }
+
+    if (include_y)
+    {
+        query_min_max_for_xyz_info_list.push_back(
+            QueryMinMaxForXyzInfo
+            {
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY),
+                this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH)
+            });
+    }
+
+    return this->CreateQueryMinMaxForXyz(this->GetDocument()->GetDataBaseConfiguration2d()->GetTableNameForTilesInfoOrThrow(), query_min_max_for_xyz_info_list);
+}

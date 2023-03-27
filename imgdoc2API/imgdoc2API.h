@@ -157,6 +157,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileInfo(
 /// \param           dimensions                     Pointer to a buffer.
 /// \param           count                          On input, the size of the array pointed to by 'dimensions', on output the actual number of dimension available.
 /// \param           error_information              If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTileDimensions(
     HandleDocRead2D handle,
     imgdoc2::Dimension* dimensions,
@@ -168,4 +169,25 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetMinMaxForTileDimensions(
     const imgdoc2::Dimension* dimensions,
     std::uint32_t count,
     MinMaxForTilePositionsInterop* result,
+    ImgDoc2ErrorInformation* error_information);
+
+/// Retrieve the "axis aligned bounding box" (covering all tiles). This function is corresponding to the
+/// method 'IDocInfo2d::GetTilesBoundingBox'. If the values cannot be retrieved (e.g. if the document 
+/// is empty), then the min-values will be set to 'std::numeric_limits<double>::max()' and the max-values
+/// to 'std::numeric_limits<double>::lowest()'.
+///
+/// \param          handle            The handle of the read2d-object.
+/// \param [in,out] min_x             If non-null, the minimum x coordinate is put here.
+/// \param [in,out] max_x             If non-null, the maximum x coordinate is put here.
+/// \param [in,out] min_y             If non-null, the minimum y coordinate is put here.
+/// \param [in,out] max_y             If non-null, the maximum y coordinate is put here.
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
+    HandleDocRead2D handle,
+    double* min_x,
+    double* max_x,
+    double* min_y,
+    double* max_y,
     ImgDoc2ErrorInformation* error_information);
