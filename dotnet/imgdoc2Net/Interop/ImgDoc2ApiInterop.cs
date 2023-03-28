@@ -1688,6 +1688,7 @@ namespace ImgDoc2Net.Interop
             public int Maximum;
         }
 
+        /// <summary> This struct gathers a pyramid-layer index and a count of tiles. It is corresponding to the unmanaged struct 'PerLayerTileCountInterop'.</summary>
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         private struct PerLayerTileCountInterop
         {
@@ -1695,13 +1696,31 @@ namespace ImgDoc2Net.Interop
             public ulong TileCount;
         }
 
+        /// <summary> This struct is used for the 'IDocInfo_GetTileCountPerLayer'-API. It corresponds to the unmanaged struct 'TileCountPerLayerInterop'.</summary>
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         private struct TileCountPerLayerInterop
         {
+            /// <summary> 
+            /// The number of elements in the array 'pyramid_layer_and_tile_count' - i.e. the number of elements
+            ///  for which space is allocated.
+            /// </summary>
             public uint ElementCountAllocated;
+
+            /// <summary> 
+            /// On input, this number is not used. On output, it contains the number of available results.
+            /// This number may be larger than 'element_count_allocated', and if this is the case, it
+            /// indicates that not all results could be returned.
+            /// The number of valid items in 'pyramid_layer_and_tile_count' in any case is the minimum
+            /// of 'element_count_allocated' and 'element_count_available'.
+            /// </summary>
             public uint ElementCountAvailable;
+
+            /// <summary> This is actually an array of PerLayerTileCountInterop-struct (or - it is used as if it were an array).</summary>
             public PerLayerTileCountInterop PyramidLayerAndTileCount;
 
+            /// <summary> Calculates the size of this structure large enough to hold the specified number of elements.</summary>
+            /// <param name="numberOfElements"> Number of elements.</param>
+            /// <returns> The calculated size in bytes.</returns>
             public static int CalculateSize(int numberOfElements)
             {
                 return (numberOfElements * Marshal.SizeOf<PerLayerTileCountInterop>()) + (2 * Marshal.SizeOf<uint>());
