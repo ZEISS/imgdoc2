@@ -28,6 +28,8 @@ public:
     // interface IDocInfo
     void GetTileDimensions(imgdoc2::Dimension* dimensions, std::uint32_t& count) override;
     std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) override;
+    std::uint64_t GetTotalTileCount() override;
+    std::map<int, std::uint64_t> GetTileCountPerLayer() override;
 
     // interface IDocInfo2d
     void GetTilesBoundingBox(imgdoc2::DoubleInterval* bounds_x, imgdoc2::DoubleInterval* bounds_y) override;

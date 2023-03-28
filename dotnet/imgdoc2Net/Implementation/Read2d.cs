@@ -135,6 +135,18 @@ namespace ImgDoc2Net.Implementation
                 MaxY = extent.maxY,
             };
         }
+
+        /// <inheritdoc/>
+        public long GetTotalNumberOfTiles()
+        {
+            return ImgDoc2ApiInterop.Instance.DocInfoGetTotalTileCount(this.reader2dObjectHandle);
+        }
+
+        /// <inheritdoc/>
+        public Dictionary<int, long> GetTileCountPerPyramidLayer()
+        {
+            return ImgDoc2ApiInterop.Instance.GetTileCountPerPyramidLayer(this.reader2dObjectHandle);
+        }
     }
 
     /// <content>

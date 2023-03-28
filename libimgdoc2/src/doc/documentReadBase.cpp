@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <gsl/assert>
+#include <gsl/narrow>
 
 using namespace std;
 using namespace imgdoc2;
@@ -15,10 +16,10 @@ using namespace imgdoc2;
 {
     if (dimensions != nullptr)
     {
-        copy_n(tile_dimensions.cbegin(), min(count, static_cast<uint32_t>(tile_dimensions.size())), dimensions);
+        copy_n(tile_dimensions.cbegin(), min(count, gsl::narrow<uint32_t>(tile_dimensions.size())), dimensions);
     }
 
-    count = static_cast<uint32_t>(tile_dimensions.size());
+    count = gsl::narrow<uint32_t>(tile_dimensions.size());
 }
 
 std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentReadBase::GetMinMaxForTileDimensionInternal(
@@ -54,7 +55,7 @@ std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentReadBase::GetMinMax
         throw internal_error_exception("database-query gave no result, this is unexpected.");
     }
 
-    for (size_t i = 0; i < dimensions_to_query_for.size(); ++i)
+    for (int i = 0; i < gsl::narrow<int>(dimensions_to_query_for.size()); ++i)
     {
         Int32Interval coordinate_bounds;
         auto min = query_statement->GetResultInt32OrNull(i * 2);
@@ -154,4 +155,37 @@ std::shared_ptr<IDbStatement> DocumentReadBase::CreateQueryMinMaxForXyz(const st
     }
 
     return result_index;
+}
+
+std::uint64_t DocumentReadBase::GetTotalTileCount(const std::string& table_name)
+{
+    ostringstream string_stream;
+    string_stream << "SELECT COUNT(*) FROM [" << table_name << "];";
+    const auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+
+    const bool is_done = this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get());
+    if (!is_done)
+    {
+        throw internal_error_exception("database-query gave no result, this is unexpected.");
+    }
+
+    const auto result = statement->GetResultInt64(0);
+    return result;
+}
+
+std::map<int, std::uint64_t> DocumentReadBase::GetTileCountPerLayer(const std::string& table_name, const std::string& pyramid_level_column_name)
+{
+    ostringstream string_stream;
+    string_stream << "SELECT [" << pyramid_level_column_name << "], COUNT(*) FROM [" << table_name << "] GROUP BY [" << pyramid_level_column_name << "];";
+    const auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+
+    map<int, uint64_t> result;
+    while (this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        const auto layer = statement->GetResultInt32(0);
+        const auto count = statement->GetResultInt64(1);
+        result[layer] = count;
+    }
+
+    return result;
 }

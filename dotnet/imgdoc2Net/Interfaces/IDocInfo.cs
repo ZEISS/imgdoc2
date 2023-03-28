@@ -35,5 +35,13 @@ namespace ImgDoc2Net.Interfaces
         /// Gets an axis aligned bounding box (of all tiles in the document). </summary>
         /// <returns>   The bounding box. </returns>
         Extent2d GetBoundingBox();
+
+        /// <summary> Gets total number of tiles in the document.</summary>
+        /// <returns> The total number of tiles.</returns>
+        long GetTotalNumberOfTiles();
+
+        /// <summary> Gets the total number of tiles per pyramid layer.</summary>
+        /// <returns> A dictionary, where key is the pyramid layer number, and value is the total number of tiles (on this layer) in the document. </returns>
+        Dictionary<int, long> GetTileCountPerPyramidLayer();
     }
 }

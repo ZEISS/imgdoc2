@@ -33,6 +33,16 @@ namespace imgdoc2
         ///
         /// \returns    A map containing the min/max-information for the requested dimensions.
         virtual std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for) = 0;
+
+        /// Gets the total number of tiles (or bricks) in the document.
+        ///
+        /// \returns The total tile count.
+        virtual std::uint64_t GetTotalTileCount() = 0;
+
+        /// Gets the total number of tiles (or bricks) per pyramid layer.
+        ///
+        /// \returns A map, where key is the pyramid layer number, and value is the total number of tiles (on this layer) in the document.
+        virtual std::map<int, std::uint64_t> GetTileCountPerLayer() = 0;
     public:
         std::vector<imgdoc2::Dimension> GetTileDimensions()
         {

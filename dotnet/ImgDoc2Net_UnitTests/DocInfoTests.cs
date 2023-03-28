@@ -288,5 +288,141 @@ namespace ImgDoc2Net_UnitTests
                 extent.IsValid.Should().BeFalse();
             }
         }
+
+        [Fact]
+        public void CreateDocumentAndCallGetTotalNumberOfTilesAndCheck()
+        {
+            var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
+            {
+                // arrange
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                createOptions.AddDimension(new Dimension('o'));
+                using var document = Document.CreateNew(createOptions);
+                using var reader2d = document.Get2dReader();
+                using var writer2d = document.Get2dWriter();
+
+                LogicalPosition logicalPosition = new LogicalPosition()
+                {
+                    PositionX = 10,
+                    PositionY = 20,
+                    Width = 100,
+                    Height = 111,
+                    PyramidLevel = 0
+                };
+
+                var tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 11)});
+
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 141)});
+
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                // act
+                var totalNumberOfTiles = reader2d.GetTotalNumberOfTiles();
+
+                // assert
+                totalNumberOfTiles.Should().Be(2);
+            }
+
+            Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
+        }
+
+        [Fact]
+        public void CreateDocumentAndCallGetTileCountPerPyramidLayerAndCheck()
+        {
+            var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
+            {
+                // arrange
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                createOptions.AddDimension(new Dimension('o'));
+                using var document = Document.CreateNew(createOptions);
+                using var reader2d = document.Get2dReader();
+                using var writer2d = document.Get2dWriter();
+
+                // add 3 tiles on pyramid level 0, 2 tiles on pyramid level 1 and 1 tile on pyramid level 2
+                LogicalPosition logicalPosition = new LogicalPosition()
+                {
+                    PositionX = 10,
+                    PositionY = 20,
+                    Width = 100,
+                    Height = 111,
+                    PyramidLevel = 0
+                };
+
+                var tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 11)});
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 12)});
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 13)});
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 141)});
+                logicalPosition.PyramidLevel = 1;
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 142)});
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                tileCoordinate = new TileCoordinate(new[]
+                    {Tuple.Create(new Dimension('o'), 200)});
+                logicalPosition.PyramidLevel = 2;
+                writer2d.AddTile(
+                    tileCoordinate,
+                    in logicalPosition,
+                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    DataType.Zero,
+                    null);
+
+                // act
+                var tileCounterPerPyramidLayer = reader2d.GetTileCountPerPyramidLayer();
+
+                // assert
+                Assert.Equal(tileCounterPerPyramidLayer, new Dictionary<int, long>() { { 0, 3 }, { 1, 2 }, { 2, 1 } });
+            }
+
+            Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
+        }
     }
 }
