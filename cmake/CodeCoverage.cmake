@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright 2012-2017 Lars Bilke
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 # Copyright (c) 2012 - 2017, Lars Bilke
 # All rights reserved.
 #
