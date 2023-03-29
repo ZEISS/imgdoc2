@@ -24,8 +24,10 @@ struct ImgDoc2ApiStatistics
     atomic_uint32_t number_of_document_objects_active{ 0 };
     atomic_uint32_t number_of_reader2d_objects_active{ 0 };
     atomic_uint32_t number_of_writer2d_objects_active{ 0 };
+    atomic_uint32_t number_of_reader3d_objects_active{ 0 };
+    atomic_uint32_t number_of_writer3d_objects_active{ 0 };
 
-    ImgDoc2StatisticsInterop GetInteropStruct()
+    ImgDoc2StatisticsInterop GetInteropStruct() const
     {
         ImgDoc2StatisticsInterop interop;
         interop.number_of_createoptions_objects_active = this->number_of_createoptions_objects_active.load();
@@ -33,6 +35,9 @@ struct ImgDoc2ApiStatistics
         interop.number_of_document_objects_active = this->number_of_document_objects_active.load();
         interop.number_of_reader2d_objects_active = this->number_of_reader2d_objects_active.load();
         interop.number_of_writer2d_objects_active = this->number_of_writer2d_objects_active.load();
+
+        // TODO: extend this for 3D
+        // 
         return interop;
     }
 };
@@ -242,6 +247,35 @@ void DestroyReader2d(HandleDocRead2D handle)
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
     --gImgDoc2ApiStatistics.number_of_reader2d_objects_active;
+}
+
+ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* reader, ImgDoc2ErrorInformation* error_information)
+{
+    if (reader == nullptr)
+    {
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    auto spReader3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader3d();   // NOLINT(performance-no-int-to-ptr)
+    if (spReader3d)
+    {
+        auto shared_reader3d_wrappping_object = new SharedPtrWrapper<IDocRead3d>{ spReader3d };
+        *reader = reinterpret_cast<HandleDocRead3D>(shared_reader3d_wrappping_object);
+        ++gImgDoc2ApiStatistics.number_of_reader3d_objects_active;
+    }
+    else
+    {
+        *reader = kInvalidObjectHandle;
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+void DestroyReader3d(HandleDocRead3D handle)
+{
+    const auto object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    delete object;
+    --gImgDoc2ApiStatistics.number_of_reader3d_objects_active;
 }
 
 ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* document_writer2d, ImgDoc2ErrorInformation* error_information)

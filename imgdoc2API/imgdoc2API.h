@@ -29,6 +29,8 @@ typedef ObjectHandle HandleOpenExistingOptions;
 typedef ObjectHandle HandleDoc;
 typedef ObjectHandle HandleDocRead2D;
 typedef ObjectHandle HandleDocWrite2D;
+typedef ObjectHandle HandleDocRead3D;
+typedef ObjectHandle HandleDocWrite3D;
 
 EXTERNAL_API(void)GetStatistics(ImgDoc2StatisticsInterop* statistics_interop);
 
@@ -52,6 +54,9 @@ EXTERNAL_API(void) DestroyDocument(HandleDoc handle);
 
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* document_read2d, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(void) DestroyReader2d(HandleDocRead2D handle);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead2D* document_read3d, ImgDoc2ErrorInformation* error_information);
+EXTERNAL_API(void) DestroyReader3d(HandleDocRead2D handle);
 
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* document_write2d, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(void) DestroyWriter2d(HandleDocWrite2D handle);
