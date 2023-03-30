@@ -239,7 +239,7 @@ namespace ImgDoc2Net.Interop
     /// </content>
     internal partial class ImgDoc2ApiInterop
     {
-        /// <summary>   Gets the "ImgDoc2Statistics". </summary>
+        /// <summary>   Gets the "ImgDoc2Statistics" - information about how many active objects exist. </summary>
         /// <returns>   The "ImgDoc2Statistics". </returns>
         public ImgDoc2Statistics GetStatistics()
         {
@@ -257,6 +257,8 @@ namespace ImgDoc2Net.Interop
                     NumberOfDocumentObjectsActive = (int)statisticsInterop.NumberOfDocumentObjectsActive,
                     NumberOfReader2dObjectsActive = (int)statisticsInterop.NumberOfReader2dObjectsActive,
                     NumberOfWriter2dObjectsActive = (int)statisticsInterop.NumberOfWriter2dObjectsActive,
+                    NumberOfReader3dObjectsActive = (int)statisticsInterop.NumberOfReader3dObjectsActive,
+                    NumberOfWriter3dObjectsActive = (int)statisticsInterop.NumberOfWriter3dObjectsActive
                 };
             }
         }
@@ -1662,6 +1664,11 @@ namespace ImgDoc2Net.Interop
             public byte DataType;
         }
 
+        /// <summary> 
+        /// Statistics about the number of active object, provided by the interop-layer. This is
+        /// intended to be used for debugging/testing purposes.
+        /// This struct is corresponding to the unmanaged struct 'ImgDoc2StatisticsInterop'.
+        /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         private struct ImgDoc2StatisticsInterop
         {
@@ -1670,6 +1677,8 @@ namespace ImgDoc2Net.Interop
             public uint NumberOfDocumentObjectsActive;
             public uint NumberOfReader2dObjectsActive;
             public uint NumberOfWriter2dObjectsActive;
+            public uint NumberOfReader3dObjectsActive;
+            public uint NumberOfWriter3dObjectsActive;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
