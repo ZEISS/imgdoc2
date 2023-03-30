@@ -14,5 +14,7 @@ struct ImgDoc2StatisticsInterop
     std::uint32_t number_of_document_objects_active;
     std::uint32_t number_of_reader2d_objects_active;
     std::uint32_t number_of_writer2d_objects_active;
+    std::uint32_t number_of_reader3d_objects_active;
+    std::uint32_t number_of_writer3d_objects_active;
 };
 #pragma pack(pop)

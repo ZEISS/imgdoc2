@@ -35,9 +35,8 @@ struct ImgDoc2ApiStatistics
         interop.number_of_document_objects_active = this->number_of_document_objects_active.load();
         interop.number_of_reader2d_objects_active = this->number_of_reader2d_objects_active.load();
         interop.number_of_writer2d_objects_active = this->number_of_writer2d_objects_active.load();
-
-        // TODO: extend this for 3D
-        // 
+        interop.number_of_reader3d_objects_active = this->number_of_reader3d_objects_active.load();
+        interop.number_of_writer3d_objects_active = this->number_of_writer3d_objects_active.load();
         return interop;
     }
 };
