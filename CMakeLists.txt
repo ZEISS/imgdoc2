@@ -79,5 +79,5 @@ if (IMGDOC2_CODECOV)
         EXECUTABLE libimgdoc2_tests
 		    DEPENDENCIES   libimgdoc2
 		    BASE_DIRECTORY "${PROJECT_SOURCE_DIR}/libimgdoc2_tests"
-		    EXCLUDE libimgdoc2_tests )
+		    EXCLUDE "${PROJECT_SOURCE_DIR}/libimgdoc2_tests/*" "${PROJECT_BINARY_DIR}/_deps/*" "/usr/include/*")
 endif()
