@@ -74,7 +74,7 @@ if (IMGDOC2_CODECOV)
   include("${CMAKE_SOURCE_DIR}/cmake/CodeCoverage.cmake")
   append_coverage_compiler_flags_to_target(libimgdoc2_tests)
   append_coverage_compiler_flags_to_target(libimgdoc2)
-  SETUP_TARGET_FOR_COVERAGE_LCOV(
+  setup_target_for_coverage_gcovr_xml(
 		    NAME code_coverage
         EXECUTABLE libimgdoc2_tests
 		    DEPENDENCIES   libimgdoc2
