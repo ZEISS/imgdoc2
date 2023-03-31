@@ -55,7 +55,7 @@ jobs:
           sudo apt-get -y install lcov
           cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF
           cd ${{github.workspace}}/coveragebuild
-          make coverage
+          make code_coverage
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
