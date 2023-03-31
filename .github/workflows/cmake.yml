@@ -52,6 +52,7 @@ jobs:
 
       - name: code-coverage
         run: |
+          apt -y install lcov
           cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF
           cd ${{github.workspace}}/coveragebuild
           make coverage
