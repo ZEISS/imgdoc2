@@ -62,4 +62,4 @@ jobs:
         with:
           files: ${{github.workspace}}/coveragebuild/code_coverage.xml
           flags: unittests # optional
-          verbose: true 
+          verbose: true
