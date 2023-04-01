@@ -112,8 +112,8 @@ HandleEnvironmentObject CreateEnvironmentObject(
         pfn_log,
         pfn_is_level_active,
         pfn_report_fatal_error_and_exit);
-    auto shared_environment_wrappping_object = new SharedPtrWrapper<IHostingEnvironment>{ environment };
-    return reinterpret_cast<HandleEnvironmentObject>(shared_environment_wrappping_object);
+    auto shared_environment_wrapping_object = new SharedPtrWrapper<IHostingEnvironment>{ environment };
+    return reinterpret_cast<HandleEnvironmentObject>(shared_environment_wrapping_object);
 }
 
 void DestroyEnvironmentObject(HandleEnvironmentObject handle)
@@ -260,8 +260,8 @@ ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* do
     auto spReader3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader3d();   // NOLINT(performance-no-int-to-ptr)
     if (spReader3d)
     {
-        auto shared_reader3d_wrappping_object = new SharedPtrWrapper<IDocRead3d>{ spReader3d };
-        *document_read3d = reinterpret_cast<HandleDocRead3D>(shared_reader3d_wrappping_object);
+        auto shared_reader3d_wrapping_object = new SharedPtrWrapper<IDocRead3d>{ spReader3d };
+        *document_read3d = reinterpret_cast<HandleDocRead3D>(shared_reader3d_wrapping_object);
         ++gImgDoc2ApiStatistics.number_of_reader3d_objects_active;
     }
     else
