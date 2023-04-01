@@ -204,6 +204,15 @@ using namespace std;
     return CuboidD{ cuboid_interop.x, cuboid_interop.y, cuboid_interop.z, cuboid_interop.width, cuboid_interop.height, cuboid_interop.depth };
 }
 
+/*static*/imgdoc2::Plane_NormalAndDistD Utilities::ConvertPlaneNormalAndDistanceInterop(const PlaneNormalAndDistanceInterop& plane_normal_and_distance_interop)
+{
+    return Plane_NormalAndDistD
+    {
+        Vector3dD{plane_normal_and_distance_interop.normal_x, plane_normal_and_distance_interop.normal_y, plane_normal_and_distance_interop.normal_z},
+        plane_normal_and_distance_interop.distance
+    };
+}
+
 imgdoc2::LogicalOperator Utilities::ConvertToLogicalOperatorEnum(std::uint8_t value)
 {
     if (value > static_cast<underlying_type_t<LogicalOperator>>(LogicalOperator::MaxValue))

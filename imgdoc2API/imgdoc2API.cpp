@@ -860,6 +860,53 @@ ImgDoc2ErrorCode IDocRead3d_GetTilesIntersectingRect(
     return ImgDoc2_ErrorCode_OK;
 }
 
+ImgDoc2ErrorCode IDocRead3d_GetTilesIntersectingPlane(
+    HandleDocRead3D handle,
+    const PlaneNormalAndDistanceInterop* plane_normal_and_distance_interop,
+    const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
+    const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
+    QueryResultInterop* result,
+    ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
+        Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
+        CTileInfoQueryClause();
+    const auto dimension_coordinate_query_clause = dim_coordinate_query_clause_interop != nullptr ?
+        Utilities::ConvertDimensionQueryRangeClauseInteropToImgdoc2(dim_coordinate_query_clause_interop) :
+        CDimCoordinateQueryClause();
+    const auto plane_normal_and_distance = Utilities::ConvertPlaneNormalAndDistanceInterop(*plane_normal_and_distance_interop);
+    uint32_t results_retrieved_count = 0;
+    result->more_results_available = 0;
+    try
+    {
+        reader3d->GetTilesIntersectingPlane(
+            plane_normal_and_distance,
+            dim_coordinate_query_clause_interop != nullptr ? &dimension_coordinate_query_clause : nullptr,
+            tile_info_query_clause_interop != nullptr ? &tile_info_query_clause : nullptr,
+            [result, &results_retrieved_count](imgdoc2::dbIndex index)->bool
+            {
+                if (results_retrieved_count < result->element_count)
+                {
+                    result->indices[results_retrieved_count] = index;
+                    ++results_retrieved_count;
+                    return true;
+                }
+
+                result->more_results_available = 1;
+                return false;
+            });
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
+
+    result->element_count = results_retrieved_count;
+    return ImgDoc2_ErrorCode_OK;
+}
+
 ImgDoc2ErrorCode IDocRead2d_ReadTileData(
     HandleDocRead2D handle,
     std::int64_t pk,

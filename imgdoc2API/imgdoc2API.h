@@ -22,6 +22,7 @@
 #include "cuboiddoubleinterop.h"
 #include "minmaxfortiledimensioninterop.h"
 #include "tilecountperlayerinterop.h"
+#include "planenormalanddistanceinterop.h"
 
 typedef std::intptr_t ObjectHandle;
 
@@ -193,6 +194,13 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_Query(
 EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetTilesIntersectingRect(
     HandleDocRead3D handle,
     const CuboidDoubleInterop* query_cuboid,
+    const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
+    const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
+    QueryResultInterop* result,
+    ImgDoc2ErrorInformation* error_information);
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetTilesIntersectingPlane(
+    HandleDocRead3D handle,
+    const PlaneNormalAndDistanceInterop* plane_normal_and_distance_interop,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
     const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
     QueryResultInterop* result,

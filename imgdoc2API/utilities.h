@@ -17,6 +17,7 @@
 #include "tileblobinfointerop.h"
 #include "rectangledoubleinterop.h"
 #include "cuboiddoubleinterop.h"
+#include "planenormalanddistanceinterop.h"
 
 class Utilities
 {
@@ -36,6 +37,7 @@ public:
     static imgdoc2::CuboidD ConvertCuboidDoubleInterop(const CuboidDoubleInterop& cuboid_interop);
     static TileBlobInfoInterop ConvertImgDoc2TileBlobInfoToInterop(const imgdoc2::TileBlobInfo& tile_blob_info);
     static BrickBlobInfoInterop ConvertImgDoc2BrickBlobInfoToInterop(const imgdoc2::BrickBlobInfo& brick_blob_info);
+    static imgdoc2::Plane_NormalAndDistD ConvertPlaneNormalAndDistanceInterop(const PlaneNormalAndDistanceInterop& plane_normal_and_distance_interop);
     static imgdoc2::DocumentType ConvertDocumentTypeFromInterop(std::uint8_t document_type_interop);
 
     /// Attempts to convert information from a tile-coordinate object into a tile-coordinate-interop-structure.
