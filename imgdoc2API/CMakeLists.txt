@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 add_library(imgdoc2API  SHARED
-                imgdoc2API.h
-                imgdoc2API.cpp 
+                "imgdoc2API.h"
+                "imgdoc2API.cpp"
                 "importexport.h" 
                 "errorcodes.h" 
                 "tilecoordinateinterop.h" 
