@@ -17,6 +17,7 @@
 using namespace imgdoc2;
 using namespace std;
 
+/// This struct is used to count active instances of objects, which are created by the imgdoc2API.
 struct ImgDoc2ApiStatistics
 {
     atomic_uint32_t number_of_createoptions_objects_active{ 0 };
@@ -41,7 +42,7 @@ struct ImgDoc2ApiStatistics
     }
 };
 
-static ImgDoc2ApiStatistics gImgDoc2ApiStatistics;
+static ImgDoc2ApiStatistics g_imgdoc2_api_statistics;  ///< Define a static object, which is used to count active instances of objects, which are created by the imgdoc2API.
 
 template <typename t>
 struct SharedPtrWrapper
@@ -97,7 +98,7 @@ void GetStatistics(ImgDoc2StatisticsInterop* statistics_interop)
 {
     if (statistics_interop != nullptr)
     {
-        *statistics_interop = gImgDoc2ApiStatistics.GetInteropStruct();
+        *statistics_interop = g_imgdoc2_api_statistics.GetInteropStruct();
     }
 }
 
@@ -124,7 +125,7 @@ void DestroyEnvironmentObject(HandleEnvironmentObject handle)
 
 HandleCreateOptions CreateCreateOptions()
 {
-    ++gImgDoc2ApiStatistics.number_of_createoptions_objects_active;
+    ++g_imgdoc2_api_statistics.number_of_createoptions_objects_active;
     return reinterpret_cast<HandleCreateOptions>(ClassFactory::CreateCreateOptionsPtr());
 }
 
@@ -132,12 +133,12 @@ void DestroyCreateOptions(HandleCreateOptions handle)
 {
     const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_createoptions_objects_active;
+    --g_imgdoc2_api_statistics.number_of_createoptions_objects_active;
 }
 
 HandleOpenExistingOptions CreateOpenExistingOptions()
 {
-    ++gImgDoc2ApiStatistics.number_of_openexistingoptions_objects_active;
+    ++g_imgdoc2_api_statistics.number_of_openexistingoptions_objects_active;
     return reinterpret_cast<HandleOpenExistingOptions>(ClassFactory::CreateOpenExistingOptions());
 }
 
@@ -145,7 +146,7 @@ void DestroyOpenExistingOptions(HandleOpenExistingOptions handle)
 {
     const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_openexistingoptions_objects_active;
+    --g_imgdoc2_api_statistics.number_of_openexistingoptions_objects_active;
 }
 
 ImgDoc2ErrorCode CreateNewDocument(HandleCreateOptions create_options, HandleEnvironmentObject handle_environment_object, HandleDoc* document, ImgDoc2ErrorInformation* error_information)
@@ -174,7 +175,7 @@ ImgDoc2ErrorCode CreateNewDocument(HandleCreateOptions create_options, HandleEnv
 
     auto shared_imgdoc_wrapping_object = new SharedPtrWrapper<IDoc>{ imgdoc2 };
     *document = reinterpret_cast<HandleDoc>(shared_imgdoc_wrapping_object);
-    ++gImgDoc2ApiStatistics.number_of_document_objects_active;
+    ++g_imgdoc2_api_statistics.number_of_document_objects_active;
     return ImgDoc2_ErrorCode_OK;
 }
 
@@ -208,7 +209,7 @@ ImgDoc2ErrorCode OpenExistingDocument(
 
     auto shared_imgdoc_wrapping_object = new SharedPtrWrapper<IDoc>{ imgdoc2 };
     *document = reinterpret_cast<HandleDoc>(shared_imgdoc_wrapping_object);
-    ++gImgDoc2ApiStatistics.number_of_document_objects_active;
+    ++g_imgdoc2_api_statistics.number_of_document_objects_active;
     return ImgDoc2_ErrorCode_OK;
 }
 
@@ -216,7 +217,7 @@ void DestroyDocument(HandleDoc handle)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_document_objects_active;
+    --g_imgdoc2_api_statistics.number_of_document_objects_active;
 }
 
 ImgDoc2ErrorCode IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* document_read2d, ImgDoc2ErrorInformation* error_information)
@@ -232,7 +233,7 @@ ImgDoc2ErrorCode IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* do
     {
         auto shared_reader2d_wrapping_object = new SharedPtrWrapper<IDocRead2d>{ spReader2d };
         *document_read2d = reinterpret_cast<HandleDocRead2D>(shared_reader2d_wrapping_object);
-        ++gImgDoc2ApiStatistics.number_of_reader2d_objects_active;
+        ++g_imgdoc2_api_statistics.number_of_reader2d_objects_active;
     }
     else
     {
@@ -246,7 +247,7 @@ void DestroyReader2d(HandleDocRead2D handle)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_reader2d_objects_active;
+    --g_imgdoc2_api_statistics.number_of_reader2d_objects_active;
 }
 
 ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* document_read3d, ImgDoc2ErrorInformation* error_information)
@@ -262,7 +263,7 @@ ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* do
     {
         auto shared_reader3d_wrapping_object = new SharedPtrWrapper<IDocRead3d>{ spReader3d };
         *document_read3d = reinterpret_cast<HandleDocRead3D>(shared_reader3d_wrapping_object);
-        ++gImgDoc2ApiStatistics.number_of_reader3d_objects_active;
+        ++g_imgdoc2_api_statistics.number_of_reader3d_objects_active;
     }
     else
     {
@@ -276,7 +277,7 @@ void DestroyReader3d(HandleDocRead3D handle)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_reader3d_objects_active;
+    --g_imgdoc2_api_statistics.number_of_reader3d_objects_active;
 }
 
 ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* document_writer2d, ImgDoc2ErrorInformation* error_information)
@@ -292,7 +293,7 @@ ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* d
     {
         auto shared_writer2d_wrapping_object = new SharedPtrWrapper<IDocWrite2d>{ spWriter2d };
         *document_writer2d = reinterpret_cast<HandleDocWrite2D>(shared_writer2d_wrapping_object);
-        ++gImgDoc2ApiStatistics.number_of_writer2d_objects_active;
+        ++g_imgdoc2_api_statistics.number_of_writer2d_objects_active;
     }
     else
     {
@@ -306,7 +307,7 @@ void DestroyWriter2d(HandleDocWrite2D handle)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_writer2d_objects_active;
+    --g_imgdoc2_api_statistics.number_of_writer2d_objects_active;
 }
 
 ImgDoc2ErrorCode IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite3D* document_writer3d, ImgDoc2ErrorInformation* error_information)
@@ -322,7 +323,7 @@ ImgDoc2ErrorCode IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite3D* d
     {
         auto shared_writer3d_wrapping_object = new SharedPtrWrapper<IDocWrite3d>{ spWriter3d };
         *document_writer3d = reinterpret_cast<HandleDocWrite2D>(shared_writer3d_wrapping_object);
-        ++gImgDoc2ApiStatistics.number_of_writer3d_objects_active;
+        ++g_imgdoc2_api_statistics.number_of_writer3d_objects_active;
     }
     else
     {
@@ -336,7 +337,7 @@ void DestroyWriter3d(HandleDocWrite2D handle)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     delete object;
-    --gImgDoc2ApiStatistics.number_of_writer3d_objects_active;
+    --g_imgdoc2_api_statistics.number_of_writer3d_objects_active;
 }
 
 ImgDoc2ErrorCode CreateOptions_SetFilename(HandleCreateOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information)
