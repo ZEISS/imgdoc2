@@ -21,9 +21,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(IMGDOC2_BUILD_CLANGTIDY "Build with Clang-Tidy" OFF)
 
-# Experimental: enable code-coverage for unit-tests (only works with GCC/Clang)
+# Enable code-coverage for unit-tests (only works with GCC/Clang)
 # Usage is something like: cmake .. -DCMAKE_BUILD_TYPE=Debug -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF && make && make code_coverage
-# This will generate a coverage-report in the build-directory (code_coverage/index.html)
+# This will generate a coverage-report in the build-directory (code_coverage.xml)
 option(IMGDOC2_CODECOV "Build with Code-Coverage (for unit-tests)" OFF)
 
 option(IMGDOC2_BUILD_CONVCZI "Whether to build the convczi-tool" ON)

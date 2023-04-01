@@ -7,25 +7,36 @@
 #include <imgdoc2.h>
 #include "importexport.h"
 #include "logicalpositioninfointerop.h"
+#include "logicalpositioninfo3dinterop.h"
 #include "tilecoordinateinterop.h"
 #include "dimcoordinatequeryclauseinterop.h"
 #include "tileinfoqueryclauseinterop.h"
 #include "tilebaseinfointerop.h"
+#include "brickbaseinfointerop.h"
+#include "brickblobinfointerop.h"
 #include "tileblobinfointerop.h"
 #include "rectangledoubleinterop.h"
+#include "cuboiddoubleinterop.h"
 
 class Utilities
 {
 public:
     static imgdoc2::TileCoordinate ConvertToTileCoordinate(const TileCoordinateInterop* tile_coordinate_interop);
     static imgdoc2::LogicalPositionInfo ConvertLogicalPositionInfoInteropToImgdoc2(const LogicalPositionInfoInterop& logical_position_info_interop);
+    static imgdoc2::LogicalPositionInfo3D ConvertLogicalPositionInfo3DInteropToImgdoc2(const LogicalPositionInfo3DInterop& logical_position_info_interop);
     static LogicalPositionInfoInterop ConvertImgDoc2LogicalPositionInfoToInterop(const imgdoc2::LogicalPositionInfo& logical_position_info);
+    //static LogicalPositionInfo3DInterop ConvertImgDoc2LogicalPositionInfo3DToInterop(const imgdoc2::LogicalPositionInfo3D& logical_position_info_3d);
+    static LogicalPositionInfo3DInterop ConvertImgDoc2LogicalPositionInfo3DToInterop(const imgdoc2::LogicalPositionInfo3D& logical_position_info_3d_interop);
     static imgdoc2::CDimCoordinateQueryClause ConvertDimensionQueryRangeClauseInteropToImgdoc2(const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop);
     static imgdoc2::CTileInfoQueryClause ConvertTileInfoQueryClauseInteropToImgdoc2(const TileInfoQueryClauseInterop* tile_info_query_clause_interop);
     static imgdoc2::TileBaseInfo ConvertTileBaseInfoInteropToImgdoc2(const TileBaseInfoInterop& tile_base_info_interop);
+    static imgdoc2::BrickBaseInfo ConvertBrickBaseInfoInteropToImgdoc2(const BrickBaseInfoInterop& brick_base_info_interop);
     static imgdoc2::DataTypes ConvertDatatypeEnumInterop(std::uint8_t data_type_interop);
     static imgdoc2::RectangleD ConvertRectangleDoubleInterop(const RectangleDoubleInterop& rectangle_interop);
+    static imgdoc2::CuboidD ConvertCuboidDoubleInterop(const CuboidDoubleInterop& cuboid_interop);
     static TileBlobInfoInterop ConvertImgDoc2TileBlobInfoToInterop(const imgdoc2::TileBlobInfo& tile_blob_info);
+    static BrickBlobInfoInterop ConvertImgDoc2BrickBlobInfoToInterop(const imgdoc2::BrickBlobInfo& brick_blob_info);
+    static imgdoc2::DocumentType ConvertDocumentTypeFromInterop(std::uint8_t document_type_interop);
 
     /// Attempts to convert information from a tile-coordinate object into a tile-coordinate-interop-structure.
     /// This method is expecting that the tile_coordinate_interop-struct is provided by the caller, and that the 
@@ -34,7 +45,7 @@ public:
     /// \param [in,out] tile_coordinate_interop The tile coordinate interop.
     /// \returns {bool} True if it succeeds, false if it fails.
     static bool TryConvertToTileCoordinateInterop(const imgdoc2::ITileCoordinate* tile_coordinate, TileCoordinateInterop* tile_coordinate_interop);
-public:
+
     class BlobOutputOnFunctionsDecorator : public imgdoc2::IBlobOutput
     {
     public:
@@ -57,6 +68,34 @@ public:
         std::intptr_t blob_output_handle_;
         fnReserve fpnReserve_;
         fnSetData fpnSetData_;
+    };
+
+    /// A wrapper object for a data object that is used to pass data to the imgdoc2 API.
+    struct GetDataObject : public imgdoc2::IDataObjBase
+    {
+    private:
+        const void* p_;
+        size_t s_;
+    public:
+
+        /// Constructor - initializes the object with the given data.
+        /// Attention: The data must be valid as long as the object is used.
+        ///
+        /// \param  p   Pointer to the data.
+        /// \param  s   Size of the data.
+        GetDataObject(const void* p, size_t s) :p_(p), s_(s) {}
+
+        void GetData(const void** p, size_t* s) const override
+        {
+            if (p != nullptr)
+            {
+                *p = this->p_;
+            }
+            if (s != nullptr)
+            {
+                *s = this->s_;
+            }
+        }
     };
 
     static imgdoc2::LogicalOperator ConvertToLogicalOperatorEnum(std::uint8_t value);

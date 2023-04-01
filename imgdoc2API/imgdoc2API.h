@@ -9,19 +9,23 @@
 #include "errorcodes.h"
 #include "tilecoordinateinterop.h"
 #include "logicalpositioninfointerop.h"
+#include "logicalpositioninfo3dinterop.h"
 #include "queryresultinterop.h"
 #include "dimcoordinatequeryclauseinterop.h"
 #include "tileinfoqueryclauseinterop.h"
 #include "tileblobinfointerop.h"
+#include "brickblobinfointerop.h"
 #include "tilebaseinfointerop.h"
+#include "brickbaseinfointerop.h"
 #include "statisticsinterop.h"
 #include "rectangledoubleinterop.h"
+#include "cuboiddoubleinterop.h"
 #include "minmaxfortiledimensioninterop.h"
 #include "tilecountperlayerinterop.h"
 
 typedef std::intptr_t ObjectHandle;
 
-static constexpr ObjectHandle kInvalidObjectHandle = 0;
+static constexpr ObjectHandle kInvalidObjectHandle = 0; ///< (Immutable) Reserved value indicating an invalid object handle.
 
 typedef ObjectHandle HandleEnvironmentObject;
 typedef ObjectHandle HandleCreateOptions;
@@ -61,6 +65,10 @@ EXTERNAL_API(void) DestroyReader3d(HandleDocRead2D handle);
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* document_write2d, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(void) DestroyWriter2d(HandleDocWrite2D handle);
 
+EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite2D* document_write3d, ImgDoc2ErrorInformation* error_information);
+EXTERNAL_API(void) DestroyWriter3d(HandleDocWrite3D handle);
+
+EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetDocumentType(HandleDoc handle_document, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetFilename(HandleCreateOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetUseSpatialIndex(HandleCreateOptions handle, bool use_spatial_index, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_AddIndexForDimension(HandleCreateOptions handle, char dimension, ImgDoc2ErrorInformation* error_information);
@@ -77,6 +85,8 @@ EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetUseBlobTable(HandleCreateOptions
 ///
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetFilename(HandleCreateOptions handle, char* filename_utf8, size_t* size, ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetDocumentType(HandleDoc handle_document, std::uint8_t* document_type_interop, ImgDoc2ErrorInformation* error_information);
 
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bool* use_spatial_index, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool* create_blob_table, ImgDoc2ErrorInformation* error_information);
@@ -152,6 +162,47 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileInfo(
     TileCoordinateInterop* tile_coordinate_interop,
     LogicalPositionInfoInterop* logical_position_info_interop,
     TileBlobInfoInterop* tile_blob_info_interop,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_AddBrick(
+    HandleDocWrite3D handle,
+    const TileCoordinateInterop* tile_coordinate_interop,
+    const LogicalPositionInfo3DInterop* logical_position_info_interop,
+    const BrickBaseInfoInterop* brick_base_info_interop,
+    std::uint8_t data_type,
+    const void* ptr_data,
+    std::uint64_t size_data,
+    imgdoc2::dbIndex* result_pk,
+    ImgDoc2ErrorInformation* error_information);
+
+// ------ IDocQuery3d ------
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickInfo(
+    HandleDocRead3D handle,
+    std::int64_t pk,
+    TileCoordinateInterop* tile_coordinate_interop,
+    LogicalPositionInfo3DInterop* logical_position_info3d_interop,
+    BrickBlobInfoInterop* brick_blob_info_interop,
+    ImgDoc2ErrorInformation* error_information);
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_Query(
+    HandleDocRead3D handle,
+    std::int64_t pk,
+    const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
+    const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
+    QueryResultInterop* result,
+    ImgDoc2ErrorInformation* error_information);
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetTilesIntersectingRect(
+    HandleDocRead3D handle,
+    const CuboidDoubleInterop* query_cuboid,
+    const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
+    const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
+    QueryResultInterop* result,
+    ImgDoc2ErrorInformation* error_information);
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickData(
+    HandleDocRead3D handle,
+    std::int64_t pk,
+    std::intptr_t blob_output_handle,
+    bool(LIBIMGDOC2_STDCALL* pfnReserve)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*size*/), // NOLINT(readability/casting)
+    bool(LIBIMGDOC2_STDCALL* pfnSetData)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/), // NOLINT(readability/casting)
     ImgDoc2ErrorInformation* error_information);
 
 /// Get the tile-dimensions used in the document. On input, the parameter 'count' must give the

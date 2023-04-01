@@ -29,5 +29,21 @@ namespace ImgDoc2Net.Interfaces
         ///
         /// <returns> The 2D writer object.</returns>
         IWrite2d Get2dWriter();
+
+        /// <summary> 
+        /// Try to get a "reader object" for a 3D-document. This method may return null
+        /// if such an object cannot be constructed.
+        /// </summary>
+        ///
+        /// <returns> The 3D reader object if successful; null otherwise.</returns>
+        IRead3d Get3dReader();
+
+        /// <summary> 
+        /// Try to get a "write object" for a 3D-document. This method may return null
+        /// if such an object cannot be constructed.
+        /// </summary>
+        ///
+        /// <returns> The 3D writer object if successful; null otherwise.</returns>
+        IWrite3d Get3dWriter();
     }
 }

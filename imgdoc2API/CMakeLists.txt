@@ -19,7 +19,7 @@ add_library(imgdoc2API  SHARED
                 "tileinfoqueryclauseinterop.h" 
                 "tileblobinfointerop.h" 
                 "minmaxfortiledimensioninterop.h" 
-                "tilecountperlayerinterop.h")
+                "tilecountperlayerinterop.h" "logicalpositioninfo3dinterop.h" "brickbaseinfointerop.h" "brickblobinfointerop.h" "cuboiddoubleinterop.h")
 
 target_link_libraries(imgdoc2API PRIVATE libimgdoc2)
 

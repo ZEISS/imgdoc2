@@ -68,6 +68,30 @@ namespace ImgDoc2Net.Implementation
 
             return null;
         }
+
+        /// <inheritdoc/>
+        public IRead3d Get3dReader()
+        {
+            var readerHandle = ImgDoc2ApiInterop.Instance.DocumentGetReader3d(this.documentHandle);
+            if (readerHandle != IntPtr.Zero)
+            {
+                return new Read3d(readerHandle);
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public IWrite3d Get3dWriter()
+        {
+            var writerHandle = ImgDoc2ApiInterop.Instance.DocumentGetWriter3d(this.documentHandle);
+            if (writerHandle != IntPtr.Zero)
+            {
+                return new Write3d(writerHandle);
+            }
+
+            return null;
+        }
     }
 
     /// <content>   

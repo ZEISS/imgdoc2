@@ -96,6 +96,10 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<CreateOptions_GetBooleanDelegate>("CreateOptions_GetUseBlobTable");
                 this.createOptionsSetUseBlobTable =
                     this.GetProcAddressThrowIfNotFound<CreateOptions_SetBooleanDelegate>("CreateOptions_SetUseBlobTable");
+                this.createOptionsSetDocumentType =
+                    this.GetProcAddressThrowIfNotFound<CreateOptions_SetDocumentTypeDelegate>("CreateOptions_SetDocumentType");
+                this.createOptionsGetDocumentType =
+                    this.GetProcAddressThrowIfNotFound<CreateOptions_GetDocumentTypeDelegate>("CreateOptions_GetDocumentType");
                 this.openExistingOptionsSetFilename =
                     this.GetProcAddressThrowIfNotFound<OpenExistingOptionsSetFilenameDelegate>("OpenExistingOptions_SetFilename");
                 this.openExistingOptionsGetFilename =
@@ -125,6 +129,14 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetWriter2d");
                 this.destroyWriter2d =
                     this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyWriter2d");
+                this.documentGetReader3d =
+                    this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetReader3d");
+                this.destroyReader3d =
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyReader3d");
+                this.documentGetWriter3d =
+                    this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetWriter3d");
+                this.destroyWriter3d =
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyWriter3d");
 
                 this.idocwrite2dAddTile =
                     this.GetProcAddressThrowIfNotFound<IDocWrite2d_AddTileDelegate>("IDocWrite2d_AddTile");
@@ -136,6 +148,9 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<IDocRead2d_ReadTileDataDelegate>("IDocRead2d_ReadTileData");
                 this.idocread2ReadTileInfo =
                     this.GetProcAddressThrowIfNotFound<IDocRead2d_ReadTileInfoDelegate>("IDocRead2d_ReadTileInfo");
+
+                this.idocwrite3dAddBrick =
+                    this.GetProcAddressThrowIfNotFound<IDocWrite3d_AddBrickDelegate>("IDocWrite3d_AddBrick");
 
                 this.idocinfoGetTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo_GetTileDimensions");
@@ -258,7 +273,7 @@ namespace ImgDoc2Net.Interop
                     NumberOfReader2dObjectsActive = (int)statisticsInterop.NumberOfReader2dObjectsActive,
                     NumberOfWriter2dObjectsActive = (int)statisticsInterop.NumberOfWriter2dObjectsActive,
                     NumberOfReader3dObjectsActive = (int)statisticsInterop.NumberOfReader3dObjectsActive,
-                    NumberOfWriter3dObjectsActive = (int)statisticsInterop.NumberOfWriter3dObjectsActive
+                    NumberOfWriter3dObjectsActive = (int)statisticsInterop.NumberOfWriter3dObjectsActive,
                 };
             }
         }
@@ -305,6 +320,7 @@ namespace ImgDoc2Net.Interop
         /// <returns>   The filename property. </returns>
         public string CreateOptionsGetFilename(IntPtr handleCreateOptions)
         {
+            this.ThrowIfNotInitialized();
             return this.GetStringInteropHelper(
                 (IntPtr fileNameUtf8, IntPtr size) =>
                 {
@@ -316,22 +332,46 @@ namespace ImgDoc2Net.Interop
                 nameof(this.CreateOptionsGetFilename));
         }
 
+        public void CreateOptionsSetDocumentType(IntPtr handleCreateOptions, DocumentType documentType)
+        {
+            this.ThrowIfNotInitialized();
+            ImgDoc2ErrorInformation errorInformation;
+            int returnCode;
+            unsafe
+            {
+                returnCode = this.createOptionsSetDocumentType(handleCreateOptions, (byte)documentType, &errorInformation);
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+        }
+
+        public DocumentType CreateOptionsGetDocumentType(IntPtr handleCreateOptions)
+        {
+            this.ThrowIfNotInitialized();
+            byte documentType;
+            ImgDoc2ErrorInformation errorInformation;
+            int returnCode;
+            unsafe
+            {
+                returnCode = this.createOptionsGetDocumentType(handleCreateOptions, &documentType, &errorInformation);
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+            return (DocumentType)Enum.ToObject(typeof(DocumentType), documentType);
+        }
+
         public bool CreateOptionsGetUseSpatialIndex(IntPtr handleCreateOptions)
         {
             this.ThrowIfNotInitialized();
             bool useSpatialIndex;
             int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
             unsafe
             {
-                returnCode = this.createOptionsGetUseSpatialIndex(handleCreateOptions, &useSpatialIndex, null);
+                returnCode = this.createOptionsGetUseSpatialIndex(handleCreateOptions, &useSpatialIndex, &errorInformation);
             }
 
-            if (returnCode != ImgDoc2_ErrorCode_OK)
-            {
-                // TODO(Jbl) : stretch out error-handling
-                throw new Exception("Error from 'CreateOptionsGetUseSpatialIndex'.");
-            }
-
+            this.HandleErrorCases(returnCode, in errorInformation);
             return useSpatialIndex;
         }
 
@@ -340,17 +380,13 @@ namespace ImgDoc2Net.Interop
             this.ThrowIfNotInitialized();
             bool useBlobTable;
             int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
             unsafe
             {
-                returnCode = this.createOptionsGetUseBlobTable(handleCreateOptions, &useBlobTable, null);
+                returnCode = this.createOptionsGetUseBlobTable(handleCreateOptions, &useBlobTable, &errorInformation);
             }
 
-            if (returnCode != ImgDoc2_ErrorCode_OK)
-            {
-                // TODO(Jbl) : stretch out error-handling
-                throw new Exception("Error from 'CreateOptionsGetUseBlobTable'.");
-            }
-
+            this.HandleErrorCases(returnCode, in errorInformation);
             return useBlobTable;
         }
 
@@ -358,32 +394,26 @@ namespace ImgDoc2Net.Interop
         {
             this.ThrowIfNotInitialized();
             int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
             unsafe
             {
-                returnCode = this.createOptionsSetUseSpatialIndex(handleCreateOptions, useSpatialIndex, null);
+                returnCode = this.createOptionsSetUseSpatialIndex(handleCreateOptions, useSpatialIndex, &errorInformation);
             }
 
-            if (returnCode != ImgDoc2_ErrorCode_OK)
-            {
-                // TODO(Jbl) : stretch out error-handling
-                throw new Exception("Error from 'CreateOptionsGetFilename'.");
-            }
+            this.HandleErrorCases(returnCode, in errorInformation);
         }
 
         public void CreateOptionsSetUseBlobTable(IntPtr handleCreateOptions, bool useBlobTable)
         {
             this.ThrowIfNotInitialized();
             int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
             unsafe
             {
-                returnCode = this.createOptionsSetUseBlobTable(handleCreateOptions, useBlobTable, null);
+                returnCode = this.createOptionsSetUseBlobTable(handleCreateOptions, useBlobTable, &errorInformation);
             }
 
-            if (returnCode != ImgDoc2_ErrorCode_OK)
-            {
-                // TODO(Jbl) : stretch out error-handling
-                throw new Exception("Error from 'CreateOptionsGetFilename'.");
-            }
+            this.HandleErrorCases(returnCode, in errorInformation);
         }
 
         public void CreateOptionsAddDimension(IntPtr handleCreateOptions, Dimension dimension)
@@ -417,6 +447,7 @@ namespace ImgDoc2Net.Interop
             this.ThrowIfNotInitialized();
 
             int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
 
             // for sake of simplicity, we only call once into native code with a buffer which is large enough for
             //  all conceivable cases
@@ -433,6 +464,8 @@ namespace ImgDoc2Net.Interop
                     throw new NotImplementedException("Buffersize exceeded, may want to implement variable buffersizes.");
                 }
 
+                this.HandleErrorCases(returnCode, in errorInformation);
+
                 Dimension[] dimensions = new Dimension[sizeOfBuffer.ToUInt32()];
                 for (int i = 0; i < sizeOfBuffer.ToUInt32(); i++)
                 {
@@ -448,23 +481,26 @@ namespace ImgDoc2Net.Interop
             this.ThrowIfNotInitialized();
 
             int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
 
             // for sake of simplicity, we only call once into native code with a buffer which is large enough for
             //  all conceivable cases
-            const int BufferSize = 64;
+            const int bufferSize = 64;
             unsafe
             {
-                byte* dimensionsBuffer = stackalloc byte[BufferSize];
+                byte* dimensionsBuffer = stackalloc byte[bufferSize];
                 UIntPtr
                     sizeOfBuffer =
                         new UIntPtr(
-                            BufferSize); // TODO(Jbl):  we are abusing UIntPtr as an equivalent to size_t, c.f. https://stackoverflow.com/questions/32906774/what-is-equal-to-the-c-size-t-in-c-sharp
+                            bufferSize); // TODO(Jbl):  we are abusing UIntPtr as an equivalent to size_t, c.f. https://stackoverflow.com/questions/32906774/what-is-equal-to-the-c-size-t-in-c-sharp
                 returnCode = this.createOptionsGetIndexedDimensions(handleCreateOptions, dimensionsBuffer, new IntPtr(&sizeOfBuffer), null);
-                if (sizeOfBuffer.ToUInt32() > BufferSize)
+                if (sizeOfBuffer.ToUInt32() > bufferSize)
                 {
                     throw new NotImplementedException(
                         "Buffersize exceeded, may want to implement variable buffersizes.");
                 }
+
+                this.HandleErrorCases(returnCode, in errorInformation);
 
                 Dimension[] dimensions = new Dimension[sizeOfBuffer.ToUInt32()];
                 for (int i = 0; i < sizeOfBuffer.ToUInt32(); i++)
@@ -560,7 +596,7 @@ namespace ImgDoc2Net.Interop
             this.destroyDocument(handleDocument);
         }
 
-        public IntPtr DocumentGetReader2d(IntPtr handleDocumnet)
+        public IntPtr DocumentGetReader2d(IntPtr handleDocument)
         {
             this.ThrowIfNotInitialized();
 
@@ -569,7 +605,7 @@ namespace ImgDoc2Net.Interop
             ImgDoc2ErrorInformation errorInformation;
             unsafe
             {
-                returnCode = this.documentGetReader2d(handleDocumnet, &reader2dHandle, &errorInformation);
+                returnCode = this.documentGetReader2d(handleDocument, &reader2dHandle, &errorInformation);
             }
 
             this.HandleErrorCases(returnCode, in errorInformation);
@@ -582,7 +618,7 @@ namespace ImgDoc2Net.Interop
             this.destroyReader2d(handleReader);
         }
 
-        public IntPtr DocumentGetWriter2d(IntPtr handleDocumnet)
+        public IntPtr DocumentGetWriter2d(IntPtr handleDocument)
         {
             this.ThrowIfNotInitialized();
 
@@ -591,7 +627,7 @@ namespace ImgDoc2Net.Interop
             ImgDoc2ErrorInformation errorInformation;
             unsafe
             {
-                returnCode = this.documentGetWriter2d(handleDocumnet, &writerHandle, &errorInformation);
+                returnCode = this.documentGetWriter2d(handleDocument, &writerHandle, &errorInformation);
             }
 
             this.HandleErrorCases(returnCode, in errorInformation);
@@ -602,6 +638,55 @@ namespace ImgDoc2Net.Interop
         {
             this.ThrowIfNotInitialized();
             this.destroyWriter2d(handleWriter);
+        }
+
+        /// <summary> Create a document3D-reader-object handle 3D.</summary>
+        /// <param name="handleDocument"> The handle of the document3D-object.</param>
+        /// <returns> A handle to a newly created document3D-reader-object if successful.</returns>
+        public IntPtr DocumentGetReader3d(IntPtr handleDocument)
+        {
+            this.ThrowIfNotInitialized();
+
+            int returnCode;
+            IntPtr reader3dHandle;
+            ImgDoc2ErrorInformation errorInformation;
+            unsafe
+            {
+                returnCode = this.documentGetReader3d(handleDocument, &reader3dHandle, &errorInformation);
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+            return reader3dHandle;
+        }
+
+        /// <summary> Destroys the specified document3D-reader-object.</summary>
+        /// <param name="handleReader"> The document3D-reader-object.</param>
+        public void DestroyReader3d(IntPtr handleReader)
+        {
+            this.ThrowIfNotInitialized();
+            this.destroyReader3d(handleReader);
+        }
+
+        public IntPtr DocumentGetWriter3d(IntPtr handleDocument)
+        {
+            this.ThrowIfNotInitialized();
+
+            int returnCode;
+            IntPtr writer3dHandle;
+            ImgDoc2ErrorInformation errorInformation;
+            unsafe
+            {
+                returnCode = this.documentGetWriter3d(handleDocument, &writer3dHandle, &errorInformation);
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+            return writer3dHandle;
+        }
+
+        public void DestroyWriter3d(IntPtr handleWriter)
+        {
+            this.ThrowIfNotInitialized();
+            this.destroyWriter3d(handleWriter);
         }
 
         public long Writer2dAddTile(
@@ -631,6 +716,45 @@ namespace ImgDoc2Net.Interop
                         new IntPtr(pointerTileCoordinateInterop),
                         &logicalPositionInfoInterop,
                         &tileBaseInfoInterop,
+                        (byte)dataType,
+                        pointerData,
+                        dataSize,
+                        &resultPk,
+                        &errorInformation);
+                }
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+            return resultPk;
+        }
+
+        public long Writer3dAddBrick(
+            IntPtr write3dHandle,
+            ITileCoordinate coordinate,
+            in LogicalPosition3d logicalPosition3d,
+            Brick3dBaseInfo brick3dBaseInfo,
+            DataType dataType,
+            IntPtr pointerData,
+            long dataSize)
+        {
+            this.ThrowIfNotInitialized();
+            byte[] tileCoordinateInterop = ConvertToTileCoordinateInterop(coordinate);
+            LogicalPositionInfo3DInterop logicalPosition3dInfoInterop = new LogicalPositionInfo3DInterop(in logicalPosition3d);
+            BrickBaseInfoInterop brickBaseInfoInterop = ConvertToBrickBaseInfoInterop(brick3dBaseInfo);
+
+            int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
+            long resultPk;
+
+            unsafe
+            {
+                fixed (byte* pointerTileCoordinateInterop = &tileCoordinateInterop[0])
+                {
+                    returnCode = this.idocwrite3dAddBrick(
+                        write3dHandle,
+                        new IntPtr(pointerTileCoordinateInterop),
+                        &logicalPosition3dInfoInterop,
+                        &brickBaseInfoInterop,
                         (byte)dataType,
                         pointerData,
                         dataSize,
@@ -1056,6 +1180,7 @@ namespace ImgDoc2Net.Interop
                         tileCountPerLayerInterop->ElementCountAllocated = (uint)elementCountRequired;
                         returnCode = this.idocinfoGetTileCountPerLayer(read2dHandle, tileCountPerLayerInterop, &errorInformation);
                         this.HandleErrorCases(returnCode, errorInformation);
+
                         // we do not expect that the size was insufficient in this case, and if so we throw an exception
                         if (tileCountPerLayerInterop->ElementCountAvailable > tileCountPerLayerInterop->ElementCountAllocated)
                         {
@@ -1126,7 +1251,7 @@ namespace ImgDoc2Net.Interop
     /// </content>
     internal partial class ImgDoc2ApiInterop
     {
-        public void Writer2dAddTile(IntPtr write2dHandle, ITileCoordinate coordinate, in LogicalPosition logicalPosition, Tile2dBaseInfo tile2dBaseInfo, DataType dataType, byte[] data)
+        public long Writer2dAddTile(IntPtr write2dHandle, ITileCoordinate coordinate, in LogicalPosition logicalPosition, Tile2dBaseInfo tile2dBaseInfo, DataType dataType, byte[] data)
         {
             if (data != null && data.Length > 0)
             {
@@ -1134,13 +1259,31 @@ namespace ImgDoc2Net.Interop
                 {
                     fixed (byte* pointer = &data[0])
                     {
-                        this.Writer2dAddTile(write2dHandle, coordinate, in logicalPosition, tile2dBaseInfo, dataType, new IntPtr(pointer), data.Length);
+                        return this.Writer2dAddTile(write2dHandle, coordinate, in logicalPosition, tile2dBaseInfo, dataType, new IntPtr(pointer), data.Length);
                     }
                 }
             }
             else
             {
-                this.Writer2dAddTile(write2dHandle, coordinate, in logicalPosition, tile2dBaseInfo, dataType, IntPtr.Zero, 0);
+                return this.Writer2dAddTile(write2dHandle, coordinate, in logicalPosition, tile2dBaseInfo, dataType, IntPtr.Zero, 0);
+            }
+        }
+
+        public long Writer3dAddBrick(IntPtr write3dHandle, ITileCoordinate coordinate, in LogicalPosition3d logicalPosition3d, Brick3dBaseInfo brick3dBaseInfo, DataType dataType, byte[] data)
+        {
+            if (data != null && data.Length > 0)
+            {
+                unsafe
+                {
+                    fixed (byte* pointer = &data[0])
+                    {
+                        return this.Writer3dAddBrick(write3dHandle, coordinate, in logicalPosition3d, brick3dBaseInfo, dataType, new IntPtr(pointer), data.Length);
+                    }
+                }
+            }
+            else
+            {
+                return this.Writer3dAddBrick(write3dHandle, coordinate, in logicalPosition3d, brick3dBaseInfo, dataType, IntPtr.Zero, 0);
             }
         }
     }
@@ -1407,6 +1550,8 @@ namespace ImgDoc2Net.Interop
         private readonly VoidAndReturnIntPtrDelegate createOpenExistingOptions;
         private readonly IntPtrAndReturnVoidDelegate destroyOpenExistingOptions;
 
+        private readonly CreateOptions_SetDocumentTypeDelegate createOptionsSetDocumentType;
+        private readonly CreateOptions_GetDocumentTypeDelegate createOptionsGetDocumentType;
         private readonly CreateOptionsSetFilenameDelegate createOptionsSetFilename;
         private readonly CreateOptionsGetFilenameDelegate createOptionsGetFilename;
         private readonly CreateOptions_SetBooleanDelegate createOptionsSetUseSpatialIndex;
@@ -1430,11 +1575,18 @@ namespace ImgDoc2Net.Interop
         private readonly IDoc_GetObjectDelegate documentGetWriter2d;
         private readonly IntPtrAndReturnVoidDelegate destroyWriter2d;
 
+        private readonly IDoc_GetObjectDelegate documentGetReader3d;
+        private readonly IntPtrAndReturnVoidDelegate destroyReader3d;
+        private readonly IDoc_GetObjectDelegate documentGetWriter3d;
+        private readonly IntPtrAndReturnVoidDelegate destroyWriter3d;
+
         private readonly IDocWrite2d_AddTileDelegate idocwrite2dAddTile;
         private readonly IDocRead2d_QueryDelegate idocread2dQuery;
         private readonly IDocRead2d_GetTilesIntersectingRectDelegate idocread2dGetTilesIntersectingRect;
         private readonly IDocRead2d_ReadTileDataDelegate idocread2dReadTileData;
         private readonly IDocRead2d_ReadTileInfoDelegate idocread2ReadTileInfo;
+
+        private readonly IDocWrite3d_AddBrickDelegate idocwrite3dAddBrick;
 
         private readonly CreateEnvironmentObjectDelegate createEnvironmentObject;
 
@@ -1452,6 +1604,12 @@ namespace ImgDoc2Net.Interop
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int IntPtrAndReturnVoidDelegate(IntPtr handle);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int CreateOptions_SetDocumentTypeDelegate(IntPtr handle, byte documentType, ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int CreateOptions_GetDocumentTypeDelegate(IntPtr handle, byte* documentType, ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int CreateOptionsSetFilenameDelegate(IntPtr handle, IntPtr fileNameUtf8, ImgDoc2ErrorInformation* errorInformation);
@@ -1548,6 +1706,17 @@ namespace ImgDoc2Net.Interop
             IntPtr blobOutputHandle,
             IntPtr functionPointerSetSize,
             IntPtr functionPointerSetData,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        private unsafe delegate int IDocWrite3d_AddBrickDelegate(
+            IntPtr handle,
+            IntPtr tileCoordinateInterop,
+            LogicalPositionInfo3DInterop* logicalPositionInfoInterop,
+            BrickBaseInfoInterop* tileBaseInfo,
+            byte dataType,
+            IntPtr dataPtr,
+            long size,
+            long* resultPk,
             ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -1703,6 +1872,45 @@ namespace ImgDoc2Net.Interop
         {
             public int LayerIndex;
             public ulong TileCount;
+        }
+
+        /// <summary> This struct is corresponding to the unmanaged struct 'LogicalPositionInfo3DInterop'. </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct LogicalPositionInfo3DInterop
+        {
+            public double PositionX;
+            public double PositionY;
+            public double PositionZ;
+            public double Width;
+            public double Height;
+            public double Depth;
+            public int PyramidLevel;
+
+            public LogicalPositionInfo3DInterop(in LogicalPosition3d logicalPosition3d)
+            {
+                this.PositionX = logicalPosition3d.PositionX;
+                this.PositionY = logicalPosition3d.PositionY;
+                this.PositionZ = logicalPosition3d.PositionZ;
+                this.Width = logicalPosition3d.Width;
+                this.Height = logicalPosition3d.Height;
+                this.Depth = logicalPosition3d.Depth;
+                this.PyramidLevel = logicalPosition3d.PyramidLevel;
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct BrickBaseInfoInterop
+        {
+            /// <summary> Width of the brick in unit of pixels.</summary>
+            public uint PixelWidth;
+
+            /// <summary> Height of the brick in unit of pixels.</summary>
+            public uint PixelHeight;
+
+            /// <summary> Depth of the brick in unit of pixels.</summary>
+            public uint PixelDepth;
+
+            public byte PixelType;
         }
 
         /// <summary> This struct is used for the 'IDocInfo_GetTileCountPerLayer'-API. It corresponds to the unmanaged struct 'TileCountPerLayerInterop'.</summary>
@@ -1882,6 +2090,16 @@ namespace ImgDoc2Net.Interop
             tileBaseInfoInterop.PixelHeight = (uint)tile2dBaseInfo.PixelHeight;
             tileBaseInfoInterop.PixelType = (byte)tile2dBaseInfo.PixelType;
             return tileBaseInfoInterop;
+        }
+
+        private static BrickBaseInfoInterop ConvertToBrickBaseInfoInterop(Brick3dBaseInfo brick3dBaseInfo)
+        {
+            var brickBaseInfoInterop = default(BrickBaseInfoInterop);
+            brickBaseInfoInterop.PixelWidth = (uint)brick3dBaseInfo.PixelWidth;
+            brickBaseInfoInterop.PixelHeight = (uint)brick3dBaseInfo.PixelHeight;
+            brickBaseInfoInterop.PixelDepth = (uint)brick3dBaseInfo.PixelDepth;
+            brickBaseInfoInterop.PixelType = (byte)brick3dBaseInfo.PixelType;
+            return brickBaseInfoInterop;
         }
 
         private static LogicalPosition ConvertToLogicalPosition(
