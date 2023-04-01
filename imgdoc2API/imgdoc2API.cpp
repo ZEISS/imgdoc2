@@ -545,7 +545,7 @@ ImgDoc2ErrorCode CreateOptions_GetIndexedDimensions(HandleCreateOptions handle, 
     const auto dimensions_from_object = object->GetIndexedDimensions();
 
     size_t count = 0;
-    for (auto d : dimensions_from_object)
+    for (const auto d : dimensions_from_object)
     {
         if (count >= *elements_count)
         {
@@ -592,7 +592,7 @@ ImgDoc2ErrorCode IDocWrite2d_AddTile(
     try
     {
         const Utilities::GetDataObject data_object(ptr_data, size_data);
-        auto pk = writer2d->AddTile(
+        const auto pk = writer2d->AddTile(
             &tile_coordinate,
             &logical_position_info,
             &tile_info,
@@ -646,7 +646,7 @@ ImgDoc2ErrorCode IDocWrite3d_AddBrick(
     try
     {
         const Utilities::GetDataObject data_object(ptr_data, size_data);
-        auto pk = writer3d->AddBrick(
+        const auto pk = writer3d->AddBrick(
             &tile_coordinate,
             &logical_position_info,
             &tile_info,
@@ -954,6 +954,7 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickData(
         FillOutErrorInformation(exception, error_information);
         return MapExceptionToReturnValue(exception);
     }
+
     return ImgDoc2_ErrorCode_OK;
 }
 
