@@ -32,6 +32,5 @@ namespace ImgDoc2Net.Interfaces
         /// <summary> Gets or sets the depth.</summary>
         /// <value> The depth.</value>
         public double Depth { get; set; }
-
     }
 }

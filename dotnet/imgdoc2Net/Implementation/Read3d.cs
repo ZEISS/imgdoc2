@@ -6,6 +6,7 @@ namespace ImgDoc2Net.Implementation
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using ImgDoc2Net.Interfaces;
     using ImgDoc2Net.Interop;
 
@@ -22,6 +23,66 @@ namespace ImgDoc2Net.Implementation
 
         private Read3d()
         {
+        }
+
+        /// <inheritdoc/>
+        public List<long> Query(IDimensionQueryClause queryClause, ITileInfoQueryClause tileInfoQueryClause, QueryOptions queryOptions)
+        {
+            // TODO(Jbl): error-handling
+            var queryResult = ImgDoc2ApiInterop.Instance.Reader3dQuery(
+                this.reader3dObjectHandle,
+                queryClause,
+                tileInfoQueryClause,
+                queryOptions != null ? queryOptions.MaxNumbersOfResults : QueryOptions.DefaultMaxNumberOfResults);
+            if (queryOptions != null)
+            {
+                queryOptions.ResultWasComplete = queryResult.ResultComplete;
+            }
+
+            return queryResult.Keys;
+        }
+
+        /// <inheritdoc/>
+        public List<long> QueryTilesIntersectingRect(Cuboid cuboid, IDimensionQueryClause queryClause, ITileInfoQueryClause tileInfoQueryClause, QueryOptions queryOptions)
+        {
+            // TODO(Jbl): error-handling
+            var queryResult = ImgDoc2ApiInterop.Instance.Reader3dQueryBricksIntersectingCuboid(
+                this.reader3dObjectHandle,
+                cuboid,
+                queryClause,
+                tileInfoQueryClause,
+                queryOptions != null ? queryOptions.MaxNumbersOfResults : QueryOptions.DefaultMaxNumberOfResults);
+            if (queryOptions != null)
+            {
+                queryOptions.ResultWasComplete = queryResult.ResultComplete;
+            }
+
+            return queryResult.Keys;
+        }
+
+        /// <inheritdoc/>
+        public List<long> QueryTilesIntersectingPlane(PlaneHesse plane, IDimensionQueryClause queryClause, ITileInfoQueryClause tileInfoQueryClause, QueryOptions queryOptions)
+        {
+            // TODO(Jbl): error-handling
+            var queryResult = ImgDoc2ApiInterop.Instance.Reader3dQueryBricksIntersectingPlane(
+                this.reader3dObjectHandle,
+                plane,
+                queryClause,
+                tileInfoQueryClause,
+                queryOptions != null ? queryOptions.MaxNumbersOfResults : QueryOptions.DefaultMaxNumberOfResults);
+            if (queryOptions != null)
+            {
+                queryOptions.ResultWasComplete = queryResult.ResultComplete;
+            }
+
+            return queryResult.Keys;
+        }
+
+        /// <inheritdoc/>
+        public byte[] ReadBrickData(long key)
+        {
+            // TODO(Jbl): error-handling
+            return ImgDoc2ApiInterop.Instance.Reader2dReadTileData(this.reader3dObjectHandle, key);
         }
 
         public Extent2d GetBoundingBox()
