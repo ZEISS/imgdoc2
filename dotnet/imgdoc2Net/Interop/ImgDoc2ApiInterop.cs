@@ -2159,8 +2159,10 @@ namespace ImgDoc2Net.Interop
         private static QueryResult ConvertToQueryResult(byte[] queryResultInterop)
         {
             int count = BitConverter.ToInt32(queryResultInterop, 0);
-            QueryResult queryResult = new QueryResult(count);
-            queryResult.ResultComplete = BitConverter.ToInt32(queryResultInterop, 4) == 0 ? true : false;
+            QueryResult queryResult = new QueryResult(count)
+            {
+                ResultComplete = BitConverter.ToInt32(queryResultInterop, 4) == 0
+            };
 
             for (int i = 0; i < count; ++i)
             {
