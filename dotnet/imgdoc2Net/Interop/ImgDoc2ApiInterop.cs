@@ -849,6 +849,79 @@ namespace ImgDoc2Net.Interop
             return result;
         }
 
+        public QueryResult Reader3dQuery(IntPtr read2dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
+        {
+            // TODO(JBl): merge with Reader2dQuery
+            this.ThrowIfNotInitialized();
+            byte[] dimensionQueryClauseInterop = (clause != null) ? ConvertToTileCoordinateInterop(clause) : null;
+            byte[] tileInfoQueryClauseInterop = (tileInfoQueryClause != null)
+                ? ConvertToTileInfoQueryInterop(tileInfoQueryClause)
+                : null;
+            byte[] queryResultInterop = CreateQueryResultInterop(maxNumberOfResults);
+
+            int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
+
+            unsafe
+            {
+                fixed (byte* pointerQueryResultInterop = &queryResultInterop[0])
+                {
+                    if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
+                    {
+                        fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
+                        fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
+                        {
+                            returnCode = this.idocread3dQuery(
+                                read2dHandle,
+                                new IntPtr(pointerDimensionQueryClauseInterop),
+                                new IntPtr(pointerTileInfoQueryClauseInterop),
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop == null)
+                    {
+                        fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
+                        {
+                            returnCode = this.idocread3dQuery(
+                                read2dHandle,
+                                new IntPtr(pointerDimensionQueryClauseInterop),
+                                IntPtr.Zero,
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop != null)
+                    {
+                        fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
+                        {
+                            returnCode = this.idocread3dQuery(
+                                read2dHandle,
+                                IntPtr.Zero,
+                                new IntPtr(pointerTileInfoQueryClauseInterop),
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else
+                    {
+                        // if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
+                        returnCode = this.idocread3dQuery(
+                            read2dHandle,
+                            IntPtr.Zero,
+                            IntPtr.Zero,
+                            new IntPtr(pointerQueryResultInterop),
+                            &errorInformation);
+                    }
+                }
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+
+            QueryResult result = ConvertToQueryResult(queryResultInterop);
+            return result;
+        }
+
         /// <summary>   Execute a "spatial query" - which may also include a dimension-query-clause and a tile-info-query-clause. </summary>
         /// <param name="read2dHandle" type="IntPtr">                           The read2d-object. </param>
         /// <param name="rectangle" type="Rectangle">                           The query rectangle. </param>
@@ -974,6 +1047,32 @@ namespace ImgDoc2Net.Interop
             return blobOutput.Buffer;
         }
 
+        public byte[] Reader3dReadBrickData(IntPtr read3dHandle, long pk)
+        {
+            this.ThrowIfNotInitialized();
+            int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
+
+            BlobOutputOnByteArray blobOutput = new BlobOutputOnByteArray();
+
+            unsafe
+            {
+                GCHandle gcHandle = GCHandle.Alloc(blobOutput, GCHandleType.Normal);
+                returnCode = this.idocread3dReadBrickData(
+                    read3dHandle,
+                    pk,
+                    GCHandle.ToIntPtr(gcHandle),
+                    this.funcPtrBlobOutputSetSizeForwarder,
+                    this.funcPtrBlobOutputSetDataForwarder,
+                    &errorInformation);
+                gcHandle.Free();
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+
+            return blobOutput.Buffer;
+        }
+
         public void Reader2dReadTileInfo(
             IntPtr read2dHandle,
             long pk,
@@ -1015,12 +1114,12 @@ namespace ImgDoc2Net.Interop
                     coordinate = ConvertToTileCoordinate(pointerToTileCoordinateInterop);
                     if (fillLogicalPositionInfo)
                     {
-                        logicalPosition = ConvertToLogicalPosition(logicalPositionInfoInterop);
+                        logicalPosition = ConvertToLogicalPosition(in logicalPositionInfoInterop);
                     }
 
                     if (fillTileBlobInfo)
                     {
-                        tileBlobInfo = ConvertToTileBlobInfo(tileBlobInfoInterop);
+                        tileBlobInfo = ConvertToTileBlobInfo(in tileBlobInfoInterop);
                     }
                 }
                 else
@@ -1039,12 +1138,88 @@ namespace ImgDoc2Net.Interop
 
                     if (fillLogicalPositionInfo)
                     {
-                        logicalPosition = ConvertToLogicalPosition(logicalPositionInfoInterop);
+                        logicalPosition = ConvertToLogicalPosition(in logicalPositionInfoInterop);
                     }
 
                     if (fillTileBlobInfo)
                     {
-                        tileBlobInfo = ConvertToTileBlobInfo(tileBlobInfoInterop);
+                        tileBlobInfo = ConvertToTileBlobInfo(in tileBlobInfoInterop);
+                    }
+                }
+            }
+        }
+
+        public void Reader3dReadBrickInfo(
+            IntPtr read2dHandle,
+            long pk,
+            bool fillTileCoordinate,
+            bool fillLogicalPositionInfo,
+            bool fillTileBlobInfo,
+            out ITileCoordinate coordinate,
+            out LogicalPosition3d logicalPosition3d,
+            out BrickBlobInfo brickBlobInfo)
+        {
+            this.ThrowIfNotInitialized();
+            coordinate = null;
+            logicalPosition3d = default(LogicalPosition3d);
+            brickBlobInfo = default(BrickBlobInfo);
+
+            ImgDoc2ErrorInformation errorInformation;
+
+            unsafe
+            {
+                if (fillTileCoordinate)
+                {
+                    const int maxNumberOfCoordinates = 40;
+
+                    int sizeForTileCoordinateInterop = TileCoordinateInterop.CalculateSize(maxNumberOfCoordinates);
+                    byte* data = stackalloc byte[sizeForTileCoordinateInterop];
+                    TileCoordinateInterop* pointerToTileCoordinateInterop = (TileCoordinateInterop*)data;
+                    pointerToTileCoordinateInterop->NumberOfElements = maxNumberOfCoordinates;
+                    LogicalPositionInfo3DInterop logicalPositionInfo3DInterop = default(LogicalPositionInfo3DInterop);
+                    BrickBlobInfoInterop brickBlobInfoInterop = default(BrickBlobInfoInterop);
+                    int returnCode = this.idocread3dReadBrickInfo(
+                        read2dHandle,
+                        pk,
+                        new IntPtr(pointerToTileCoordinateInterop),
+                        fillLogicalPositionInfo ? &logicalPositionInfo3DInterop : null,
+                        fillTileBlobInfo ? &brickBlobInfoInterop : null,
+                        &errorInformation);
+
+                    this.HandleErrorCases(returnCode, in errorInformation);
+                    coordinate = ConvertToTileCoordinate(pointerToTileCoordinateInterop);
+                    if (fillLogicalPositionInfo)
+                    {
+                        logicalPosition3d = ConvertToLogicalPosition3D(in logicalPositionInfo3DInterop);
+                    }
+
+                    if (fillTileBlobInfo)
+                    {
+                        brickBlobInfo = ConvertToBrickBlobInfo(in brickBlobInfoInterop);
+                    }
+                }
+                else
+                {
+                    LogicalPositionInfo3DInterop logicalPositionInfo3DInterop = default(LogicalPositionInfo3DInterop);
+                    BrickBlobInfoInterop brickBlobInfoInterop = default(BrickBlobInfoInterop);
+                    int returnCode = this.idocread3dReadBrickInfo(
+                        read2dHandle,
+                        pk,
+                        IntPtr.Zero,
+                        fillLogicalPositionInfo ? &logicalPositionInfo3DInterop : null,
+                        fillTileBlobInfo ? &brickBlobInfoInterop : null,
+                        &errorInformation);
+
+                    this.HandleErrorCases(returnCode, in errorInformation);
+
+                    if (fillLogicalPositionInfo)
+                    {
+                        logicalPosition3d = ConvertToLogicalPosition3D(in logicalPositionInfo3DInterop);
+                    }
+
+                    if (fillTileBlobInfo)
+                    {
+                        brickBlobInfo = ConvertToBrickBlobInfo(in brickBlobInfoInterop);
                     }
                 }
             }
@@ -2203,6 +2378,20 @@ namespace ImgDoc2Net.Interop
             return logicalPosition;
         }
 
+        private static LogicalPosition3d ConvertToLogicalPosition3D(
+            in LogicalPositionInfo3DInterop logicalPositionInfo3DInterop)
+        {
+            LogicalPosition3d logicalPosition3d = default(LogicalPosition3d);
+            logicalPosition3d.PositionX = logicalPositionInfo3DInterop.PositionX;
+            logicalPosition3d.PositionY = logicalPositionInfo3DInterop.PositionY;
+            logicalPosition3d.PositionZ = logicalPositionInfo3DInterop.PositionZ;
+            logicalPosition3d.Width = logicalPositionInfo3DInterop.Width;
+            logicalPosition3d.Height = logicalPositionInfo3DInterop.Height;
+            logicalPosition3d.Depth = logicalPositionInfo3DInterop.Depth;
+            logicalPosition3d.PyramidLevel = logicalPositionInfo3DInterop.PyramidLevel;
+            return logicalPosition3d;
+        }
+
         private static Tile2dBaseInfo ConvertToTile2dBaseInfo(in TileBaseInfoInterop tileBaseInfoInterop)
         {
             Tile2dBaseInfo tile2dBaseInfo = new Tile2dBaseInfo(
@@ -2212,15 +2401,36 @@ namespace ImgDoc2Net.Interop
             return tile2dBaseInfo;
         }
 
+        private static Brick3dBaseInfo ConvertToBrick3dBaseInfo(in BrickBaseInfoInterop brickBaseInfoInterop)
+        {
+            Brick3dBaseInfo brick3dBaseInfo = new Brick3dBaseInfo(
+                (int)brickBaseInfoInterop.PixelWidth,
+                (int)brickBaseInfoInterop.PixelHeight,
+                (int)brickBaseInfoInterop.PixelDepth,
+                (PixelType)brickBaseInfoInterop.PixelType); // TODO: check conversion to int and enum
+            return brick3dBaseInfo;
+        }
+
         private static TileBlobInfo ConvertToTileBlobInfo(in TileBlobInfoInterop tileBlobInfoInterop)
         {
             TileBlobInfo tileBlobInfo = new TileBlobInfo
             {
-                Tile2dBaseInfo = ConvertToTile2dBaseInfo(tileBlobInfoInterop.TileBaseInfo),
+                Tile2dBaseInfo = ConvertToTile2dBaseInfo(in tileBlobInfoInterop.TileBaseInfo),
                 DataType = (DataType)tileBlobInfoInterop.DataType, // TODO: check enum
             };
 
             return tileBlobInfo;
+        }
+
+        private static BrickBlobInfo ConvertToBrickBlobInfo(in BrickBlobInfoInterop brickBlobInfoInterop)
+        {
+            BrickBlobInfo brickBlobInfo = new BrickBlobInfo
+            {
+                Brick3dBaseInfo = ConvertToBrick3dBaseInfo(in brickBlobInfoInterop.BrickBaseInfo),
+                DataType = (DataType)brickBlobInfoInterop.DataType, // TODO: check enum
+            };
+
+            return brickBlobInfo;
         }
 
         private static unsafe TileCoordinate ConvertToTileCoordinate(TileCoordinateInterop* tileCoordinateInterop)
