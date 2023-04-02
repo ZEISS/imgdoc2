@@ -153,7 +153,7 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<IDocWrite3d_AddBrickDelegate>("IDocWrite3d_AddBrick");
                 this.idocread3dQuery =
                     this.GetProcAddressThrowIfNotFound<IDocRead3d_QueryDelegate>("IDocRead3d_Query");
-                this.idocread3dGetBricksIntersectingCuboid = 
+                this.idocread3dGetBricksIntersectingCuboid =
                     this.GetProcAddressThrowIfNotFound<IDocRead3d_GetBricksIntersectingCuboidDelegate>("IDocRead3d_GetBricksIntersectingCuboid");
                 this.idocread3dGetBricksIntersectingPlane =
                     this.GetProcAddressThrowIfNotFound<IDocRead3d_GetBricksIntersectingPlaneDelegate>("IDocRead3d_GetBricksIntersectingPlane");
@@ -1006,6 +1006,190 @@ namespace ImgDoc2Net.Interop
                             returnCode = this.idocread2dGetTilesIntersectingRect(
                                 read2dHandle,
                                 &rectangleDoubleInterop,
+                                new IntPtr(pointerDimensionQueryClauseInterop),
+                                new IntPtr(pointerTileInfoQueryClause),
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                }
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+
+            QueryResult result = ConvertToQueryResult(queryResultInterop);
+            return result;
+        }
+
+        public QueryResult Reader3dQueryBricksIntersectingCuboid(
+            IntPtr read3dHandle,
+            Cuboid cuboid,
+            IDimensionQueryClause dimensionQueryClause,
+            ITileInfoQueryClause tileInfoQueryClause,
+            int maxNumberOfResults)
+        {
+            this.ThrowIfNotInitialized();
+            byte[] dimensionQueryClauseInterop = dimensionQueryClause != null
+                ? ConvertToTileCoordinateInterop(dimensionQueryClause)
+                : null;
+            byte[] tileInfoQueryClauseInterop = (tileInfoQueryClause != null)
+                ? ConvertToTileInfoQueryInterop(tileInfoQueryClause)
+                : null;
+            byte[] queryResultInterop = CreateQueryResultInterop(maxNumberOfResults);
+
+            int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
+
+            unsafe
+            {
+                fixed (byte* pointerQueryResultInterop = &queryResultInterop[0])
+                {
+                    // TODO(JBL): this code is quite lame, maybe there is a better way which prevents us from having to code all those cases...
+                    if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop == null)
+                    {
+                        CuboidDoubleInterop cuboidDoubleInterop = new CuboidDoubleInterop()
+                        { X = cuboid.X, Y = cuboid.Y, Z = cuboid.Z, Width = cuboid.Width, Height = cuboid.Height, Depth = cuboid.Depth };
+                        returnCode = this.idocread3dGetBricksIntersectingCuboid(
+                            read3dHandle,
+                            &cuboidDoubleInterop,
+                            IntPtr.Zero,
+                            IntPtr.Zero,
+                            new IntPtr(pointerQueryResultInterop),
+                            &errorInformation);
+                    }
+                    else if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop == null)
+                    {
+                        fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
+                        {
+                            CuboidDoubleInterop cuboidDoubleInterop = new CuboidDoubleInterop()
+                            { X = cuboid.X, Y = cuboid.Y, Z = cuboid.Z, Width = cuboid.Width, Height = cuboid.Height, Depth = cuboid.Depth };
+                            returnCode = this.idocread3dGetBricksIntersectingCuboid(
+                                read3dHandle,
+                                &cuboidDoubleInterop,
+                                new IntPtr(pointerDimensionQueryClauseInterop),
+                                IntPtr.Zero,
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop != null)
+                    {
+                        fixed (byte* pointerTileInfoQueryClause = &tileInfoQueryClauseInterop[0])
+                        {
+                            CuboidDoubleInterop cuboidDoubleInterop = new CuboidDoubleInterop()
+                            { X = cuboid.X, Y = cuboid.Y, Z = cuboid.Z, Width = cuboid.Width, Height = cuboid.Height, Depth = cuboid.Depth };
+                            returnCode = this.idocread3dGetBricksIntersectingCuboid(
+                                read3dHandle,
+                                &cuboidDoubleInterop,
+                                IntPtr.Zero,
+                                new IntPtr(pointerTileInfoQueryClause),
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else
+                    {
+                        // if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
+                        fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
+                        fixed (byte* pointerTileInfoQueryClause = &tileInfoQueryClauseInterop[0])
+                        {
+                            CuboidDoubleInterop cuboidDoubleInterop = new CuboidDoubleInterop()
+                            { X = cuboid.X, Y = cuboid.Y, Z = cuboid.Z, Width = cuboid.Width, Height = cuboid.Height, Depth = cuboid.Depth };
+                            returnCode = this.idocread3dGetBricksIntersectingCuboid(
+                                read3dHandle,
+                                &cuboidDoubleInterop,
+                                new IntPtr(pointerDimensionQueryClauseInterop),
+                                new IntPtr(pointerTileInfoQueryClause),
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                }
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
+
+            QueryResult result = ConvertToQueryResult(queryResultInterop);
+            return result;
+        }
+
+        public QueryResult Reader3dQueryBricksIntersectingPlane(
+           IntPtr read3dHandle,
+           PlaneHesse plane,
+           IDimensionQueryClause dimensionQueryClause,
+           ITileInfoQueryClause tileInfoQueryClause,
+           int maxNumberOfResults)
+        {
+            this.ThrowIfNotInitialized();
+            byte[] dimensionQueryClauseInterop = dimensionQueryClause != null
+                ? ConvertToTileCoordinateInterop(dimensionQueryClause)
+                : null;
+            byte[] tileInfoQueryClauseInterop = (tileInfoQueryClause != null)
+                ? ConvertToTileInfoQueryInterop(tileInfoQueryClause)
+                : null;
+            byte[] queryResultInterop = CreateQueryResultInterop(maxNumberOfResults);
+
+            int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
+
+            unsafe
+            {
+                fixed (byte* pointerQueryResultInterop = &queryResultInterop[0])
+                {
+                    // TODO(JBL): this code is quite lame, maybe there is a better way which prevents us from having to code all those cases...
+                    if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop == null)
+                    {
+                        PlaneNormalAndDistanceInterop planeNormalAndDistanceInterop = new PlaneNormalAndDistanceInterop()
+                        { NormalX = plane.NormalX, NormalY = plane.NormalY, NormalZ = plane.NormalZ, Distance = plane.Distance };
+                        returnCode = this.idocread3dGetBricksIntersectingPlane(
+                            read3dHandle,
+                            &planeNormalAndDistanceInterop,
+                            IntPtr.Zero,
+                            IntPtr.Zero,
+                            new IntPtr(pointerQueryResultInterop),
+                            &errorInformation);
+                    }
+                    else if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop == null)
+                    {
+                        fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
+                        {
+                            PlaneNormalAndDistanceInterop planeNormalAndDistanceInterop = new PlaneNormalAndDistanceInterop()
+                            { NormalX = plane.NormalX, NormalY = plane.NormalY, NormalZ = plane.NormalZ, Distance = plane.Distance };
+                            returnCode = this.idocread3dGetBricksIntersectingPlane(
+                                read3dHandle,
+                                &planeNormalAndDistanceInterop,
+                                new IntPtr(pointerDimensionQueryClauseInterop),
+                                IntPtr.Zero,
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop != null)
+                    {
+                        fixed (byte* pointerTileInfoQueryClause = &tileInfoQueryClauseInterop[0])
+                        {
+                            PlaneNormalAndDistanceInterop planeNormalAndDistanceInterop = new PlaneNormalAndDistanceInterop()
+                            { NormalX = plane.NormalX, NormalY = plane.NormalY, NormalZ = plane.NormalZ, Distance = plane.Distance };
+                            returnCode = this.idocread3dGetBricksIntersectingPlane(
+                                read3dHandle,
+                                &planeNormalAndDistanceInterop,
+                                IntPtr.Zero,
+                                new IntPtr(pointerTileInfoQueryClause),
+                                new IntPtr(pointerQueryResultInterop),
+                                &errorInformation);
+                        }
+                    }
+                    else
+                    {
+                        // if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
+                        fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
+                        fixed (byte* pointerTileInfoQueryClause = &tileInfoQueryClauseInterop[0])
+                        {
+                            PlaneNormalAndDistanceInterop planeNormalAndDistanceInterop = new PlaneNormalAndDistanceInterop()
+                            { NormalX = plane.NormalX, NormalY = plane.NormalY, NormalZ = plane.NormalZ, Distance = plane.Distance };
+                            returnCode = this.idocread3dGetBricksIntersectingPlane(
+                                read3dHandle,
+                                &planeNormalAndDistanceInterop,
                                 new IntPtr(pointerDimensionQueryClauseInterop),
                                 new IntPtr(pointerTileInfoQueryClause),
                                 new IntPtr(pointerQueryResultInterop),
