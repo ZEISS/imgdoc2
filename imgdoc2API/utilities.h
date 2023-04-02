@@ -79,7 +79,6 @@ public:
         const void* p_;
         size_t s_;
     public:
-
         /// Constructor - initializes the object with the given data.
         /// Attention: The data must be valid as long as the object is used.
         ///
