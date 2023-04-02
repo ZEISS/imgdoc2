@@ -812,7 +812,7 @@ ImgDoc2ErrorCode IDocRead2d_GetTilesIntersectingRect(
     return ImgDoc2_ErrorCode_OK;
 }
 
-ImgDoc2ErrorCode IDocRead3d_GetTilesIntersectingRect(
+ImgDoc2ErrorCode IDocRead3d_GetBricksIntersectingCuboid(
     HandleDocRead3D handle,
     const CuboidDoubleInterop* query_cuboid,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
@@ -861,7 +861,7 @@ ImgDoc2ErrorCode IDocRead3d_GetTilesIntersectingRect(
     return ImgDoc2_ErrorCode_OK;
 }
 
-ImgDoc2ErrorCode IDocRead3d_GetTilesIntersectingPlane(
+ImgDoc2ErrorCode IDocRead3d_GetBricksIntersectingPlane(
     HandleDocRead3D handle,
     const PlaneNormalAndDistanceInterop* plane_normal_and_distance_interop,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,

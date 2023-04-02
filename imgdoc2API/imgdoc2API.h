@@ -191,14 +191,14 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_Query(
     const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information);
-EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetTilesIntersectingRect(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetBricksIntersectingCuboid(
     HandleDocRead3D handle,
     const CuboidDoubleInterop* query_cuboid,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
     const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information);
-EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetTilesIntersectingPlane(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_GetBricksIntersectingPlane(
     HandleDocRead3D handle,
     const PlaneNormalAndDistanceInterop* plane_normal_and_distance_interop,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,

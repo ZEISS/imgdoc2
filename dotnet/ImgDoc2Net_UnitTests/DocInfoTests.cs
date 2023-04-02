@@ -207,7 +207,7 @@ namespace ImgDoc2Net_UnitTests
                 minMax.Count().Should().Be(2);
 
                 // the min/max should be "indeterminate" or "invalid", which means that min > max.
-                (var min, var max) = minMax[new Dimension('v')];
+                var (min, max) = minMax[new Dimension('v')];
                 min.Should().BeGreaterThan(max);
                 (min, max) = minMax[new Dimension('w')];
                 min.Should().BeGreaterThan(max);
@@ -271,7 +271,7 @@ namespace ImgDoc2Net_UnitTests
         }
 
         [Fact]
-        public void CreateEmtyDocument1AndCallGetBoundingBoxAndCheck()
+        public void CreateEmptyDocument1AndCallGetBoundingBoxAndCheck()
         {
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
@@ -287,6 +287,8 @@ namespace ImgDoc2Net_UnitTests
                 // assert
                 extent.IsValid.Should().BeFalse();
             }
+
+            Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
         }
 
         [Fact]

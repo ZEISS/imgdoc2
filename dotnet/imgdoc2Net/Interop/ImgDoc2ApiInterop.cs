@@ -151,6 +151,16 @@ namespace ImgDoc2Net.Interop
 
                 this.idocwrite3dAddBrick =
                     this.GetProcAddressThrowIfNotFound<IDocWrite3d_AddBrickDelegate>("IDocWrite3d_AddBrick");
+                this.idocread3dQuery =
+                    this.GetProcAddressThrowIfNotFound<IDocRead3d_QueryDelegate>("IDocRead3d_Query");
+                this.idocread3dGetBricksIntersectingCuboid = 
+                    this.GetProcAddressThrowIfNotFound<IDocRead3d_GetBricksIntersectingCuboidDelegate>("IDocRead3d_GetBricksIntersectingCuboid");
+                this.idocread3dGetBricksIntersectingPlane =
+                    this.GetProcAddressThrowIfNotFound<IDocRead3d_GetBricksIntersectingPlaneDelegate>("IDocRead3d_GetBricksIntersectingPlane");
+                this.idocread3dReadBrickInfo =
+                    this.GetProcAddressThrowIfNotFound<IDocRead3d_ReadBrickInfoDelegate>("IDocRead3d_ReadBrickInfo");
+                this.idocread3dReadBrickData =
+                    this.GetProcAddressThrowIfNotFound<IDocRead3d_ReadBrickDataDelegate>("IDocRead3d_ReadBrickData");
 
                 this.idocinfoGetTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo_GetTileDimensions");
@@ -1587,6 +1597,11 @@ namespace ImgDoc2Net.Interop
         private readonly IDocRead2d_ReadTileInfoDelegate idocread2ReadTileInfo;
 
         private readonly IDocWrite3d_AddBrickDelegate idocwrite3dAddBrick;
+        private readonly IDocRead3d_QueryDelegate idocread3dQuery;
+        private readonly IDocRead3d_GetBricksIntersectingCuboidDelegate idocread3dGetBricksIntersectingCuboid;
+        private readonly IDocRead3d_GetBricksIntersectingPlaneDelegate idocread3dGetBricksIntersectingPlane;
+        private readonly IDocRead3d_ReadBrickInfoDelegate idocread3dReadBrickInfo;
+        private readonly IDocRead3d_ReadBrickDataDelegate idocread3dReadBrickData;
 
         private readonly CreateEnvironmentObjectDelegate createEnvironmentObject;
 
@@ -1708,6 +1723,15 @@ namespace ImgDoc2Net.Interop
             IntPtr functionPointerSetData,
             ImgDoc2ErrorInformation* errorInformation);
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocRead3d_QueryDelegate(
+            IntPtr read3dHandle,
+            IntPtr dimensionQueryClauseInterop,
+            IntPtr tileInfoQueryClauseInterop,
+            IntPtr queryResultInterop,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int IDocWrite3d_AddBrickDelegate(
             IntPtr handle,
             IntPtr tileCoordinateInterop,
@@ -1717,6 +1741,42 @@ namespace ImgDoc2Net.Interop
             IntPtr dataPtr,
             long size,
             long* resultPk,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocRead3d_GetBricksIntersectingCuboidDelegate(
+            IntPtr read3dHandle,
+            CuboidDoubleInterop* cuboid,
+            IntPtr dimensionQueryClauseInterop,
+            IntPtr tileInfoQueryClauseInterop,
+            IntPtr queryResultInterop,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocRead3d_GetBricksIntersectingPlaneDelegate(
+            IntPtr read3dHandle,
+            PlaneNormalAndDistanceInterop* planeNormalAndDistanceInterop,
+            IntPtr dimensionQueryClauseInterop,
+            IntPtr tileInfoQueryClauseInterop,
+            IntPtr queryResultInterop,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocRead3d_ReadBrickInfoDelegate(
+            IntPtr read3dHandle,
+            long pk,
+            IntPtr tileCoordinateInterop,
+            LogicalPositionInfo3DInterop* logicalPositionInfoInterop,
+            BrickBlobInfoInterop* tileBlobInfoInterop,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocRead3d_ReadBrickDataDelegate(
+            IntPtr read3dHandle,
+            long pk,
+            IntPtr blobOutputHandle,
+            IntPtr functionPointerSetSize,
+            IntPtr functionPointerSetData,
             ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -1874,6 +1934,26 @@ namespace ImgDoc2Net.Interop
             public ulong TileCount;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct CuboidDoubleInterop
+        {
+            public double X;
+            public double Y;
+            public double Z;
+            public double Width;
+            public double Height;
+            public double Depth;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct PlaneNormalAndDistanceInterop
+        {
+            public double NormalX;
+            public double NormalY;
+            public double NormalZ;
+            public double Distance;
+        }
+
         /// <summary> This struct is corresponding to the unmanaged struct 'LogicalPositionInfo3DInterop'. </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         private struct LogicalPositionInfo3DInterop
@@ -1911,6 +1991,13 @@ namespace ImgDoc2Net.Interop
             public uint PixelDepth;
 
             public byte PixelType;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct BrickBlobInfoInterop
+        {
+            public BrickBaseInfoInterop BrickBaseInfo;
+            public byte DataType;
         }
 
         /// <summary> This struct is used for the 'IDocInfo_GetTileCountPerLayer'-API. It corresponds to the unmanaged struct 'TileCountPerLayerInterop'.</summary>
