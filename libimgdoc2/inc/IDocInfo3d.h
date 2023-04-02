@@ -9,7 +9,7 @@
 namespace imgdoc2
 {
     /// This interface is used for retrieving global information (about the document (i.e. usually aggregated from
-    /// the individual tiles) specific to the 3d-document.
+    /// the individual bricks) specific to the 3d-document.
     class IDocInfo3d : public IDocInfo
     {
     public:

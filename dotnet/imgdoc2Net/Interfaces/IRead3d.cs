@@ -9,7 +9,7 @@ namespace ImgDoc2Net.Interfaces
     /// <summary>   
     /// This interface is used to give read-access to the document3D. 
     /// </summary>
-    public interface IRead3d : IDisposable, IDocInfo, IDocQuery3d
+    public interface IRead3d : IDisposable, IDocInfo3d, IDocQuery3d
     {
     }
 }

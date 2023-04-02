@@ -1060,7 +1060,7 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickInfo(
 }
 
 
-ImgDoc2ErrorCode IDocInfo_GetTileDimensions(
+ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
     HandleDocRead2D handle,
     imgdoc2::Dimension* dimensions,
     std::uint32_t* count,
@@ -1103,14 +1103,14 @@ ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const vector<Dimension> dimensions_array(dimensions, dimensions + count);
     std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> min_max;
 
     try
     {
-        min_max = reader2d->GetMinMaxForTileDimension(dimensions_array);
+        min_max = doc_info->GetMinMaxForTileDimension(dimensions_array);
     }
     catch (exception& exception)
     {
@@ -1194,10 +1194,10 @@ ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
-        *total_tile_count = reader2d->GetTotalTileCount();
+        *total_tile_count = doc_info->GetTotalTileCount();
     }
     catch (exception& exception)
     {

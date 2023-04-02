@@ -85,14 +85,9 @@ namespace ImgDoc2Net.Implementation
             return ImgDoc2ApiInterop.Instance.Reader2dReadTileData(this.reader3dObjectHandle, key);
         }
 
-        public Extent2d GetBoundingBox()
-        {
-            throw new NotImplementedException();
-        }
-
         public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
         {
-            throw new NotImplementedException();
+            return ImgDoc2ApiInterop.Instance.DocInfoGetMinMaxForTileDimensions(this.reader3dObjectHandle, dimensions);
         }
 
         public Dictionary<int, long> GetTileCountPerPyramidLayer()
@@ -106,6 +101,11 @@ namespace ImgDoc2Net.Implementation
         }
 
         public long GetTotalNumberOfTiles()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Extent3d GetBoundingBox()
         {
             throw new NotImplementedException();
         }

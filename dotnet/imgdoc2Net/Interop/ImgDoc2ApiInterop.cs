@@ -162,8 +162,8 @@ namespace ImgDoc2Net.Interop
                 this.idocread3dReadBrickData =
                     this.GetProcAddressThrowIfNotFound<IDocRead3d_ReadBrickDataDelegate>("IDocRead3d_ReadBrickData");
 
-                this.idocinfoGetTileDimensions =
-                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo_GetTileDimensions");
+                this.idocinfo2dGetTileDimensions =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo2d_GetTileDimensions");
                 this.idocinfoGetMinMaxForTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo_GetMinMaxForTileDimensions");
                 this.idocinfoGetBoundingBoxForTiles =
@@ -1414,7 +1414,7 @@ namespace ImgDoc2Net.Interop
         /// </summary>
         /// <param name="read2dHandle"> The reader-2d-object.</param>
         /// <returns> An array with the dimensions used in the document.</returns>
-        public Dimension[] DocInfoGetTileDimensions(IntPtr read2dHandle)
+        public Dimension[] DocInfo2dGetTileDimensions(IntPtr read2dHandle)
         {
             this.ThrowIfNotInitialized();
             unsafe
@@ -1423,13 +1423,13 @@ namespace ImgDoc2Net.Interop
                 ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
                 byte* dimensionsArray = stackalloc byte[initialArraySize];
                 uint count = initialArraySize;
-                int returnCode = this.idocinfoGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
+                int returnCode = this.idocinfo2dGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
                 this.HandleErrorCases(returnCode, errorInformation);
                 if (count > initialArraySize)
                 {
                     // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
                     byte* dimensionsArray2 = stackalloc byte[(int)count];
-                    returnCode = this.idocinfoGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
+                    returnCode = this.idocinfo2dGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
                     dimensionsArray = dimensionsArray2;
                 }
 
@@ -1964,7 +1964,7 @@ namespace ImgDoc2Net.Interop
 
         private readonly CreateEnvironmentObjectDelegate createEnvironmentObject;
 
-        private readonly IDocInfo_GetTileDimensionsDelegate idocinfoGetTileDimensions;
+        private readonly IDocInfo_GetTileDimensionsDelegate idocinfo2dGetTileDimensions;
         private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfoGetMinMaxForTileDimensions;
         private readonly IDocInfo_GetBoundingBoxForTilesDelegate idocinfoGetBoundingBoxForTiles;
         private readonly IDocInfo_GetTotalTileCountDelegate idocinfoGetTotalTileCount;

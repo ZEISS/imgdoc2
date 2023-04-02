@@ -223,7 +223,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickData(
 /// \param           count                          On input, the size of the array pointed to by 'dimensions', on output the actual number of dimension available.
 /// \param           error_information              If non-null, in case of an error, additional information describing the error are put here.
 /// \returns An error-code indicating success or failure of the operation.
-EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTileDimensions(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileDimensions(
     HandleDocRead2D handle,
     imgdoc2::Dimension* dimensions,
     std::uint32_t* count,

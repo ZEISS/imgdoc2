@@ -39,7 +39,7 @@ namespace ImgDoc2Net_UnitTests
             Assert.NotEqual(reader2dHandle, IntPtr.Zero);
 
             // act
-            var dimensions = instance.DocInfoGetTileDimensions(reader2dHandle);
+            var dimensions = instance.DocInfo2dGetTileDimensions(reader2dHandle);
 
             instance.DestroyDocument(documentHandle);
             instance.DestroyReader2d(reader2dHandle);

@@ -6,10 +6,10 @@ namespace ImgDoc2Net.Interfaces
 {
     /// <summary>   
     /// This class is used to represent the "minimum and the maximum of the value range for
-    /// the x- and y-position". 
-    /// If MinX > MaxX (or MinY > MaxY), then the value is indeterminate.
+    /// the x-, y- and z-position". 
+    /// If MinX > MaxX (or MinY > MaxY or MinZ > MaxZ), then the value is indeterminate.
     /// </summary>
-    public class Extent2d
+    public class Extent3d
     {
         /// <summary>   Gets or sets the minimum x coordinate value. </summary>
         /// <value> The minimum x coordinate value. </value>
@@ -27,6 +27,14 @@ namespace ImgDoc2Net.Interfaces
         /// <value> The maximum y coordinate value. </value>
         public double MaxY { get; set; } = double.MinValue;
 
+        /// <summary>   Gets or sets the minimum z coordinate value. </summary>
+        /// <value> The minimum z coordinate value. </value>
+        public double MinZ { get; set; } = double.MaxValue;
+
+        /// <summary>   Gets or sets the maximum z coordinate value. </summary>
+        /// <value> The maximum z coordinate value. </value>
+        public double MaxZ { get; set; } = double.MinValue;
+
         /// <summary>   Gets a value indicating whether the extent for the x coordinate is valid. </summary>
         /// <value> True if the extent for the x coordinate is valid, false if not. </value>
         public bool IsExtentXValid
@@ -34,9 +42,16 @@ namespace ImgDoc2Net.Interfaces
             get { return this.MinX <= this.MaxX; }
         }
 
-        /// <summary>   Gets a value indicating whether the extent for the y coordinate is valid. </summary>
+        /// <summary>   Gets a value indicating whether the extent for the z coordinate is valid. </summary>
         /// <value> True if the extent for the y coordinate is valid, false if not. </value>
         public bool IsExtentYValid
+        {
+            get { return this.MinY <= this.MaxY; }
+        }
+
+        /// <summary>   Gets a value indicating whether the extent for the z coordinate is valid. </summary>
+        /// <value> True if the extent for the z coordinate is valid, false if not. </value>
+        public bool IsExtentZValid
         {
             get { return this.MinY <= this.MaxY; }
         }
@@ -45,7 +60,7 @@ namespace ImgDoc2Net.Interfaces
         /// <value> True if the extent is valid, false if not. </value>
         public bool IsValid
         {
-            get { return this.IsExtentXValid && this.IsExtentYValid; }
+            get { return this.IsExtentXValid && this.IsExtentYValid && this.IsExtentZValid; }
         }
     }
 }

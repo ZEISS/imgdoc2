@@ -114,7 +114,7 @@ namespace ImgDoc2Net.Implementation
         /// <inheritdoc/>
         public Dimension[] GetTileDimensions()
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetTileDimensions(this.reader2dObjectHandle);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetTileDimensions(this.reader2dObjectHandle);
         }
 
         /// <inheritdoc/>
