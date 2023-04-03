@@ -30,7 +30,7 @@ namespace imgdoc2
         /// advertised with the "Reserve"-call. The method should validate this condition and
         /// throw an exception in case of a violation.
         /// If the method returns "false", it is interpreted "the object is not interested in any
-        /// additional data", and subsequent calls may be surpressed.
+        /// additional data", and subsequent calls may be suppressed.
         /// \param  offset    The offset.
         /// \param  size      The size.
         /// \param  data The data.
