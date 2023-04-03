@@ -1102,8 +1102,8 @@ ImgDoc2ErrorCode IDocInfo3d_GetTileDimensions(
     return IDocInfo_GetTileDimensions(reader3d.get(), dimensions, count, error_information);
 }
 
-ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
-    HandleDocRead2D handle,
+static ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
+    imgdoc2::IDocInfo* doc_info,
     const imgdoc2::Dimension* dimensions,
     std::uint32_t count,
     MinMaxForTilePositionsInterop* result,
@@ -1120,8 +1120,6 @@ ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
         FillOutErrorInformationForInvalidArgument("result", "must not be null", error_information);
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
-
-    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const vector<Dimension> dimensions_array(dimensions, dimensions + count);
     std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> min_max;
@@ -1144,6 +1142,65 @@ ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
     }
 
     return ImgDoc2_ErrorCode_OK;
+
+}
+
+
+ImgDoc2ErrorCode IDocInfo2d_GetMinMaxForTileDimensions(
+    HandleDocRead2D handle,
+    const imgdoc2::Dimension* dimensions,
+    std::uint32_t count,
+    MinMaxForTilePositionsInterop* result,
+    ImgDoc2ErrorInformation* error_information)
+{
+    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetMinMaxForTileDimensions(doc_info.get(), dimensions, count, result, error_information);
+    //if (dimensions == nullptr)
+    //{
+    //    FillOutErrorInformationForInvalidArgument("dimensions", "must not be null", error_information);
+    //    return ImgDoc2_ErrorCode_InvalidArgument;
+    //}
+
+    //if (result == nullptr)
+    //{
+    //    FillOutErrorInformationForInvalidArgument("result", "must not be null", error_information);
+    //    return ImgDoc2_ErrorCode_InvalidArgument;
+    //}
+
+    //const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
+    //const vector<Dimension> dimensions_array(dimensions, dimensions + count);
+    //std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> min_max;
+
+    //try
+    //{
+    //    min_max = doc_info->GetMinMaxForTileDimension(dimensions_array);
+    //}
+    //catch (exception& exception)
+    //{
+    //    FillOutErrorInformation(exception, error_information);
+    //    return MapExceptionToReturnValue(exception);
+    //}
+
+    //for (uint32_t i = 0; i < count; ++i)
+    //{
+    //    const auto& item = min_max.at(dimensions[i]);
+    //    (result + i)->minimum_value = item.minimum_value;
+    //    (result + i)->maximum_value = item.maximum_value;
+    //}
+
+    //return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocInfo3d_GetMinMaxForTileDimensions(
+    HandleDocRead3D handle,
+    const imgdoc2::Dimension* dimensions,
+    std::uint32_t count,
+    MinMaxForTilePositionsInterop* result,
+    ImgDoc2ErrorInformation* error_information)
+{
+    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetMinMaxForTileDimensions(doc_info.get(), dimensions, count, result, error_information);
 }
 
 ImgDoc2ErrorCode IDocInfo_GetBoundingBoxForTiles(

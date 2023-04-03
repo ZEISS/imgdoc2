@@ -120,7 +120,7 @@ namespace ImgDoc2Net.Implementation
         /// <inheritdoc/>
         public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetMinMaxForTileDimensions(this.reader2dObjectHandle, dimensions);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetMinMaxForTileDimensions(this.reader2dObjectHandle, dimensions);
         }
 
         /// <inheritdoc/>

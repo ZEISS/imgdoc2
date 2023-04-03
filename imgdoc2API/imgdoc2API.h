@@ -217,6 +217,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickData(
 /// size of the memory pointed to by 'dimensions' (= the number of elements in there). On output,
 /// the actual number of elements available is put into 'count'. At most, the initial number 
 /// of elements are copied to the 'dimension' buffer.
+/// Note that this function is only applicable to 3d-documents (and offers the same functionality as IDocInfo3d_GetTileDimensions for 3d-documents).
 ///
 /// \param           handle                         The handle of the read2d-object.
 /// \param           dimensions                     Pointer to a buffer.
@@ -229,14 +230,32 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileDimensions(
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information);
 
+/// Get the tile-dimensions used in the document. On input, the parameter 'count' must give the
+/// size of the memory pointed to by 'dimensions' (= the number of elements in there). On output,
+/// the actual number of elements available is put into 'count'. At most, the initial number 
+/// of elements are copied to the 'dimension' buffer.
+/// Note that this function is only applicable to 3d-documents (and offers the same functionality as IDocInfo2d_GetTileDimensions for 2d-documents).
+///
+/// \param           handle                         The handle of the read3d-object.
+/// \param           dimensions                     Pointer to a buffer.
+/// \param           count                          On input, the size of the array pointed to by 'dimensions', on output the actual number of dimension available.
+/// \param           error_information              If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileDimensions(
     HandleDocRead3D handle,
     imgdoc2::Dimension* dimensions,
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information);
 
-EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetMinMaxForTileDimensions(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetMinMaxForTileDimensions(
     HandleDocRead2D handle,
+    const imgdoc2::Dimension* dimensions,
+    std::uint32_t count,
+    MinMaxForTilePositionsInterop* result,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetMinMaxForTileDimensions(
+    HandleDocRead3D handle,
     const imgdoc2::Dimension* dimensions,
     std::uint32_t count,
     MinMaxForTilePositionsInterop* result,

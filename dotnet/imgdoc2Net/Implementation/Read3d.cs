@@ -87,7 +87,7 @@ namespace ImgDoc2Net.Implementation
 
         public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetMinMaxForTileDimensions(this.reader3dObjectHandle, dimensions);
+            return ImgDoc2ApiInterop.Instance.DocInfo3dGetMinMaxForTileDimensions(this.reader3dObjectHandle, dimensions);
         }
 
         public Dictionary<int, long> GetTileCountPerPyramidLayer()

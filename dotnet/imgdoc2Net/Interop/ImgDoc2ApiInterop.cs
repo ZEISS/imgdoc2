@@ -166,8 +166,10 @@ namespace ImgDoc2Net.Interop
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo2d_GetTileDimensions");
                 this.idocinfo3dGetTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo3d_GetTileDimensions");
-                this.idocinfoGetMinMaxForTileDimensions =
-                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo_GetMinMaxForTileDimensions");
+                this.idocinfo2dGetMinMaxForTileDimensions =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo2d_GetMinMaxForTileDimensions");
+                this.idocinfo3dGetMinMaxForTileDimensions =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo3d_GetMinMaxForTileDimensions");
                 this.idocinfoGetBoundingBoxForTiles =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetBoundingBoxForTilesDelegate>("IDocInfo_GetBoundingBoxForTiles");
                 this.idocinfoGetTotalTileCount =
@@ -1475,7 +1477,7 @@ namespace ImgDoc2Net.Interop
             }
         }
 
-        public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfoGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
+        public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfo2dGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
         {
             this.ThrowIfNotInitialized();
             int dimensionCount = dimensions.Count();
@@ -1495,7 +1497,49 @@ namespace ImgDoc2Net.Interop
                 fixed (byte* pointerToDimensionArray = dimensionsArray)
                 fixed (MinMaxInterop* pointerToMinMaxArray = &minMaxInteropArray[0])
                 {
-                    int returnCode = this.idocinfoGetMinMaxForTileDimensions(
+                    int returnCode = this.idocinfo2dGetMinMaxForTileDimensions(
+                        read2dHandle,
+                        new IntPtr(pointerToDimensionArray),
+                        (uint)dimensionCount,
+                        new IntPtr(pointerToMinMaxArray),
+                        &errorInformation);
+                }
+
+                var result = new Dictionary<Dimension, (int Minimum, int Maximum)>(dimensionCount);
+
+                i = 0;
+                foreach (var d in dimensionsArray)
+                {
+                    result[new Dimension(Convert.ToChar(d))] = (minMaxInteropArray[i].Minimum, minMaxInteropArray[i].Maximum);
+                    ++i;
+                }
+
+                return result;
+            }
+        }
+
+        public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfo3dGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
+        {
+            // TODO(JBL): combine with 2d version
+            this.ThrowIfNotInitialized();
+            int dimensionCount = dimensions.Count();
+            unsafe
+            {
+                Span<byte> dimensionsArray = stackalloc byte[dimensionCount];
+                int i = 0;
+                foreach (var dimension in dimensions)
+                {
+                    dimensionsArray[i] = (byte)dimension.Id;
+                    ++i;
+                }
+
+                MinMaxInterop[] minMaxInteropArray = new MinMaxInterop[dimensionCount];
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+
+                fixed (byte* pointerToDimensionArray = dimensionsArray)
+                fixed (MinMaxInterop* pointerToMinMaxArray = &minMaxInteropArray[0])
+                {
+                    int returnCode = this.idocinfo3dGetMinMaxForTileDimensions(
                         read2dHandle,
                         new IntPtr(pointerToDimensionArray),
                         (uint)dimensionCount,
@@ -1998,7 +2042,8 @@ namespace ImgDoc2Net.Interop
 
         private readonly IDocInfo_GetTileDimensionsDelegate idocinfo2dGetTileDimensions;
         private readonly IDocInfo_GetTileDimensionsDelegate idocinfo3dGetTileDimensions;
-        private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfoGetMinMaxForTileDimensions;
+        private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfo2dGetMinMaxForTileDimensions;
+        private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfo3dGetMinMaxForTileDimensions;
         private readonly IDocInfo_GetBoundingBoxForTilesDelegate idocinfoGetBoundingBoxForTiles;
         private readonly IDocInfo_GetTotalTileCountDelegate idocinfoGetTotalTileCount;
         private readonly IDocInfo_GetTileCountPerLayerDelegate idocinfoGetTileCountPerLayer;
