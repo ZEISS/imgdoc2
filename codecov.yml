@@ -4,7 +4,7 @@
 
 comment:
   layout: "header, diff, flags, components"
-  
+
 component_management:
   individual_components:
     - component_id: libimgdoc2  # this is an identifier that should not be changed
