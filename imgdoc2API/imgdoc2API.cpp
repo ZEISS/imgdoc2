@@ -1142,7 +1142,6 @@ static ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
     }
 
     return ImgDoc2_ErrorCode_OK;
-
 }
 
 ImgDoc2ErrorCode IDocInfo2d_GetMinMaxForTileDimensions(
