@@ -229,6 +229,12 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileDimensions(
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information);
 
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileDimensions(
+    HandleDocRead3D handle,
+    imgdoc2::Dimension* dimensions,
+    std::uint32_t* count,
+    ImgDoc2ErrorInformation* error_information);
+
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetMinMaxForTileDimensions(
     HandleDocRead2D handle,
     const imgdoc2::Dimension* dimensions,

@@ -82,7 +82,7 @@ namespace ImgDoc2Net.Implementation
         public byte[] ReadBrickData(long key)
         {
             // TODO(Jbl): error-handling
-            return ImgDoc2ApiInterop.Instance.Reader2dReadTileData(this.reader3dObjectHandle, key);
+            return ImgDoc2ApiInterop.Instance.Reader3dReadBrickData(this.reader3dObjectHandle, key);
         }
 
         public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
@@ -97,7 +97,7 @@ namespace ImgDoc2Net.Implementation
 
         public Dimension[] GetTileDimensions()
         {
-            throw new NotImplementedException();
+            return ImgDoc2ApiInterop.Instance.DocInfo3dGetTileDimensions(this.reader3dObjectHandle);
         }
 
         public long GetTotalNumberOfTiles()

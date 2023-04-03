@@ -1059,9 +1059,8 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickInfo(
     return ImgDoc2_ErrorCode_OK;
 }
 
-
-ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
-    HandleDocRead2D handle,
+static ImgDoc2ErrorCode IDocInfo_GetTileDimensions(
+    imgdoc2::IDocInfo* doc_info,
     imgdoc2::Dimension* dimensions,
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information)
@@ -1077,11 +1076,45 @@ ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
         FillOutErrorInformationForInvalidArgument("dimensions", "must not be null (if a count > 0 was given)", error_information);
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
+    
+    doc_info->GetTileDimensions(dimensions, *count);
+    return ImgDoc2_ErrorCode_OK;
+}
+
+
+ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
+    HandleDocRead2D handle,
+    imgdoc2::Dimension* dimensions,
+    std::uint32_t* count,
+    ImgDoc2ErrorInformation* error_information)
+{
+  /*  if (count == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("count", "must not be null", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }
+
+    if (*count > 0 && dimensions == nullptr)
+    {
+        FillOutErrorInformationForInvalidArgument("dimensions", "must not be null (if a count > 0 was given)", error_information);
+        return ImgDoc2_ErrorCode_InvalidArgument;
+    }*/
 
     const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetTileDimensions(reader2d.get(), dimensions, count, error_information);
 
-    reader2d->GetTileDimensions(dimensions, *count);
-    return ImgDoc2_ErrorCode_OK;
+   /* reader2d->GetTileDimensions(dimensions, *count);
+    return ImgDoc2_ErrorCode_OK;*/
+}
+
+ImgDoc2ErrorCode IDocInfo3d_GetTileDimensions(
+    HandleDocRead2D handle,
+    imgdoc2::Dimension* dimensions,
+    std::uint32_t* count,
+    ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetTileDimensions(reader3d.get(), dimensions, count, error_information);
 }
 
 ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(

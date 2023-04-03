@@ -164,6 +164,8 @@ namespace ImgDoc2Net.Interop
 
                 this.idocinfo2dGetTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo2d_GetTileDimensions");
+                this.idocinfo3dGetTileDimensions =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileDimensionsDelegate>("IDocInfo3d_GetTileDimensions");
                 this.idocinfoGetMinMaxForTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo_GetMinMaxForTileDimensions");
                 this.idocinfoGetBoundingBoxForTiles =
@@ -1443,6 +1445,36 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        public Dimension[] DocInfo3dGetTileDimensions(IntPtr read3dHandle)
+        {
+            // TODO(JBL): combine with 2d version
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                const int initialArraySize = 20;    // number of elements for the initial buffer we supply
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                byte* dimensionsArray = stackalloc byte[initialArraySize];
+                uint count = initialArraySize;
+                int returnCode = this.idocinfo3dGetTileDimensions(read3dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                if (count > initialArraySize)
+                {
+                    // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
+                    byte* dimensionsArray2 = stackalloc byte[(int)count];
+                    returnCode = this.idocinfo3dGetTileDimensions(read3dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
+                    dimensionsArray = dimensionsArray2;
+                }
+
+                Dimension[] dimensions = new Dimension[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    dimensions[i] = new Dimension(Convert.ToChar(dimensionsArray[i]));
+                }
+
+                return dimensions;
+            }
+        }
+
         public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfoGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
         {
             this.ThrowIfNotInitialized();
@@ -1965,6 +1997,7 @@ namespace ImgDoc2Net.Interop
         private readonly CreateEnvironmentObjectDelegate createEnvironmentObject;
 
         private readonly IDocInfo_GetTileDimensionsDelegate idocinfo2dGetTileDimensions;
+        private readonly IDocInfo_GetTileDimensionsDelegate idocinfo3dGetTileDimensions;
         private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfoGetMinMaxForTileDimensions;
         private readonly IDocInfo_GetBoundingBoxForTilesDelegate idocinfoGetBoundingBoxForTiles;
         private readonly IDocInfo_GetTotalTileCountDelegate idocinfoGetTotalTileCount;
