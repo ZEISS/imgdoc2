@@ -6,7 +6,6 @@
 #include "LogicalPositionInfo.h"
 #include "BrickBaseInfo.h"
 #include "ITileCoordinate.h"
-#include "LogicalPositionInfo.h"
 #include "IDimCoordinateQueryClause.h"
 #include "ITIleInfoQueryClause.h"
 #include "IBlobOutput.h"
