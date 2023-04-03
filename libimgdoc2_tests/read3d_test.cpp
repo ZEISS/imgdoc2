@@ -32,7 +32,7 @@ TEST(Read3d, TryReadBrickInfoForNonExistentTile)
 
 TEST(Read3d, CreateDocumentAddSingleTileReadTileInfoCheckForCorrectness)
 {
-    // here we exercise the IDocRead2d::ReadTileInfo method - we create a document, add one tile, read it again
+    // here we exercise the IDocRead3d::ReadBrickInfo method - we create a document, add one tile, read it again
     //  and compare the content
     constexpr size_t kBLOB_SIZE = 100;
 
