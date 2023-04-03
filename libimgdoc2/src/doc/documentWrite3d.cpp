@@ -158,7 +158,7 @@ imgdoc2::dbIndex DocumentWrite3d::AddBlobData(imgdoc2::TileDataStorageType stora
         throw invalid_operation_exception("Storage-types other than 'blob-in-database' are not implemented.");
     }
 
-    if (!this->document_->GetDataBaseConfiguration2d()->GetHasBlobsTable())
+    if (!this->document_->GetDataBaseConfiguration3d()->GetHasBlobsTable())
     {
         throw invalid_operation_exception("The database does not have a blob-table.");
     }

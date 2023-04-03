@@ -186,7 +186,6 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickInfo(
     ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_Query(
     HandleDocRead3D handle,
-    std::int64_t pk,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
     const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
     QueryResultInterop* result,
@@ -280,6 +279,31 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetBoundingBoxForTiles(
     double* max_x,
     double* min_y,
     double* max_y,
+    ImgDoc2ErrorInformation* error_information);
+
+/// Retrieve the "axis aligned bounding box" (covering all bricks). This function is corresponding to the
+/// method 'IDocInfo3d::GetBricksBoundingBox'. If the values cannot be retrieved (e.g. if the document
+/// is empty), then the min-values will be set to 'std::numeric_limits<double>::max()' and the max-values
+/// to 'std::numeric_limits<double>::lowest()'.
+///
+/// \param          handle            The handle of the read3d-object.
+/// \param [in,out] min_x             If non-null, the minimum x coordinate is put here.
+/// \param [in,out] max_x             If non-null, the maximum x coordinate is put here.
+/// \param [in,out] min_y             If non-null, the minimum y coordinate is put here.
+/// \param [in,out] max_y             If non-null, the maximum y coordinate is put here.
+/// \param [in,out] min_z             If non-null, the minimum z coordinate is put here.
+/// \param [in,out] max_z             If non-null, the maximum z coordinate is put here.
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetBoundingBoxForBricks(
+    HandleDocRead3D handle,
+    double* min_x,
+    double* max_x,
+    double* min_y,
+    double* max_y,
+    double* min_z,
+    double* max_z,
     ImgDoc2ErrorInformation* error_information);
 
 /// Get the total number of tiles in the document. This function is corresponding to the method

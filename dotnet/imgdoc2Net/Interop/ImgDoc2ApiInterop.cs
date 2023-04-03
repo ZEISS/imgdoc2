@@ -171,7 +171,9 @@ namespace ImgDoc2Net.Interop
                 this.idocinfo3dGetMinMaxForTileDimensions =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetMinMaxForTileDimensionsDelegate>("IDocInfo3d_GetMinMaxForTileDimensions");
                 this.idocinfo2dGetBoundingBoxForTiles =
-                    this.GetProcAddressThrowIfNotFound<IDocInfo_GetBoundingBoxForTilesDelegate>("IDocInfo2d_GetBoundingBoxForTiles");
+                    this.GetProcAddressThrowIfNotFound<IDocInfo2d_GetBoundingBoxForTilesDelegate>("IDocInfo2d_GetBoundingBoxForTiles");
+                this.idocinfo3dGetBoundingBoxForBricks =
+                    this.GetProcAddressThrowIfNotFound<IDocInfo3d_GetBoundingBoxForBricksDelegate>("IDocInfo3d_GetBoundingBoxForBricks");
                 this.idocinfo2dGetTotalTileCount =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTotalTileCountDelegate>("IDocInfo2d_GetTotalTileCount");
                 this.idocinfo3dGetTotalTileCount =
@@ -857,7 +859,7 @@ namespace ImgDoc2Net.Interop
             return result;
         }
 
-        public QueryResult Reader3dQuery(IntPtr read2dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
+        public QueryResult Reader3dQuery(IntPtr read3dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
         {
             // TODO(JBl): merge with Reader2dQuery
             this.ThrowIfNotInitialized();
@@ -880,7 +882,7 @@ namespace ImgDoc2Net.Interop
                         fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
                         {
                             returnCode = this.idocread3dQuery(
-                                read2dHandle,
+                                read3dHandle,
                                 new IntPtr(pointerDimensionQueryClauseInterop),
                                 new IntPtr(pointerTileInfoQueryClauseInterop),
                                 new IntPtr(pointerQueryResultInterop),
@@ -892,7 +894,7 @@ namespace ImgDoc2Net.Interop
                         fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
                         {
                             returnCode = this.idocread3dQuery(
-                                read2dHandle,
+                                read3dHandle,
                                 new IntPtr(pointerDimensionQueryClauseInterop),
                                 IntPtr.Zero,
                                 new IntPtr(pointerQueryResultInterop),
@@ -904,7 +906,7 @@ namespace ImgDoc2Net.Interop
                         fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
                         {
                             returnCode = this.idocread3dQuery(
-                                read2dHandle,
+                                read3dHandle,
                                 IntPtr.Zero,
                                 new IntPtr(pointerTileInfoQueryClauseInterop),
                                 new IntPtr(pointerQueryResultInterop),
@@ -915,7 +917,7 @@ namespace ImgDoc2Net.Interop
                     {
                         // if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
                         returnCode = this.idocread3dQuery(
-                            read2dHandle,
+                            read3dHandle,
                             IntPtr.Zero,
                             IntPtr.Zero,
                             new IntPtr(pointerQueryResultInterop),
@@ -1571,7 +1573,7 @@ namespace ImgDoc2Net.Interop
         /// </summary>
         /// <param name="read2dHandle"> The reader-2d-object.</param>
         /// <returns>   A tuple containing the respective intervals. </returns>
-        public (double minX, double maxX, double minY, double maxY) DocInfoGetTilesBoundingBox(IntPtr read2dHandle)
+        public (double minX, double maxX, double minY, double maxY) DocInfo2dGetTilesBoundingBox(IntPtr read2dHandle)
         {
             this.ThrowIfNotInitialized();
             unsafe
@@ -1584,6 +1586,31 @@ namespace ImgDoc2Net.Interop
                 int returnCode = this.idocinfo2dGetBoundingBoxForTiles(read2dHandle, &minX, &maxX, &minY, &maxY, &errorInformation);
                 this.HandleErrorCases(returnCode, errorInformation);
                 return (minX, maxX, minY, maxY);
+            }
+        }
+
+        /// <summary>   
+        /// Retrieve the minimum axis aligned bounding box (of all bricks in the document). 
+        /// If the values cannot be retrieved (e.g. if the document is empty), the min-values
+        /// will be set to double.MaxValue and the max-values to double.MinValue.
+        /// </summary>
+        /// <param name="read3dHandle"> The reader-3d-object.</param>
+        /// <returns>   A tuple containing the respective intervals. </returns>
+        public (double minX, double maxX, double minY, double maxY, double minZ, double maxZ) DocInfo3dGetTilesBoundingBox(IntPtr read3dHandle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                double minX = 0.0;
+                double maxX = 0.0;
+                double minY = 0.0;
+                double maxY = 0.0;
+                double minZ = 0.0;
+                double maxZ = 0.0;
+                int returnCode = this.idocinfo3dGetBoundingBoxForBricks(read3dHandle, &minX, &maxX, &minY, &maxY, &minZ, &maxZ, &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                return (minX, maxX, minY, maxY, minZ, maxZ);
             }
         }
 
@@ -2113,7 +2140,8 @@ namespace ImgDoc2Net.Interop
         private readonly IDocInfo_GetTileDimensionsDelegate idocinfo3dGetTileDimensions;
         private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfo2dGetMinMaxForTileDimensions;
         private readonly IDocInfo_GetMinMaxForTileDimensionsDelegate idocinfo3dGetMinMaxForTileDimensions;
-        private readonly IDocInfo_GetBoundingBoxForTilesDelegate idocinfo2dGetBoundingBoxForTiles;
+        private readonly IDocInfo2d_GetBoundingBoxForTilesDelegate idocinfo2dGetBoundingBoxForTiles;
+        private readonly IDocInfo3d_GetBoundingBoxForBricksDelegate idocinfo3dGetBoundingBoxForBricks;
         private readonly IDocInfo_GetTotalTileCountDelegate idocinfo2dGetTotalTileCount;
         private readonly IDocInfo_GetTotalTileCountDelegate idocinfo3dGetTotalTileCount;
         private readonly IDocInfo_GetTileCountPerLayerDelegate idocinfo2dGetTileCountPerLayer;
@@ -2310,12 +2338,23 @@ namespace ImgDoc2Net.Interop
             ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private unsafe delegate int IDocInfo_GetBoundingBoxForTilesDelegate(
+        private unsafe delegate int IDocInfo2d_GetBoundingBoxForTilesDelegate(
             IntPtr read2dHandle,
             double* minX,
             double* maxX,
             double* minY,
             double* maxY,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocInfo3d_GetBoundingBoxForBricksDelegate(
+            IntPtr read3dHandle,
+            double* minX,
+            double* maxX,
+            double* minY,
+            double* maxY,
+            double* minZ,
+            double* maxZ,
             ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]

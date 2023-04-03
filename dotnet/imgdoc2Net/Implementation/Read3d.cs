@@ -14,7 +14,7 @@ namespace ImgDoc2Net.Implementation
     {
         private IntPtr reader3dObjectHandle;
 
-        /// <summary>   Initializes a new instance of the <see cref="Read2d"/> class. </summary>
+        /// <summary>   Initializes a new instance of the <see cref="Read3d"/> class. </summary>
         /// <param name="handle" type="IntPtr"> The handle. </param>
         public Read3d(IntPtr handle)
         {
@@ -78,6 +78,48 @@ namespace ImgDoc2Net.Implementation
             return queryResult.Keys;
         }
 
+        public (ITileCoordinate coordinate, LogicalPosition3d logicalPosition, BrickBlobInfo brickBlobInfo) ReadBrickInfo(long key)
+        {
+            ImgDoc2ApiInterop.Instance.Reader3dReadBrickInfo(
+                this.reader3dObjectHandle,
+                key,
+                true,
+                true,
+                true,
+                out ITileCoordinate coordinate,
+                out LogicalPosition3d logicalPosition3d,
+                out BrickBlobInfo brickBlobInfo);
+            return (coordinate, logicalPosition3d, brickBlobInfo);
+        }
+
+        public ITileCoordinate ReadBrickCoordinate(long key)
+        {
+            ImgDoc2ApiInterop.Instance.Reader3dReadBrickInfo(
+                this.reader3dObjectHandle,
+                key,
+                true,
+                false,
+                false,
+                out ITileCoordinate coordinate,
+                out _,
+                out _);
+            return coordinate;
+        }
+
+        public LogicalPosition3d ReadBrickLogicalPosition(long key)
+        {
+            ImgDoc2ApiInterop.Instance.Reader3dReadBrickInfo(
+                this.reader3dObjectHandle,
+                key,
+                false,
+                true,
+                false,
+                out _,
+                out LogicalPosition3d logicalPosition3d,
+                out _);
+            return logicalPosition3d;
+        }
+
         /// <inheritdoc/>
         public byte[] ReadBrickData(long key)
         {
@@ -85,29 +127,43 @@ namespace ImgDoc2Net.Implementation
             return ImgDoc2ApiInterop.Instance.Reader3dReadBrickData(this.reader3dObjectHandle, key);
         }
 
+        /// <inheritdoc/>
         public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
         {
             return ImgDoc2ApiInterop.Instance.DocInfo3dGetMinMaxForTileDimensions(this.reader3dObjectHandle, dimensions);
         }
 
+        /// <inheritdoc/>
         public Dictionary<int, long> GetTileCountPerPyramidLayer()
         {
             return ImgDoc2ApiInterop.Instance.DocInfo3dGetTileCountPerPyramidLayer(this.reader3dObjectHandle);
         }
 
+        /// <inheritdoc/>
         public Dimension[] GetTileDimensions()
         {
             return ImgDoc2ApiInterop.Instance.DocInfo3dGetTileDimensions(this.reader3dObjectHandle);
         }
 
+        /// <inheritdoc/>
         public long GetTotalNumberOfTiles()
         {
             return ImgDoc2ApiInterop.Instance.DocInfo3dGetTotalTileCount(this.reader3dObjectHandle);
         }
 
+        /// <inheritdoc/>
         public Extent3d GetBoundingBox()
         {
-            throw new NotImplementedException();
+            var extent = ImgDoc2ApiInterop.Instance.DocInfo3dGetTilesBoundingBox(this.reader3dObjectHandle);
+            return new Extent3d
+            {
+                MinX = extent.minX,
+                MaxX = extent.maxX,
+                MinY = extent.minY,
+                MaxY = extent.maxY,
+                MinZ = extent.minZ,
+                MaxZ = extent.maxZ,
+            };
         }
     }
 
@@ -132,7 +188,7 @@ namespace ImgDoc2Net.Implementation
 
         private void ReleaseUnmanagedResources()
         {
-            ImgDoc2ApiInterop.Instance.DestroyReader2d(this.reader3dObjectHandle);
+            ImgDoc2ApiInterop.Instance.DestroyReader3d(this.reader3dObjectHandle);
             this.reader3dObjectHandle = IntPtr.Zero;
         }
     }

@@ -126,7 +126,7 @@ namespace ImgDoc2Net.Implementation
         /// <inheritdoc/>
         public Extent2d GetBoundingBox()
         {
-            var extent = ImgDoc2ApiInterop.Instance.DocInfoGetTilesBoundingBox(this.reader2dObjectHandle);
+            var extent = ImgDoc2ApiInterop.Instance.DocInfo2dGetTilesBoundingBox(this.reader2dObjectHandle);
             return new Extent2d
             {
                 MinX = extent.minX,

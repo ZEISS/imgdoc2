@@ -717,7 +717,6 @@ ImgDoc2ErrorCode IDocRead2d_Query(
 
 ImgDoc2ErrorCode IDocRead3d_Query(
     HandleDocRead3D handle,
-    std::int64_t pk,
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
     const TileInfoQueryClauseInterop* tile_info_query_clause_interop,
     QueryResultInterop* result,
@@ -1077,7 +1076,7 @@ static ImgDoc2ErrorCode IDocInfo_GetTileDimensions(
         FillOutErrorInformationForInvalidArgument("dimensions", "must not be null (if a count > 0 was given)", error_information);
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
-    
+
     doc_info->GetTileDimensions(dimensions, *count);
     return ImgDoc2_ErrorCode_OK;
 }
@@ -1223,8 +1222,79 @@ ImgDoc2ErrorCode IDocInfo2d_GetBoundingBoxForTiles(
     return ImgDoc2_ErrorCode_OK;
 }
 
-// *********** IDocInfo2d_GetTotalTileCount/IDocInfo3d_GetTotalTileCount ***********
+ImgDoc2ErrorCode IDocInfo3d_GetBoundingBoxForBricks(
+    HandleDocRead3D handle,
+    double* min_x,
+    double* max_x,
+    double* min_y,
+    double* max_y,
+    double* min_z,
+    double* max_z,
+    ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
+    DoubleInterval interval_x, interval_y, interval_z;
+    DoubleInterval* pointer_interval_x{ nullptr }, * pointer_interval_y{ nullptr }, * pointer_interval_z{ nullptr };
+    if (min_x != nullptr || max_x != nullptr)
+    {
+        pointer_interval_x = &interval_x;
+    }
+
+    if (min_y != nullptr || max_y != nullptr)
+    {
+        pointer_interval_y = &interval_y;
+    }
+
+    if (min_z != nullptr || max_z != nullptr)
+    {
+        pointer_interval_z = &interval_z;
+    }
+
+    try
+    {
+        reader3d->GetBricksBoundingBox(pointer_interval_x, pointer_interval_y, pointer_interval_z);
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
+
+    if (min_x != nullptr)
+    {
+        *min_x = interval_x.IsValid() ? interval_x.minimum_value : std::numeric_limits<double>::max();
+    }
+
+    if (max_x != nullptr)
+    {
+        *max_x = interval_x.IsValid() ? interval_x.maximum_value : std::numeric_limits<double>::lowest();
+    }
+
+    if (min_y != nullptr)
+    {
+        *min_y = interval_y.IsValid() ? interval_y.minimum_value : std::numeric_limits<double>::max();
+    }
+
+    if (max_y != nullptr)
+    {
+        *max_y = interval_y.IsValid() ? interval_y.maximum_value : std::numeric_limits<double>::lowest();
+    }
+
+    if (min_z != nullptr)
+    {
+        *min_z = interval_z.IsValid() ? interval_z.minimum_value : std::numeric_limits<double>::max();
+    }
+
+    if (max_z != nullptr)
+    {
+        *max_z = interval_z.IsValid() ? interval_z.maximum_value : std::numeric_limits<double>::lowest();
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+// *********** IDocInfo2d_GetTotalTileCount/IDocInfo3d_GetTotalTileCount ***********
 static ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
         imgdoc2::IDocInfo* doc_info,
         std::uint64_t* total_tile_count,
