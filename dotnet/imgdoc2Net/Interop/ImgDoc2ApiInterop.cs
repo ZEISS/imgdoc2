@@ -500,7 +500,6 @@ namespace ImgDoc2Net.Interop
         {
             this.ThrowIfNotInitialized();
 
-            int returnCode;
             ImgDoc2ErrorInformation errorInformation;
 
             // for sake of simplicity, we only call once into native code with a buffer which is large enough for
@@ -509,15 +508,11 @@ namespace ImgDoc2Net.Interop
             unsafe
             {
                 byte* dimensionsBuffer = stackalloc byte[bufferSize];
-                UIntPtr
-                    sizeOfBuffer =
-                        new UIntPtr(
-                            bufferSize); // TODO(Jbl):  we are abusing UIntPtr as an equivalent to size_t, c.f. https://stackoverflow.com/questions/32906774/what-is-equal-to-the-c-size-t-in-c-sharp
-                returnCode = this.createOptionsGetIndexedDimensions(handleCreateOptions, dimensionsBuffer, new IntPtr(&sizeOfBuffer), null);
+                UIntPtr sizeOfBuffer = new UIntPtr(bufferSize); // TODO(Jbl):  we are abusing UIntPtr as an equivalent to size_t, c.f. https://stackoverflow.com/questions/32906774/what-is-equal-to-the-c-size-t-in-c-sharp
+                int returnCode = this.createOptionsGetIndexedDimensions(handleCreateOptions, dimensionsBuffer, new IntPtr(&sizeOfBuffer), null);
                 if (sizeOfBuffer.ToUInt32() > bufferSize)
                 {
-                    throw new NotImplementedException(
-                        "Buffersize exceeded, may want to implement variable buffersizes.");
+                    throw new NotImplementedException("Buffersize exceeded, may want to implement variable buffersizes.");
                 }
 
                 this.HandleErrorCases(returnCode, in errorInformation);
@@ -2626,7 +2621,7 @@ namespace ImgDoc2Net.Interop
             }
         }
 
-        private Dictionary<int, long> InternalDocInfoGetTileCountPerPyramidLayer(IDocInfo_GetTileCountPerLayerDelegate docInfoGetTileCountPerLayerDelegate,IntPtr handle)
+        private Dictionary<int, long> InternalDocInfoGetTileCountPerPyramidLayer(IDocInfo_GetTileCountPerLayerDelegate docInfoGetTileCountPerLayerDelegate, IntPtr handle)
         {
             this.ThrowIfNotInitialized();
             unsafe
