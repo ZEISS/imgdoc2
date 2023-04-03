@@ -790,148 +790,11 @@ namespace ImgDoc2Net.Interop
         public QueryResult Reader2dQuery(IntPtr read2dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
         {
             return this.InternalReaderQuery(this.idocread2dQuery, read2dHandle, clause, tileInfoQueryClause, maxNumberOfResults);
-            //this.ThrowIfNotInitialized();
-            //byte[] dimensionQueryClauseInterop = (clause != null) ? ConvertToTileCoordinateInterop(clause) : null;
-            //byte[] tileInfoQueryClauseInterop = (tileInfoQueryClause != null)
-            //    ? ConvertToTileInfoQueryInterop(tileInfoQueryClause)
-            //    : null;
-            //byte[] queryResultInterop = CreateQueryResultInterop(maxNumberOfResults);
-
-            //int returnCode;
-            //ImgDoc2ErrorInformation errorInformation;
-
-            //unsafe
-            //{
-            //    fixed (byte* pointerQueryResultInterop = &queryResultInterop[0])
-            //    {
-            //        if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
-            //        {
-            //            fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
-            //            fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
-            //            {
-            //                returnCode = this.idocread2dQuery(
-            //                    read2dHandle,
-            //                    new IntPtr(pointerDimensionQueryClauseInterop),
-            //                    new IntPtr(pointerTileInfoQueryClauseInterop),
-            //                    new IntPtr(pointerQueryResultInterop),
-            //                    &errorInformation);
-            //            }
-            //        }
-            //        else if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop == null)
-            //        {
-            //            fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
-            //            {
-            //                returnCode = this.idocread2dQuery(
-            //                    read2dHandle,
-            //                    new IntPtr(pointerDimensionQueryClauseInterop),
-            //                    IntPtr.Zero,
-            //                    new IntPtr(pointerQueryResultInterop),
-            //                    &errorInformation);
-            //            }
-            //        }
-            //        else if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop != null)
-            //        {
-            //            fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
-            //            {
-            //                returnCode = this.idocread2dQuery(
-            //                    read2dHandle,
-            //                    IntPtr.Zero,
-            //                    new IntPtr(pointerTileInfoQueryClauseInterop),
-            //                    new IntPtr(pointerQueryResultInterop),
-            //                    &errorInformation);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            // if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
-            //            returnCode = this.idocread2dQuery(
-            //                read2dHandle,
-            //                IntPtr.Zero,
-            //                IntPtr.Zero,
-            //                new IntPtr(pointerQueryResultInterop),
-            //                &errorInformation);
-            //        }
-            //    }
-            //}
-
-            //this.HandleErrorCases(returnCode, in errorInformation);
-
-            //QueryResult result = ConvertToQueryResult(queryResultInterop);
-            //return result;
         }
 
         public QueryResult Reader3dQuery(IntPtr read3dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
         {
             return this.InternalReaderQuery(this.idocread3dQuery, read3dHandle, clause, tileInfoQueryClause, maxNumberOfResults);
-            //// TODO(JBl): merge with Reader2dQuery
-            //this.ThrowIfNotInitialized();
-            //byte[] dimensionQueryClauseInterop = (clause != null) ? ConvertToTileCoordinateInterop(clause) : null;
-            //byte[] tileInfoQueryClauseInterop = (tileInfoQueryClause != null)
-            //    ? ConvertToTileInfoQueryInterop(tileInfoQueryClause)
-            //    : null;
-            //byte[] queryResultInterop = CreateQueryResultInterop(maxNumberOfResults);
-
-            //int returnCode;
-            //ImgDoc2ErrorInformation errorInformation;
-
-            //unsafe
-            //{
-            //    fixed (byte* pointerQueryResultInterop = &queryResultInterop[0])
-            //    {
-            //        if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
-            //        {
-            //            fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
-            //            fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
-            //            {
-            //                returnCode = this.idocread3dQuery(
-            //                    read3dHandle,
-            //                    new IntPtr(pointerDimensionQueryClauseInterop),
-            //                    new IntPtr(pointerTileInfoQueryClauseInterop),
-            //                    new IntPtr(pointerQueryResultInterop),
-            //                    &errorInformation);
-            //            }
-            //        }
-            //        else if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop == null)
-            //        {
-            //            fixed (byte* pointerDimensionQueryClauseInterop = &dimensionQueryClauseInterop[0])
-            //            {
-            //                returnCode = this.idocread3dQuery(
-            //                    read3dHandle,
-            //                    new IntPtr(pointerDimensionQueryClauseInterop),
-            //                    IntPtr.Zero,
-            //                    new IntPtr(pointerQueryResultInterop),
-            //                    &errorInformation);
-            //            }
-            //        }
-            //        else if (dimensionQueryClauseInterop == null && tileInfoQueryClauseInterop != null)
-            //        {
-            //            fixed (byte* pointerTileInfoQueryClauseInterop = &tileInfoQueryClauseInterop[0])
-            //            {
-            //                returnCode = this.idocread3dQuery(
-            //                    read3dHandle,
-            //                    IntPtr.Zero,
-            //                    new IntPtr(pointerTileInfoQueryClauseInterop),
-            //                    new IntPtr(pointerQueryResultInterop),
-            //                    &errorInformation);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            // if (dimensionQueryClauseInterop != null && tileInfoQueryClauseInterop != null)
-            //            returnCode = this.idocread3dQuery(
-            //                read3dHandle,
-            //                IntPtr.Zero,
-            //                IntPtr.Zero,
-            //                new IntPtr(pointerQueryResultInterop),
-            //                &errorInformation);
-            //        }
-            //    }
-            //}
-
-            //this.HandleErrorCases(returnCode, in errorInformation);
-
-            //QueryResult result = ConvertToQueryResult(queryResultInterop);
-            //return result;
         }
 
         /// <summary>   Execute a "spatial query" - which may also include a dimension-query-clause and a tile-info-query-clause. </summary>
@@ -2270,14 +2133,6 @@ namespace ImgDoc2Net.Interop
             IntPtr functionPointerSetSize,
             IntPtr functionPointerSetData,
             ImgDoc2ErrorInformation* errorInformation);
-
-        //[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        //private unsafe delegate int IDocRead3d_QueryDelegate(
-        //    IntPtr read3dHandle,
-        //    IntPtr dimensionQueryClauseInterop,
-        //    IntPtr tileInfoQueryClauseInterop,
-        //    IntPtr queryResultInterop,
-        //    ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int IDocWrite3d_AddBrickDelegate(
