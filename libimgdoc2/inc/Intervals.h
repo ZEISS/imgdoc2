@@ -26,7 +26,7 @@ namespace imgdoc2
         /// <remarks>   In case the both are 'not valid', then they are considered equal (irrespective of the actual values). </remarks>
         /// <param name="rhs">  The right hand side. </param>
         /// <returns>   True if the parameters are considered equivalent. </returns>
-        bool operator==(const DoubleInterval& rhs) const
+        [[nodiscard]] bool operator==(const DoubleInterval& rhs) const
         {
             if (this->minimum_value == rhs.minimum_value && this->maximum_value == rhs.maximum_value)
             {
@@ -41,7 +41,7 @@ namespace imgdoc2
         /// <remarks>   In case the both are 'not valid', then they are considered equal (irrespective of the actual values). </remarks>
         /// <param name="rhs">  The right hand side. </param>
         /// <returns>   True if the parameters are not considered equivalent. </returns>
-        bool operator!=(const DoubleInterval& rhs) const
+        [[nodiscard]] bool operator!=(const DoubleInterval& rhs) const
         {
             return !(*this == rhs);
         }
