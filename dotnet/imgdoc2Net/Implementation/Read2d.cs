@@ -139,13 +139,13 @@ namespace ImgDoc2Net.Implementation
         /// <inheritdoc/>
         public long GetTotalNumberOfTiles()
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetTotalTileCount(this.reader2dObjectHandle);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetTotalTileCount(this.reader2dObjectHandle);
         }
 
         /// <inheritdoc/>
         public Dictionary<int, long> GetTileCountPerPyramidLayer()
         {
-            return ImgDoc2ApiInterop.Instance.GetTileCountPerPyramidLayer(this.reader2dObjectHandle);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetTileCountPerPyramidLayer(this.reader2dObjectHandle);
         }
     }
 

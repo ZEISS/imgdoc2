@@ -1059,6 +1059,7 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickInfo(
     return ImgDoc2_ErrorCode_OK;
 }
 
+// *********** IDocInfo2d_GetTileDimensions/IDocInfo3d_GetTileDimensions ***********
 static ImgDoc2ErrorCode IDocInfo_GetTileDimensions(
     imgdoc2::IDocInfo* doc_info,
     imgdoc2::Dimension* dimensions,
@@ -1081,7 +1082,6 @@ static ImgDoc2ErrorCode IDocInfo_GetTileDimensions(
     return ImgDoc2_ErrorCode_OK;
 }
 
-
 ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
     HandleDocRead2D handle,
     imgdoc2::Dimension* dimensions,
@@ -1102,6 +1102,7 @@ ImgDoc2ErrorCode IDocInfo3d_GetTileDimensions(
     return IDocInfo_GetTileDimensions(reader3d.get(), dimensions, count, error_information);
 }
 
+// *********** IDocInfo2d_GetMinMaxForTileDimensions/IDocInfo3d_GetMinMaxForTileDimensions ***********
 static ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
     imgdoc2::IDocInfo* doc_info,
     const imgdoc2::Dimension* dimensions,
@@ -1145,7 +1146,6 @@ static ImgDoc2ErrorCode IDocInfo_GetMinMaxForTileDimensions(
 
 }
 
-
 ImgDoc2ErrorCode IDocInfo2d_GetMinMaxForTileDimensions(
     HandleDocRead2D handle,
     const imgdoc2::Dimension* dimensions,
@@ -1153,43 +1153,8 @@ ImgDoc2ErrorCode IDocInfo2d_GetMinMaxForTileDimensions(
     MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
-    return IDocInfo_GetMinMaxForTileDimensions(doc_info.get(), dimensions, count, result, error_information);
-    //if (dimensions == nullptr)
-    //{
-    //    FillOutErrorInformationForInvalidArgument("dimensions", "must not be null", error_information);
-    //    return ImgDoc2_ErrorCode_InvalidArgument;
-    //}
-
-    //if (result == nullptr)
-    //{
-    //    FillOutErrorInformationForInvalidArgument("result", "must not be null", error_information);
-    //    return ImgDoc2_ErrorCode_InvalidArgument;
-    //}
-
-    //const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
-
-    //const vector<Dimension> dimensions_array(dimensions, dimensions + count);
-    //std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> min_max;
-
-    //try
-    //{
-    //    min_max = doc_info->GetMinMaxForTileDimension(dimensions_array);
-    //}
-    //catch (exception& exception)
-    //{
-    //    FillOutErrorInformation(exception, error_information);
-    //    return MapExceptionToReturnValue(exception);
-    //}
-
-    //for (uint32_t i = 0; i < count; ++i)
-    //{
-    //    const auto& item = min_max.at(dimensions[i]);
-    //    (result + i)->minimum_value = item.minimum_value;
-    //    (result + i)->maximum_value = item.maximum_value;
-    //}
-
-    //return ImgDoc2_ErrorCode_OK;
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetMinMaxForTileDimensions(reader2d.get(), dimensions, count, result, error_information);
 }
 
 ImgDoc2ErrorCode IDocInfo3d_GetMinMaxForTileDimensions(
@@ -1199,11 +1164,11 @@ ImgDoc2ErrorCode IDocInfo3d_GetMinMaxForTileDimensions(
     MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
-    return IDocInfo_GetMinMaxForTileDimensions(doc_info.get(), dimensions, count, result, error_information);
+    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetMinMaxForTileDimensions(reader3d.get(), dimensions, count, result, error_information);
 }
 
-ImgDoc2ErrorCode IDocInfo_GetBoundingBoxForTiles(
+ImgDoc2ErrorCode IDocInfo2d_GetBoundingBoxForTiles(
     HandleDocRead2D handle,
     double* min_x,
     double* max_x,
@@ -1258,8 +1223,10 @@ ImgDoc2ErrorCode IDocInfo_GetBoundingBoxForTiles(
     return ImgDoc2_ErrorCode_OK;
 }
 
-ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
-        HandleDocRead2D handle,
+// *********** IDocInfo2d_GetTotalTileCount/IDocInfo3d_GetTotalTileCount ***********
+
+static ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
+        imgdoc2::IDocInfo* doc_info,
         std::uint64_t* total_tile_count,
         ImgDoc2ErrorInformation* error_information)
 {
@@ -1269,7 +1236,6 @@ ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto doc_info = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
         *total_tile_count = doc_info->GetTotalTileCount();
@@ -1283,8 +1249,27 @@ ImgDoc2ErrorCode IDocInfo_GetTotalTileCount(
     return ImgDoc2_ErrorCode_OK;
 }
 
-ImgDoc2ErrorCode IDocInfo_GetTileCountPerLayer(
+ImgDoc2ErrorCode IDocInfo2d_GetTotalTileCount(
         HandleDocRead2D handle,
+        std::uint64_t* total_tile_count,
+        ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetTotalTileCount(reader2d.get(), total_tile_count, error_information);
+}
+
+ImgDoc2ErrorCode IDocInfo3d_GetTotalTileCount(
+        HandleDocRead2D handle,
+        std::uint64_t* total_tile_count,
+        ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetTotalTileCount(reader3d.get(), total_tile_count, error_information);
+}
+
+// *********** IDocInfo2d_GetTileCountPerLayer/IDocInfo3d_GetTileCountPerLayer ***********
+static ImgDoc2ErrorCode IDocInfo_GetTileCountPerLayer(
+        imgdoc2::IDocInfo* doc_info,
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information)
 {
@@ -1294,10 +1279,9 @@ ImgDoc2ErrorCode IDocInfo_GetTileCountPerLayer(
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
-        const auto tile_count_per_layer = reader2d->GetTileCountPerLayer();
+        const auto tile_count_per_layer = doc_info->GetTileCountPerLayer();
         tile_count_per_layer_interop->element_count_available = 0;
         for (const auto& item : tile_count_per_layer)
         {
@@ -1318,4 +1302,22 @@ ImgDoc2ErrorCode IDocInfo_GetTileCountPerLayer(
     }
 
     return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocInfo2d_GetTileCountPerLayer(
+        HandleDocRead2D handle,
+        TileCountPerLayerInterop* tile_count_per_layer_interop,
+        ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetTileCountPerLayer(reader2d.get(), tile_count_per_layer_interop, error_information);
+}
+
+ImgDoc2ErrorCode IDocInfo3d_GetTileCountPerLayer(
+        HandleDocRead3D handle,
+        TileCountPerLayerInterop* tile_count_per_layer_interop,
+        ImgDoc2ErrorInformation* error_information)
+{
+    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    return IDocInfo_GetTileCountPerLayer(reader3d.get(), tile_count_per_layer_interop, error_information);
 }

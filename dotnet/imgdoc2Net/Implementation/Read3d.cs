@@ -92,7 +92,7 @@ namespace ImgDoc2Net.Implementation
 
         public Dictionary<int, long> GetTileCountPerPyramidLayer()
         {
-            throw new NotImplementedException();
+            return ImgDoc2ApiInterop.Instance.DocInfo3dGetTileCountPerPyramidLayer(this.reader3dObjectHandle);
         }
 
         public Dimension[] GetTileDimensions()
@@ -102,7 +102,7 @@ namespace ImgDoc2Net.Implementation
 
         public long GetTotalNumberOfTiles()
         {
-            throw new NotImplementedException();
+            return ImgDoc2ApiInterop.Instance.DocInfo3dGetTotalTileCount(this.reader3dObjectHandle);
         }
 
         public Extent3d GetBoundingBox()

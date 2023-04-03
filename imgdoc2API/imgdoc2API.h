@@ -274,7 +274,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetMinMaxForTileDimensions(
 /// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
-EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetBoundingBoxForTiles(
     HandleDocRead2D handle,
     double* min_x,
     double* max_x,
@@ -284,15 +284,30 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetBoundingBoxForTiles(
 
 /// Get the total number of tiles in the document. This function is corresponding to the method
 /// 'IDocInfo::GetTotalTileCount'.
+/// Note that this function is only applicable to 2d-documents (and offers the same functionality as IDocInfo3d_GetTotalTileCount for 3d-documents).
 ///
 /// \param          handle              he handle of the read2d-object.
 /// \param [out]    total_tile_count    The total number of tiles (must be non-null).
 /// \param [in,out] error_information   If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns    An ImgDoc2ErrorCode.
-EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTotalTileCount(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTotalTileCount(
         HandleDocRead2D handle,
         std::uint64_t* total_tile_count, 
+        ImgDoc2ErrorInformation* error_information);
+
+/// Get the total number of tiles in the document. This function is corresponding to the method
+/// 'IDocInfo::GetTotalTileCount'.
+/// Note that this function is only applicable to 3d-documents (and offers the same functionality as IDocInfo2d_GetTotalTileCount for 2d-documents).
+///
+/// \param          handle              he handle of the read3d-object.
+/// \param [out]    total_tile_count    The total number of tiles (must be non-null).
+/// \param [in,out] error_information   If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns    An ImgDoc2ErrorCode.
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTotalTileCount(
+        HandleDocRead3D handle,
+        std::uint64_t* total_tile_count,
         ImgDoc2ErrorInformation* error_information);
 
 /// Get the number of tiles per layer. This function is corresponding to the method 'IDocInfo::GetTileCountPerLayer'.
@@ -307,7 +322,12 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTotalTileCount(
 /// \param [in,out] error_information               If non-null, information describing the error.
 ///
 /// \returns    An ImgDoc2ErrorCode.
-EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo_GetTileCountPerLayer(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileCountPerLayer(
+        HandleDocRead2D handle,
+        TileCountPerLayerInterop* tile_count_per_layer_interop,
+        ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileCountPerLayer(
         HandleDocRead2D handle,
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information);
