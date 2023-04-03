@@ -25,7 +25,7 @@ public:
     virtual void BindInt64(int index, std::int64_t value) = 0;
     virtual void BindDouble(int index, double value) = 0;
 
-    /// Bind a string (in UTF8). The string is copied (called "transisent binding" in SQLite, c.f. https://www3.sqlite.org/c3ref/bind_blob.html).
+    /// Bind a string (in UTF8). The string is copied (called "transient binding" in SQLite, c.f. https://www3.sqlite.org/c3ref/bind_blob.html).
     /// So, the string only must be valid for the duration of the execution of this method. However, there is of course a performance penalty
     /// here.
    ///
