@@ -340,6 +340,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTotalTileCount(
 /// On output, the field 'element_count_available' is set to the actual number of elements available. If this number is greater than
 /// 'element_count_allocated' it means that not all results could be returned. In this case, only 'element_count_allocated' elements
 /// are written to the array. The caller can then allocate a larger array and call this function again. 
+/// Note that this function is only applicable to 2d-documents (and offers the same functionality as IDocInfo3d_GetTileCountPerLayer for 3d-documents).
 ///
 /// \param          handle                          The handle.
 /// \param [in,out] tile_count_per_layer_interop    If non-null, the tile count per layer interop.
@@ -351,7 +352,20 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileCountPerLayer(
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information);
 
+/// Get the number of tiles per layer. This function is corresponding to the method 'IDocInfo::GetTileCountPerLayer'.
+/// On input, the field 'element_count_allocated' of the 'tile_count_per_layer_interop' must be set to the number of elements
+/// allocated in the structure, i.e. how many elements can be set in the array 'tile_count_per_layer_interop->tile_count_per_layer'.
+/// On output, the field 'element_count_available' is set to the actual number of elements available. If this number is greater than
+/// 'element_count_allocated' it means that not all results could be returned. In this case, only 'element_count_allocated' elements
+/// are written to the array. The caller can then allocate a larger array and call this function again. 
+/// Note that this function is only applicable to 3d-documents (and offers the same functionality as IDocInfo2d_GetTileCountPerLayer for 2d-documents).
+///
+/// \param          handle                          The handle.
+/// \param [in,out] tile_count_per_layer_interop    If non-null, the tile count per layer interop.
+/// \param [in,out] error_information               If non-null, information describing the error.
+///
+/// \returns    An ImgDoc2ErrorCode.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileCountPerLayer(
-        HandleDocRead2D handle,
+        HandleDocRead3D handle,
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information);

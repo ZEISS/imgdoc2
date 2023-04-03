@@ -1291,20 +1291,21 @@ namespace ImgDoc2Net.Interop
         /// <returns> An array with the dimensions used in the document.</returns>
         public Dimension[] DocInfo2dGetTileDimensions(IntPtr read2dHandle)
         {
-            this.ThrowIfNotInitialized();
+            return this.InternalDocInfo3dGetTileDimensions(this.idocinfo2dGetTileDimensions, read2dHandle);
+            /*this.ThrowIfNotInitialized();
             unsafe
             {
                 const int initialArraySize = 20;    // number of elements for the initial buffer we supply
                 ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
                 byte* dimensionsArray = stackalloc byte[initialArraySize];
                 uint count = initialArraySize;
-                int returnCode = this.idocinfo2dGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
+                int returnCode = this.idocinfo2dGetTileDimensions(handle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
                 this.HandleErrorCases(returnCode, errorInformation);
                 if (count > initialArraySize)
                 {
                     // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
                     byte* dimensionsArray2 = stackalloc byte[(int)count];
-                    returnCode = this.idocinfo2dGetTileDimensions(read2dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
+                    returnCode = this.idocinfo2dGetTileDimensions(handle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
                     dimensionsArray = dimensionsArray2;
                 }
 
@@ -1315,41 +1316,44 @@ namespace ImgDoc2Net.Interop
                 }
 
                 return dimensions;
-            }
+            }*/
         }
 
         public Dimension[] DocInfo3dGetTileDimensions(IntPtr read3dHandle)
         {
-            // TODO(JBL): combine with 2d version
-            this.ThrowIfNotInitialized();
-            unsafe
-            {
-                const int initialArraySize = 20;    // number of elements for the initial buffer we supply
-                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
-                byte* dimensionsArray = stackalloc byte[initialArraySize];
-                uint count = initialArraySize;
-                int returnCode = this.idocinfo3dGetTileDimensions(read3dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
-                this.HandleErrorCases(returnCode, errorInformation);
-                if (count > initialArraySize)
-                {
-                    // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
-                    byte* dimensionsArray2 = stackalloc byte[(int)count];
-                    returnCode = this.idocinfo3dGetTileDimensions(read3dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
-                    dimensionsArray = dimensionsArray2;
-                }
+            return this.InternalDocInfo3dGetTileDimensions(this.idocinfo3dGetTileDimensions, read3dHandle);
+            //// TODO(JBL): combine with 2d version
+            //this.ThrowIfNotInitialized();
+            //unsafe
+            //{
+            //    const int initialArraySize = 20;    // number of elements for the initial buffer we supply
+            //    ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+            //    byte* dimensionsArray = stackalloc byte[initialArraySize];
+            //    uint count = initialArraySize;
+            //    int returnCode = this.idocinfo3dGetTileDimensions(read3dHandle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
+            //    this.HandleErrorCases(returnCode, errorInformation);
+            //    if (count > initialArraySize)
+            //    {
+            //        // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
+            //        byte* dimensionsArray2 = stackalloc byte[(int)count];
+            //        returnCode = this.idocinfo3dGetTileDimensions(read3dHandle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
+            //        dimensionsArray = dimensionsArray2;
+            //    }
 
-                Dimension[] dimensions = new Dimension[count];
-                for (int i = 0; i < count; ++i)
-                {
-                    dimensions[i] = new Dimension(Convert.ToChar(dimensionsArray[i]));
-                }
+            //    Dimension[] dimensions = new Dimension[count];
+            //    for (int i = 0; i < count; ++i)
+            //    {
+            //        dimensions[i] = new Dimension(Convert.ToChar(dimensionsArray[i]));
+            //    }
 
-                return dimensions;
-            }
+            //    return dimensions;
+            //}
         }
 
         public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfo2dGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
         {
+            return this.InternalDocInfoGetMinMaxForTileDimensions(this.idocinfo2dGetMinMaxForTileDimensions, read2dHandle, dimensions);
+            /*
             this.ThrowIfNotInitialized();
             int dimensionCount = dimensions.Count();
             unsafe
@@ -1369,7 +1373,7 @@ namespace ImgDoc2Net.Interop
                 fixed (MinMaxInterop* pointerToMinMaxArray = &minMaxInteropArray[0])
                 {
                     int returnCode = this.idocinfo2dGetMinMaxForTileDimensions(
-                        read2dHandle,
+                        handle,
                         new IntPtr(pointerToDimensionArray),
                         (uint)dimensionCount,
                         new IntPtr(pointerToMinMaxArray),
@@ -1387,10 +1391,13 @@ namespace ImgDoc2Net.Interop
 
                 return result;
             }
+            */
         }
 
-        public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfo3dGetMinMaxForTileDimensions(IntPtr read2dHandle, IEnumerable<Dimension> dimensions)
+        public Dictionary<Dimension, (int Minimum, int Maximum)> DocInfo3dGetMinMaxForTileDimensions(IntPtr read3dHandle, IEnumerable<Dimension> dimensions)
         {
+            return this.InternalDocInfoGetMinMaxForTileDimensions(this.idocinfo3dGetMinMaxForTileDimensions, read3dHandle, dimensions);
+            /*
             // TODO(JBL): combine with 2d version
             this.ThrowIfNotInitialized();
             int dimensionCount = dimensions.Count();
@@ -1411,7 +1418,7 @@ namespace ImgDoc2Net.Interop
                 fixed (MinMaxInterop* pointerToMinMaxArray = &minMaxInteropArray[0])
                 {
                     int returnCode = this.idocinfo3dGetMinMaxForTileDimensions(
-                        read2dHandle,
+                        handle,
                         new IntPtr(pointerToDimensionArray),
                         (uint)dimensionCount,
                         new IntPtr(pointerToMinMaxArray),
@@ -1428,7 +1435,8 @@ namespace ImgDoc2Net.Interop
                 }
 
                 return result;
-            }
+            
+        }*/
         }
 
         /// <summary>   
@@ -1484,15 +1492,16 @@ namespace ImgDoc2Net.Interop
         /// <returns> The total number of tiles in the document.</returns>
         public long DocInfo2dGetTotalTileCount(IntPtr read2dHandle)
         {
-            this.ThrowIfNotInitialized();
-            unsafe
-            {
-                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
-                ulong totalTileCount = 0;
-                int returnCode = this.idocinfo2dGetTotalTileCount(read2dHandle, &totalTileCount, &errorInformation);
-                this.HandleErrorCases(returnCode, errorInformation);
-                return (long)totalTileCount;
-            }
+            return this.InternalDocInfoGetTotalTileCount(this.idocinfo2dGetTotalTileCount, read2dHandle);
+            //this.ThrowIfNotInitialized();
+            //unsafe
+            //{
+            //    ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+            //    ulong totalTileCount = 0;
+            //    int returnCode = this.idocinfo2dGetTotalTileCount(handle, &totalTileCount, &errorInformation);
+            //    this.HandleErrorCases(returnCode, errorInformation);
+            //    return (long)totalTileCount;
+            //}
         }
 
         /// <summary> Gets total number of tiles in the document.</summary>
@@ -1500,16 +1509,17 @@ namespace ImgDoc2Net.Interop
         /// <returns> The total number of tiles in the document.</returns>
         public long DocInfo3dGetTotalTileCount(IntPtr read3dHandle)
         {
-            // TODO(JBL): combine with 2d-version
-            this.ThrowIfNotInitialized();
-            unsafe
-            {
-                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
-                ulong totalTileCount = 0;
-                int returnCode = this.idocinfo2dGetTotalTileCount(read3dHandle, &totalTileCount, &errorInformation);
-                this.HandleErrorCases(returnCode, errorInformation);
-                return (long)totalTileCount;
-            }
+            return this.InternalDocInfoGetTotalTileCount(this.idocinfo3dGetTotalTileCount, read3dHandle);
+            //// TODO(JBL): combine with 2d-version
+            //this.ThrowIfNotInitialized();
+            //unsafe
+            //{
+            //    ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+            //    ulong totalTileCount = 0;
+            //    int returnCode = this.idocinfo2dGetTotalTileCount(read3dHandle, &totalTileCount, &errorInformation);
+            //    this.HandleErrorCases(returnCode, errorInformation);
+            //    return (long)totalTileCount;
+            //}
         }
 
         /// <summary> Gets the total number of tiles per pyramid layer.</summary>
@@ -1517,7 +1527,8 @@ namespace ImgDoc2Net.Interop
         /// <returns> A dictionary, where key is the pyramid layer number, and value is the total number of tiles (on this layer) in the document. </returns>
         public Dictionary<int, long> DocInfo2dGetTileCountPerPyramidLayer(IntPtr read2dHandle)
         {
-            this.ThrowIfNotInitialized();
+            return this.InternalDocInfoGetTileCountPerPyramidLayer(this.idocinfo2dGetTileCountPerLayer, read2dHandle);
+            /*this.ThrowIfNotInitialized();
             unsafe
             {
                 const int initialArraySize = 20;    // number of elements for the initial buffer we supply (which should be enough in most cases)
@@ -1556,7 +1567,7 @@ namespace ImgDoc2Net.Interop
                 }
 
                 return result;
-            }
+            }*/
         }
 
         /// <summary> Gets the total number of tiles per pyramid layer.</summary>
@@ -1564,47 +1575,48 @@ namespace ImgDoc2Net.Interop
         /// <returns> A dictionary, where key is the pyramid layer number, and value is the total number of tiles (on this layer) in the document. </returns>
         public Dictionary<int, long> DocInfo3dGetTileCountPerPyramidLayer(IntPtr read3dHandle)
         {
-            // TODO(JBL): combine with 2d-version
-            this.ThrowIfNotInitialized();
-            unsafe
-            {
-                const int initialArraySize = 20;    // number of elements for the initial buffer we supply (which should be enough in most cases)
-                byte* tileCountPerLayerInteropData = stackalloc byte[TileCountPerLayerInterop.CalculateSize(initialArraySize)];
-                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
-                TileCountPerLayerInterop* tileCountPerLayerInterop = (TileCountPerLayerInterop*)tileCountPerLayerInteropData;
-                tileCountPerLayerInterop->ElementCountAllocated = initialArraySize;
-                int returnCode = this.idocinfo3dGetTileCountPerLayer(read3dHandle, tileCountPerLayerInterop, &errorInformation);
-                this.HandleErrorCases(returnCode, errorInformation);
-                if (tileCountPerLayerInterop->ElementCountAvailable > initialArraySize)
-                {
-                    // if the buffer size was too small, we allocate a larger one (with the size reported, this time on the heap) and try again
-                    var elementCountRequired = (int)tileCountPerLayerInterop->ElementCountAvailable;
-                    byte[] tileCountPerLayerInteropArray = new byte[TileCountPerLayerInterop.CalculateSize(elementCountRequired)];
-                    fixed (byte* pointerTileCountPerLayerInteropArray = tileCountPerLayerInteropArray)
-                    {
-                        tileCountPerLayerInterop = (TileCountPerLayerInterop*)pointerTileCountPerLayerInteropArray;
-                        tileCountPerLayerInterop->ElementCountAllocated = (uint)elementCountRequired;
-                        returnCode = this.idocinfo3dGetTileCountPerLayer(read3dHandle, tileCountPerLayerInterop, &errorInformation);
-                        this.HandleErrorCases(returnCode, errorInformation);
+            return this.InternalDocInfoGetTileCountPerPyramidLayer(this.idocinfo3dGetTileCountPerLayer, read3dHandle);
+            //// TODO(JBL): combine with 2d-version
+            //this.ThrowIfNotInitialized();
+            //unsafe
+            //{
+            //    const int initialArraySize = 20;    // number of elements for the initial buffer we supply (which should be enough in most cases)
+            //    byte* tileCountPerLayerInteropData = stackalloc byte[TileCountPerLayerInterop.CalculateSize(initialArraySize)];
+            //    ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+            //    TileCountPerLayerInterop* tileCountPerLayerInterop = (TileCountPerLayerInterop*)tileCountPerLayerInteropData;
+            //    tileCountPerLayerInterop->ElementCountAllocated = initialArraySize;
+            //    int returnCode = this.idocinfo3dGetTileCountPerLayer(read3dHandle, tileCountPerLayerInterop, &errorInformation);
+            //    this.HandleErrorCases(returnCode, errorInformation);
+            //    if (tileCountPerLayerInterop->ElementCountAvailable > initialArraySize)
+            //    {
+            //        // if the buffer size was too small, we allocate a larger one (with the size reported, this time on the heap) and try again
+            //        var elementCountRequired = (int)tileCountPerLayerInterop->ElementCountAvailable;
+            //        byte[] tileCountPerLayerInteropArray = new byte[TileCountPerLayerInterop.CalculateSize(elementCountRequired)];
+            //        fixed (byte* pointerTileCountPerLayerInteropArray = tileCountPerLayerInteropArray)
+            //        {
+            //            tileCountPerLayerInterop = (TileCountPerLayerInterop*)pointerTileCountPerLayerInteropArray;
+            //            tileCountPerLayerInterop->ElementCountAllocated = (uint)elementCountRequired;
+            //            returnCode = this.idocinfo3dGetTileCountPerLayer(read3dHandle, tileCountPerLayerInterop, &errorInformation);
+            //            this.HandleErrorCases(returnCode, errorInformation);
 
-                        // we do not expect that the size was insufficient in this case, and if so we throw an exception
-                        if (tileCountPerLayerInterop->ElementCountAvailable > tileCountPerLayerInterop->ElementCountAllocated)
-                        {
-                            throw new InvalidOperationException("The buffer size was insufficient for the tile count per layer information, which is unexpected.");
-                        }
-                    }
-                }
+            //            // we do not expect that the size was insufficient in this case, and if so we throw an exception
+            //            if (tileCountPerLayerInterop->ElementCountAvailable > tileCountPerLayerInterop->ElementCountAllocated)
+            //            {
+            //                throw new InvalidOperationException("The buffer size was insufficient for the tile count per layer information, which is unexpected.");
+            //            }
+            //        }
+            //    }
 
-                Dictionary<int, long> result = new Dictionary<int, long>((int)tileCountPerLayerInterop->ElementCountAvailable);
-                PerLayerTileCountInterop* perLayerTileCount = &tileCountPerLayerInterop->PyramidLayerAndTileCount;
-                for (int i = 0; i < tileCountPerLayerInterop->ElementCountAvailable; ++i)
-                {
-                    result.Add(perLayerTileCount->LayerIndex, (long)perLayerTileCount->TileCount);
-                    ++perLayerTileCount;
-                }
+            //    Dictionary<int, long> result = new Dictionary<int, long>((int)tileCountPerLayerInterop->ElementCountAvailable);
+            //    PerLayerTileCountInterop* perLayerTileCount = &tileCountPerLayerInterop->PyramidLayerAndTileCount;
+            //    for (int i = 0; i < tileCountPerLayerInterop->ElementCountAvailable; ++i)
+            //    {
+            //        result.Add(perLayerTileCount->LayerIndex, (long)perLayerTileCount->TileCount);
+            //        ++perLayerTileCount;
+            //    }
 
-                return result;
-            }
+            //    return result;
+            //}
         }
 
         /// <summary> Helper method that handles the interop with functions which return a string (using a semantic like with 
@@ -2759,6 +2771,133 @@ namespace ImgDoc2Net.Interop
 
             QueryResult result = ConvertToQueryResult(queryResultInterop);
             return result;
+        }
+
+        private Dimension[] InternalDocInfo3dGetTileDimensions(IDocInfo_GetTileDimensionsDelegate nativeGetTileDimensionsDelegate, IntPtr handle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                const int initialArraySize = 20;    // number of elements for the initial buffer we supply
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                byte* dimensionsArray = stackalloc byte[initialArraySize];
+                uint count = initialArraySize;
+                int returnCode = nativeGetTileDimensionsDelegate(handle, new IntPtr(dimensionsArray), new IntPtr(&count), &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                if (count > initialArraySize)
+                {
+                    // if the buffer size was too small, we allocate a larger one (with the size reported) and try again
+                    byte* dimensionsArray2 = stackalloc byte[(int)count];
+                    returnCode = nativeGetTileDimensionsDelegate(handle, new IntPtr(dimensionsArray2), new IntPtr(&count), &errorInformation);
+                    dimensionsArray = dimensionsArray2;
+                }
+
+                Dimension[] dimensions = new Dimension[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    dimensions[i] = new Dimension(Convert.ToChar(dimensionsArray[i]));
+                }
+
+                return dimensions;
+            }
+        }
+
+        private Dictionary<Dimension, (int Minimum, int Maximum)> InternalDocInfoGetMinMaxForTileDimensions(IDocInfo_GetMinMaxForTileDimensionsDelegate nativeGetMinMaxForTileDimensionsDelegate, IntPtr handle, IEnumerable<Dimension> dimensions)
+        {
+            this.ThrowIfNotInitialized();
+            int dimensionCount = dimensions.Count();
+            unsafe
+            {
+                Span<byte> dimensionsArray = stackalloc byte[dimensionCount];
+                int i = 0;
+                foreach (var dimension in dimensions)
+                {
+                    dimensionsArray[i] = (byte)dimension.Id;
+                    ++i;
+                }
+
+                MinMaxInterop[] minMaxInteropArray = new MinMaxInterop[dimensionCount];
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+
+                fixed (byte* pointerToDimensionArray = dimensionsArray)
+                fixed (MinMaxInterop* pointerToMinMaxArray = &minMaxInteropArray[0])
+                {
+                    int returnCode = nativeGetMinMaxForTileDimensionsDelegate(
+                        handle,
+                        new IntPtr(pointerToDimensionArray),
+                        (uint)dimensionCount,
+                        new IntPtr(pointerToMinMaxArray),
+                        &errorInformation);
+                }
+
+                var result = new Dictionary<Dimension, (int Minimum, int Maximum)>(dimensionCount);
+
+                i = 0;
+                foreach (var d in dimensionsArray)
+                {
+                    result[new Dimension(Convert.ToChar(d))] = (minMaxInteropArray[i].Minimum, minMaxInteropArray[i].Maximum);
+                    ++i;
+                }
+
+                return result;
+            }
+        }
+
+        private long InternalDocInfoGetTotalTileCount(IDocInfo_GetTotalTileCountDelegate docInfoGetTotalTileCountDelegate, IntPtr handle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                ulong totalTileCount = 0;
+                int returnCode = docInfoGetTotalTileCountDelegate(handle, &totalTileCount, &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                return (long)totalTileCount;
+            }
+        }
+
+        private Dictionary<int, long> InternalDocInfoGetTileCountPerPyramidLayer(IDocInfo_GetTileCountPerLayerDelegate docInfoGetTileCountPerLayerDelegate,IntPtr handle)
+        {
+            this.ThrowIfNotInitialized();
+            unsafe
+            {
+                const int initialArraySize = 20;    // number of elements for the initial buffer we supply (which should be enough in most cases)
+                byte* tileCountPerLayerInteropData = stackalloc byte[TileCountPerLayerInterop.CalculateSize(initialArraySize)];
+                ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
+                TileCountPerLayerInterop* tileCountPerLayerInterop = (TileCountPerLayerInterop*)tileCountPerLayerInteropData;
+                tileCountPerLayerInterop->ElementCountAllocated = initialArraySize;
+                int returnCode = this.idocinfo2dGetTileCountPerLayer(handle, tileCountPerLayerInterop, &errorInformation);
+                this.HandleErrorCases(returnCode, errorInformation);
+                if (tileCountPerLayerInterop->ElementCountAvailable > initialArraySize)
+                {
+                    // if the buffer size was too small, we allocate a larger one (with the size reported, this time on the heap) and try again
+                    var elementCountRequired = (int)tileCountPerLayerInterop->ElementCountAvailable;
+                    byte[] tileCountPerLayerInteropArray = new byte[TileCountPerLayerInterop.CalculateSize(elementCountRequired)];
+                    fixed (byte* pointerTileCountPerLayerInteropArray = tileCountPerLayerInteropArray)
+                    {
+                        tileCountPerLayerInterop = (TileCountPerLayerInterop*)pointerTileCountPerLayerInteropArray;
+                        tileCountPerLayerInterop->ElementCountAllocated = (uint)elementCountRequired;
+                        returnCode = this.idocinfo2dGetTileCountPerLayer(handle, tileCountPerLayerInterop, &errorInformation);
+                        this.HandleErrorCases(returnCode, errorInformation);
+
+                        // we do not expect that the size was insufficient in this case, and if so we throw an exception
+                        if (tileCountPerLayerInterop->ElementCountAvailable > tileCountPerLayerInterop->ElementCountAllocated)
+                        {
+                            throw new InvalidOperationException("The buffer size was insufficient for the tile count per layer information, which is unexpected.");
+                        }
+                    }
+                }
+
+                Dictionary<int, long> result = new Dictionary<int, long>((int)tileCountPerLayerInterop->ElementCountAvailable);
+                PerLayerTileCountInterop* perLayerTileCount = &tileCountPerLayerInterop->PyramidLayerAndTileCount;
+                for (int i = 0; i < tileCountPerLayerInterop->ElementCountAvailable; ++i)
+                {
+                    result.Add(perLayerTileCount->LayerIndex, (long)perLayerTileCount->TileCount);
+                    ++perLayerTileCount;
+                }
+
+                return result;
+            }
         }
     }
 }
