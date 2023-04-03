@@ -1,6 +1,8 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
-//
-// SPDX-License-Identifier: MIT
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ImgDoc2Net_UnitTests
 {
@@ -11,7 +13,7 @@ namespace ImgDoc2Net_UnitTests
     using System;
 
     [Collection(NonParallelCollectionDefinitionClass.Name)]
-    public class DocInfoTests
+    public class DocInfo3dTests
     {
         [Fact]
         public void ApiInteropLevelGetTileDimensionsAndCheck()
@@ -26,6 +28,7 @@ namespace ImgDoc2Net_UnitTests
             var statisticsBeforeTest = instance.GetStatistics();
 
             var createOptionsHandle = instance.CreateCreateOptions();
+            instance.CreateOptionsSetDocumentType(createOptionsHandle, DocumentType.Image3d);
             instance.CreateOptionsSetFilename(createOptionsHandle, ":memory:");
             instance.CreateOptionsAddDimension(createOptionsHandle, new Dimension('A'));
             instance.CreateOptionsAddDimension(createOptionsHandle, new Dimension('l'));
@@ -35,14 +38,14 @@ namespace ImgDoc2Net_UnitTests
 
             Assert.NotEqual(documentHandle, IntPtr.Zero);
 
-            var reader2dHandle = instance.DocumentGetReader2d(documentHandle);
-            Assert.NotEqual(reader2dHandle, IntPtr.Zero);
+            var reader3dHandle = instance.DocumentGetReader3d(documentHandle);
+            Assert.NotEqual(reader3dHandle, IntPtr.Zero);
 
             // act
-            var dimensions = instance.DocInfo2dGetTileDimensions(reader2dHandle);
+            var dimensions = instance.DocInfo3dGetTileDimensions(reader3dHandle);
 
             instance.DestroyDocument(documentHandle);
-            instance.DestroyReader2d(reader2dHandle);
+            instance.DestroyReader3d(reader3dHandle);
 
             // assert
             dimensions.Should().BeEquivalentTo(new[] { new Dimension('A'), new Dimension('Z'), new Dimension('l') });
@@ -59,7 +62,7 @@ namespace ImgDoc2Net_UnitTests
             {
                 // arrange
 
-                using var createOptions = new CreateOptions() { Filename = ":memory:" };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('A'));
                 createOptions.AddDimension(new Dimension('F'));
                 createOptions.AddDimension(new Dimension('g'));
@@ -68,10 +71,10 @@ namespace ImgDoc2Net_UnitTests
                 createOptions.AddDimension(new Dimension('q'));
                 createOptions.AddDimension(new Dimension('S'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
+                using var reader3d = document.Get3dReader();
 
                 // act
-                var dimensions = reader2d.GetTileDimensions();
+                var dimensions = reader3d.GetTileDimensions();
 
                 // assert
                 dimensions.Should().BeEquivalentTo(
@@ -93,42 +96,44 @@ namespace ImgDoc2Net_UnitTests
         [Fact]
         public void CreateDocument1AndCallGetMinMaxForTileDimensionAndCheck()
         {
-            using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+            using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
             createOptions.AddDimension(new Dimension('o'));
             using var document = Document.CreateNew(createOptions);
-            using var reader2d = document.Get2dReader();
-            using var writer2d = document.Get2dWriter();
+            using var reader3d = document.Get3dReader();
+            using var writer3d = document.Get3dWriter();
 
-            LogicalPosition logicalPosition = new LogicalPosition()
+            LogicalPosition3d logicalPosition = new LogicalPosition3d()
             {
                 PositionX = 10,
                 PositionY = 20,
+                PositionZ = 30,
                 Width = 100,
                 Height = 111,
+                Depth = 122,
                 PyramidLevel = 0
             };
 
             var tileCoordinate = new TileCoordinate(new[]
                   {Tuple.Create(new Dimension('o'), 11)});
 
-            writer2d.AddTile(
+            writer3d.AddBrick(
                 tileCoordinate,
                 in logicalPosition,
-                new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                 DataType.Zero,
                 null);
 
             tileCoordinate = new TileCoordinate(new[]
                   {Tuple.Create(new Dimension('o'), 141)});
 
-            writer2d.AddTile(
+            writer3d.AddBrick(
                 tileCoordinate,
                 in logicalPosition,
-                new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                 DataType.Zero,
                 null);
 
-            var minMax = reader2d.GetMinMaxForTileDimension(new[] { new Dimension('o') });
+            var minMax = reader3d.GetMinMaxForTileDimension(new[] { new Dimension('o') });
 
             minMax.Count.Should().Be(1);
             minMax[new Dimension('o')].Minimum.Should().Be(11);
@@ -142,43 +147,45 @@ namespace ImgDoc2Net_UnitTests
             //  and we check before leaving the test that it is where is was before (usually zero)
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
-                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('v'));
                 createOptions.AddDimension(new Dimension('w'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
-                using var writer2d = document.Get2dWriter();
+                using var reader3d = document.Get3dReader();
+                using var writer3d = document.Get3dWriter();
 
-                LogicalPosition logicalPosition = new LogicalPosition()
+                LogicalPosition3d logicalPosition = new LogicalPosition3d()
                 {
                     PositionX = 10,
                     PositionY = 20,
+                    PositionZ = 30,
                     Width = 100,
                     Height = 111,
+                    Depth = 122,
                     PyramidLevel = 0
                 };
 
                 var tileCoordinate = new TileCoordinate(new[]
                       {Tuple.Create(new Dimension('v'), -41), Tuple.Create(new Dimension('w'), 11)});
 
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 tileCoordinate = new TileCoordinate(new[]
                       {Tuple.Create(new Dimension('v'), 14), Tuple.Create(new Dimension('w'), 61)});
 
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
-                var minMax = reader2d.GetMinMaxForTileDimension(reader2d.GetTileDimensions());
+                var minMax = reader3d.GetMinMaxForTileDimension(reader3d.GetTileDimensions());
 
                 minMax.Count.Should().Be(2);
                 minMax[new Dimension('v')].Minimum.Should().Be(-41);
@@ -197,13 +204,13 @@ namespace ImgDoc2Net_UnitTests
             //  and we check before leaving the test that it is where is was before (usually zero)
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
-                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('v'));
                 createOptions.AddDimension(new Dimension('w'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
+                using var reader3d = document.Get3dReader();
 
-                var minMax = reader2d.GetMinMaxForTileDimension(reader2d.GetTileDimensions());
+                var minMax = reader3d.GetMinMaxForTileDimension(reader3d.GetTileDimensions());
                 minMax.Count().Should().Be(2);
 
                 // the min/max should be "indeterminate" or "invalid", which means that min > max.
@@ -222,49 +229,53 @@ namespace ImgDoc2Net_UnitTests
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
                 // arrange
-                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('o'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
-                using var writer2d = document.Get2dWriter();
+                using var reader3d = document.Get3dReader();
+                using var writer3d = document.Get3dWriter();
 
-                LogicalPosition logicalPosition = new LogicalPosition()
+                LogicalPosition3d logicalPosition = new LogicalPosition3d()
                 {
                     PositionX = 10,
                     PositionY = 20,
+                    PositionZ = 30,
                     Width = 100,
                     Height = 111,
+                    Depth = 122,
                     PyramidLevel = 0
                 };
 
                 var tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 11)});
 
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 141)});
 
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 // act
-                var extent = reader2d.GetBoundingBox();
+                var extent = reader3d.GetBoundingBox();
 
                 // assert
                 extent.MinX.Should().Be(10);
                 extent.MaxX.Should().Be(110);
                 extent.MinY.Should().Be(20);
                 extent.MaxY.Should().Be(131);
+                extent.MinZ.Should().Be(30);
+                extent.MaxZ.Should().Be(152);
             }
 
             Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
@@ -276,13 +287,13 @@ namespace ImgDoc2Net_UnitTests
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
                 // arrange
-                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('o'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
+                using var reader3d = document.Get3dReader();
 
                 // act
-                var extent = reader2d.GetBoundingBox();
+                var extent = reader3d.GetBoundingBox();
 
                 // assert
                 extent.IsValid.Should().BeFalse();
@@ -297,43 +308,45 @@ namespace ImgDoc2Net_UnitTests
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
                 // arrange
-                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('o'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
-                using var writer2d = document.Get2dWriter();
+                using var reader3d = document.Get3dReader();
+                using var writer3d = document.Get3dWriter();
 
-                LogicalPosition logicalPosition = new LogicalPosition()
+                LogicalPosition3d logicalPosition = new LogicalPosition3d()
                 {
                     PositionX = 10,
                     PositionY = 20,
+                    PositionZ = 30,
                     Width = 100,
                     Height = 111,
+                    Depth = 122,
                     PyramidLevel = 0
                 };
 
                 var tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 11)});
 
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 141)});
 
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 // act
-                var totalNumberOfTiles = reader2d.GetTotalNumberOfTiles();
+                var totalNumberOfTiles = reader3d.GetTotalNumberOfTiles();
 
                 // assert
                 totalNumberOfTiles.Should().Be(2);
@@ -348,77 +361,79 @@ namespace ImgDoc2Net_UnitTests
             var statisticsBeforeTest = ImgDoc2ApiInterop.Instance.GetStatistics();
             {
                 // arrange
-                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+                using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d };
                 createOptions.AddDimension(new Dimension('o'));
                 using var document = Document.CreateNew(createOptions);
-                using var reader2d = document.Get2dReader();
-                using var writer2d = document.Get2dWriter();
+                using var reader3d = document.Get3dReader();
+                using var writer3d = document.Get3dWriter();
 
                 // add 3 tiles on pyramid level 0, 2 tiles on pyramid level 1 and 1 tile on pyramid level 2
-                LogicalPosition logicalPosition = new LogicalPosition()
+                LogicalPosition3d logicalPosition = new LogicalPosition3d()
                 {
                     PositionX = 10,
                     PositionY = 20,
+                    PositionZ = 30,
                     Width = 100,
                     Height = 111,
+                    Depth = 122,    
                     PyramidLevel = 0
                 };
 
                 var tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 11)});
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 12)});
-                writer2d.AddTile(
-                    tileCoordinate,
-                    in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
-                    DataType.Zero,
+                writer3d.AddBrick(
+                    tileCoordinate, 
+                    in logicalPosition, 
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8), 
+                    DataType.Zero, 
                     null);
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 13)});
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 141)});
                 logicalPosition.PyramidLevel = 1;
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 142)});
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 tileCoordinate = new TileCoordinate(new[]
                     {Tuple.Create(new Dimension('o'), 200)});
                 logicalPosition.PyramidLevel = 2;
-                writer2d.AddTile(
+                writer3d.AddBrick(
                     tileCoordinate,
                     in logicalPosition,
-                    new Tile2dBaseInfo(1, 1, PixelType.Gray8),
+                    new Brick3dBaseInfo(1, 1, 1, PixelType.Gray8),
                     DataType.Zero,
                     null);
 
                 // act
-                var tileCounterPerPyramidLayer = reader2d.GetTileCountPerPyramidLayer();
+                var tileCounterPerPyramidLayer = reader3d.GetTileCountPerPyramidLayer();
 
                 // assert
                 Assert.Equal(tileCounterPerPyramidLayer, new Dictionary<int, long>() { { 0, 3 }, { 1, 2 }, { 2, 1 } });
