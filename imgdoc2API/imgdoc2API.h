@@ -17,7 +17,7 @@
 #include "brickblobinfointerop.h"
 #include "tilebaseinfointerop.h"
 #include "brickbaseinfointerop.h"
-#include "statisticsinterop.h"
+#include "imgdoc2statisticsinterop.h"
 #include "rectangledoubleinterop.h"
 #include "cuboiddoubleinterop.h"
 #include "minmaxfortiledimensioninterop.h"
@@ -45,7 +45,7 @@ EXTERNAL_API(void) GetStatistics(ImgDoc2StatisticsInterop* statistics_interop);
 
 /// Create a new environment object. The environment-object created here will route certain actions to the
 /// function pointers given here.
-/// IMPORTANT: The environment object created here must have a lifetime greater than any of usages.
+/// IMPORTANT: The environment object created here must have a lifetime greater than any of its usages.
 ///
 /// \param          user_parameter                  A user parameter (which gets passed to the callback function following).
 /// \param [in,out] pfn_log                         If non-null, a function pointer which gets called for providing logging functionality.
@@ -55,9 +55,9 @@ EXTERNAL_API(void) GetStatistics(ImgDoc2StatisticsInterop* statistics_interop);
 /// \returns A handle representing the new environment object.
 EXTERNAL_API(HandleEnvironmentObject) CreateEnvironmentObject(
     std::intptr_t user_parameter, 
-    void (*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
-    bool (*pfn_is_level_active)(std::intptr_t userparam, int level),
-    void (*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage));
+    void (*pfn_log)(std::intptr_t /*userparam*/, int /*level*/, const char* /*szMessage*/),
+    bool (*pfn_is_level_active)(std::intptr_t /*userparam*/, int /*level*/),
+    void (*pfn_report_fatal_error_and_exit)(std::intptr_t /*userparam*/, const char* /*szMessage*/));
 
 /// Destroys the environment object described by the specified handle.
 /// NB: it is the caller's responsibility to ensure that the object is not in use when destroying it.
@@ -317,7 +317,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_GetFilename(HandleOpenExistin
 /// \param          data_type                     The data type of the type.
 /// \param          ptr_data                      Pointer to the bitmap data of the tile.
 /// \param          size_data                     Size of the memory pointer to by 'ptr_data'.
-/// \param [in,out] result_pk                     If non-null and in case of success, the primary key of the resulting dataset it put here.
+/// \param [out]    result_pk                     If non-null and in case of success, the primary key of the resulting data-set it put here.
 /// \param [out]    error_information             If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
@@ -376,6 +376,21 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileData(
     bool(LIBIMGDOC2_STDCALL* pfnSetData)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/), // NOLINT(readability/casting)
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a reader2d-object: query the tiles table. The three query clauses are
+/// used to filter the tiles. The first clause is used to filter the tiles by their
+/// coordinates, the second by other "per tile data" and there is third geometric clause filtering
+/// tiles which have an intersection with the specified 'query_rectangle'. Those clauses are logically ANDed.
+/// Matching tiles are returned in the 'result' structure.
+///
+/// \param          handle                              The reader2d object.
+/// \param          query_rectangle                     The query rectangle.
+/// \param          dim_coordinate_query_clause_interop The interop-structure containing the coordinate query clause.
+/// \param          tile_info_query_clause_interop      The interop-structure containing the tile-info query clause.
+/// \param [out]    result                              The result structure.
+/// \param [out]    error_information                   If non-null, in case of an error, additional information describing the error are put here.
+///     error.
+///
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_GetTilesIntersectingRect(
     HandleDocRead2D handle,
     const RectangleDoubleInterop* query_rectangle,
@@ -405,6 +420,19 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileInfo(
     TileBlobInfoInterop* tile_blob_info_interop,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer3d-object: Add a brick to an image3d-document. On success, a key for the newly added brick is returned ('result_pk').
+///
+/// \param          handle                        The write2d-object.
+/// \param          tile_coordinate_interop       The interop-structure containing the coordinate information.
+/// \param          logical_position_info_interop The interop-structure containing the logical position 3D information.
+/// \param          brick_base_info_interop       The interop-structure containing the 'base brick information' information.
+/// \param          data_type                     The data type of the type.
+/// \param          ptr_data                      Pointer to the bitmap data of the brick.
+/// \param          size_data                     Size of the memory pointer to by 'ptr_data'.
+/// \param [out]    result_pk                     If non-null and in case of success, the primary key of the resulting data-set it put here.
+/// \param [out]    error_information             If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_AddBrick(
     HandleDocWrite3D handle,
     const TileCoordinateInterop* tile_coordinate_interop,
@@ -486,6 +514,17 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileDimensions(
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a reader2d-object: Retrieve the max and min for the coordinates
+/// in the given dimensions. 'count' gives the number of elements in the array pointed to
+/// by 'dimensions' and it gives the size of the output array 'result' (in units of elements).
+///
+/// \param          handle              The handle of the reader2d-object.
+/// \param          dimensions          Pointer to an array of dimensions which are queried. The number of elements is given by 'count'.
+/// \param          count               Number of elements in the 'dimensions' array and also the size of the output array 'result'
+/// \param [out]    result              Pointer to an array where on successful return the requested information is put.
+/// \param [out]    error_information   If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetMinMaxForTileDimensions(
     HandleDocRead2D handle,
     const imgdoc2::Dimension* dimensions,
@@ -493,6 +532,17 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetMinMaxForTileDimensions(
     MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a reader3d-object: Retrieve the max and min for the coordinates
+/// in the given dimensions. 'count' gives the number of elements in the array pointed to
+/// by 'dimensions' and it gives the size of the output array 'result' (in units of elements).
+///
+/// \param          handle              The handle of the reader3d-object.
+/// \param          dimensions          Pointer to an array of dimensions which are queried. The number of elements is given by 'count'.
+/// \param          count               Number of elements in the 'dimensions' array and also the size of the output array 'result'
+/// \param [out]    result              Pointer to an array where on successful return the requested information is put.
+/// \param [out]    error_information   If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetMinMaxForTileDimensions(
     HandleDocRead3D handle,
     const imgdoc2::Dimension* dimensions,

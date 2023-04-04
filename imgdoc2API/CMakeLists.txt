@@ -14,7 +14,7 @@ add_library(imgdoc2API  SHARED
                 "queryresultinterop.h" 
                 "dimcoordinatequeryclauseinterop.h" 
                 "tilebaseinfointerop.h" 
-                "statisticsinterop.h"
+                "imgdoc2statisticsinterop.h"
                 "rectangledoubleinterop.h" 
                 "tileinfoqueryclauseinterop.h" 
                 "tileblobinfointerop.h" 
@@ -24,7 +24,8 @@ add_library(imgdoc2API  SHARED
                 "brickbaseinfointerop.h" 
                 "brickblobinfointerop.h" 
                 "cuboiddoubleinterop.h" 
-                "planenormalanddistanceinterop.h")
+                "planenormalanddistanceinterop.h" 
+                "imgdoc2apistatistics.h")
 
 target_link_libraries(imgdoc2API PRIVATE libimgdoc2)
 

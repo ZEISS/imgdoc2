@@ -13,35 +13,11 @@
 #include <vector>
 #include <gsl/util>
 #include "utilities.h"
+#include "imgdoc2apistatistics.h"
 #include <imgdoc2.h>
 
 using namespace imgdoc2;
 using namespace std;
-
-/// This struct is used to count active instances of objects, which are created by the imgdoc2API.
-struct ImgDoc2ApiStatistics
-{
-    atomic_uint32_t number_of_createoptions_objects_active{ 0 };
-    atomic_uint32_t number_of_openexistingoptions_objects_active{ 0 };
-    atomic_uint32_t number_of_document_objects_active{ 0 };
-    atomic_uint32_t number_of_reader2d_objects_active{ 0 };
-    atomic_uint32_t number_of_writer2d_objects_active{ 0 };
-    atomic_uint32_t number_of_reader3d_objects_active{ 0 };
-    atomic_uint32_t number_of_writer3d_objects_active{ 0 };
-
-    ImgDoc2StatisticsInterop GetInteropStruct() const
-    {
-        ImgDoc2StatisticsInterop interop;
-        interop.number_of_createoptions_objects_active = this->number_of_createoptions_objects_active.load();
-        interop.number_of_openexistingoptions_objects_active = this->number_of_openexistingoptions_objects_active.load();
-        interop.number_of_document_objects_active = this->number_of_document_objects_active.load();
-        interop.number_of_reader2d_objects_active = this->number_of_reader2d_objects_active.load();
-        interop.number_of_writer2d_objects_active = this->number_of_writer2d_objects_active.load();
-        interop.number_of_reader3d_objects_active = this->number_of_reader3d_objects_active.load();
-        interop.number_of_writer3d_objects_active = this->number_of_writer3d_objects_active.load();
-        return interop;
-    }
-};
 
 static ImgDoc2ApiStatistics g_imgdoc2_api_statistics;  ///< Define a static object, which is used to count active instances of objects, which are created by the imgdoc2API.
 
