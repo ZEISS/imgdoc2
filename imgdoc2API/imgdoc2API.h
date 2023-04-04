@@ -308,6 +308,19 @@ EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_SetFilename(HandleOpenExistin
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_GetFilename(HandleOpenExistingOptions handle, char* filename_utf8, size_t* size, ImgDoc2ErrorInformation* error_information);
 
+/// Add a tile to an image2d-document. On success, a key for the newly added tile is returned ('result_pk').
+///
+/// \param          handle                        The write2d-object.
+/// \param          tile_coordinate_interop       The interop-structure containing the coordinate information.
+/// \param          logical_position_info_interop The interop-structure containing the logical position information.
+/// \param          tile_base_info_interop        The interop-structure containing the 'base tile information' information.
+/// \param          data_type                     The data type of the type.
+/// \param          ptr_data                      Pointer to the bitmap data of the tile.
+/// \param          size_data                     Size of the memory pointer to by 'ptr_data'.
+/// \param [in,out] result_pk                     If non-null and in case of success, the primary key of the resulting dataset it put here.
+/// \param [out]    error_information             If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_AddTile(
     HandleDocWrite2D handle, 
     const TileCoordinateInterop* tile_coordinate_interop, 
