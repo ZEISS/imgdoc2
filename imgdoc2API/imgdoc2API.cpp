@@ -11,6 +11,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <gsl/util>
 #include "utilities.h"
 #include <imgdoc2.h>
 
@@ -481,7 +482,7 @@ ImgDoc2ErrorCode CreateOptions_AddDimension(HandleCreateOptions handle, std::uin
     const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     try
     {
-        object->AddDimension(dimension);
+        object->AddDimension(gsl::narrow_cast<Dimension>(dimension));
     }
     catch (exception& exception)
     {
@@ -497,7 +498,7 @@ ImgDoc2ErrorCode CreateOptions_AddIndexedDimension(HandleCreateOptions handle, s
     const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     try
     {
-        object->AddIndexForDimension(dimension);
+        object->AddIndexForDimension(gsl::narrow_cast<Dimension>(dimension));
     }
     catch (exception& exception)
     {

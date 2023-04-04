@@ -28,6 +28,9 @@ add_library(imgdoc2API  SHARED
 
 target_link_libraries(imgdoc2API PRIVATE libimgdoc2)
 
+# Link against the GSL interface library (i.e. header only library)
+target_link_libraries(imgdoc2API PRIVATE GSL)
+
 target_compile_definitions(imgdoc2API PUBLIC LIBIMGDOC2_EXPORTS)
 
 add_custom_command(TARGET imgdoc2API POST_BUILD
