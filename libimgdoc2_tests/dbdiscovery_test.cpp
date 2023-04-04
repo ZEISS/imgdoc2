@@ -99,14 +99,14 @@ TEST(DbDiscoveryTest, CreateAndAlterGeneralTableToHaveInconsistentInformationAnd
 
     {
         DbCreator db_creator(dbConnection);
-        auto create_options = ClassFactory::CreateCreateOptionsUp();
+        const auto create_options = ClassFactory::CreateCreateOptionsUp();
         create_options->AddDimension('a');
         create_options->AddDimension('b');
         create_options->AddDimension('c');
         create_options->AddIndexForDimension('a');
         create_options->AddIndexForDimension('c');
         create_options->SetUseSpatialIndex(false);
-        auto configuration = db_creator.CreateTables2d(create_options.get());
+        const auto configuration = db_creator.CreateTables2d(create_options.get());
         database_configuration_from_creation = dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
     }
 
