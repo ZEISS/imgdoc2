@@ -351,6 +351,23 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_Query(
     QueryResultInterop* result, 
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a reader2d-object: read the pixel data the specified tile. The data transfer is done in
+/// the following way: 'blob_output_handle' is an opaque pointer-size parameter (which is not used by the function
+/// itself), which will be passed to the callback-functions 'pfnReserve' and 'pfnSetData'.  When the data is to be
+/// transferred, the function "pfnReserve" is called and notifies the receiver about the size of the data. After
+/// this call, next the function "pfnSetData" is called (potentially multiple times), passing in size and offset.
+/// Size and offset are guaranteed to not exceed the size reported before (with 'pfnReserve'). Within 'pfnSetData',
+/// the data must be copied to some caller-managed buffer - the pointer is only guaranteed to be valid within the
+/// call to 'pfnSetData.
+///
+/// \param          handle                                  The reader2d object.
+/// \param          pk                                      The primary key of the tile for which to retrieve the pixel data.
+/// \param          blob_output_handle                      An opaque pointer size value (which gets passed to the two callback functions).
+/// \param          pfnReserve                              Function pointer to function which will be called reporting the required size.
+/// \param          pfnSetData                              Function pointer to function which will be called delivering the data. 
+/// \param [out]    error_information                       If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileData(
     HandleDocRead2D handle,
     std::int64_t pk,
