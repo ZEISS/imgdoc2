@@ -107,29 +107,108 @@ EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingDocument(HandleOpenExistingOptions op
 /// \param  handle Handle of a document object (which is to be destroyed).
 EXTERNAL_API(void) DestroyDocument(HandleDoc handle);
 
+/// Method operating on a document-object: try to create a reader-2d-object on the document.
+///
+/// \param          handle_document   Handle representing the document.
+/// \param [out] document_read2d      In case of success, the handle representing the reader-2d-object is put here.
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* document_read2d, ImgDoc2ErrorInformation* error_information);
+
+/// Destroy the specified reader-2d-object.
+/// \param  handle Handle of a reader-2d-object (which is to be destroyed).
 EXTERNAL_API(void) DestroyReader2d(HandleDocRead2D handle);
 
+/// Method operating on a document-object: try to create a reader-3d-object on the document.
+///
+/// \param          handle_document   Handle representing the document.
+/// \param [out] document_read2d      In case of success, the handle representing the reader-3d-object is put here.
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead2D* document_read3d, ImgDoc2ErrorInformation* error_information);
+
+/// Destroy the specified reader-3d-object.
+/// \param  handle Handle of a reader-3d-object (which is to be destroyed).
 EXTERNAL_API(void) DestroyReader3d(HandleDocRead2D handle);
 
+/// Method operating on a document-object: try to create a writer-2d-object on the document.
+///
+/// \param          handle_document   Handle representing the document.
+/// \param [out] document_read2d      In case of success, the handle representing the writer-2d-object is put here.
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* document_write2d, ImgDoc2ErrorInformation* error_information);
+
+/// Destroy the specified reader-2d-object.
+/// \param  handle Handle of a reader-2d-object (which is to be destroyed).
 EXTERNAL_API(void) DestroyWriter2d(HandleDocWrite2D handle);
 
+/// Method operating on a document-object: try to create a writer-3d-object on the document.
+///
+/// \param          handle_document   Handle representing the document.
+/// \param [out] document_read2d      In case of success, the handle representing the writer-3d-object is put here.
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite2D* document_write3d, ImgDoc2ErrorInformation* error_information);
+
+/// Destroy the specified writer-3d-object.
+/// \param  handle Handle of a writer-3d-object (which is to be destroyed).
 EXTERNAL_API(void) DestroyWriter3d(HandleDocWrite3D handle);
 
-EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetDocumentType(HandleDoc handle_document, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information);
+/// Method operating on a CreateOptions-object: Set the document type.
+///
+/// \param          handle                The handle of the CreateOptions object.
+/// \param          document_type_interop The document type interop.
+/// \param [in,out] error_information     If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetDocumentType(HandleCreateOptions handle, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: Set the filename.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param          filename_utf8     The filename (given as an UTF-8 encoded string).
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetFilename(HandleCreateOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: Set the flag whether to use a spatial index.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param          use_spatial_index Flag indicating whether a spatial index is to be constructed.
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetUseSpatialIndex(HandleCreateOptions handle, bool use_spatial_index, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: Specify a dimension for which an index is to be created.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param          dimension         Dimension for which an index is to be created.
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_AddIndexForDimension(HandleCreateOptions handle, char dimension, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: Specify whether a "blob-table" is to be created within the database.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param          use_blob_table    Boolean whether a blob-table is to be created.
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetUseBlobTable(HandleCreateOptions handle, bool use_blob_table, ImgDoc2ErrorInformation* error_information);
 
-/// Get the property 'filename' from the CreateOptions-object (as an UTF8-encoded string).
+/// Method operating on a CreateOptions-object: Get the property 'filename' from the CreateOptions-object (as an UTF8-encoded string).
 /// On input, 'size' specifies the size of the buffer pointed to 'filename_utf8' in bytes. On return, the actual
 /// number of bytes required is put here (including the terminating zero character).
 /// If 'filename_utf8' is non-null, then at most as many bytes as indicated by 'size' (on input) are written.
-/// \param          handle Handle identifying an CreateOptions-object.
+/// \param          handle               Handle identifying an CreateOptions-object.
 /// \param [out]    filename_utf8        If non-null, the buffer where the string will be placed.
 /// \param [in,out] size                 On input, the size of the buffer pointed to by 'filename_utf8'; on output the number of bytes actually required.
 /// \param [out]    error_information    If non-null, in case of an error, additional information describing the error are put here.
@@ -137,7 +216,14 @@ EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_SetUseBlobTable(HandleCreateOptions
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetFilename(HandleCreateOptions handle, char* filename_utf8, size_t* size, ImgDoc2ErrorInformation* error_information);
 
-EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetDocumentType(HandleDoc handle_document, std::uint8_t* document_type_interop, ImgDoc2ErrorInformation* error_information);
+/// Method operating on a CreateOptions-object: get the document type setting from the CreateOptions object.
+///
+/// \param          handle                The handle of the CreateOptions object.
+/// \param [out]    document_type_interop If non-null, the document type is put here.
+/// \param [out]    error_information     If non-null, information describing the error.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetDocumentType(HandleCreateOptions handle, std::uint8_t* document_type_interop, ImgDoc2ErrorInformation* error_information);
 
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bool* use_spatial_index, ImgDoc2ErrorInformation* error_information);
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool* create_blob_table, ImgDoc2ErrorInformation* error_information);

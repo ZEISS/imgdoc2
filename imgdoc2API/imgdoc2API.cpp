@@ -354,9 +354,9 @@ ImgDoc2ErrorCode OpenExistingOptions_SetFilename(HandleOpenExistingOptions handl
     return ImgDoc2_ErrorCode_OK;
 }
 
-ImgDoc2ErrorCode CreateOptions_SetDocumentType(HandleDoc handle_document, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information)
+ImgDoc2ErrorCode CreateOptions_SetDocumentType(HandleCreateOptions handle, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle_document);  // NOLINT(performance-no-int-to-ptr)
+    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto document_type = Utilities::ConvertDocumentTypeFromInterop(document_type_interop);
     try
     {
@@ -438,7 +438,7 @@ ImgDoc2ErrorCode OpenExistingOptions_GetFilename(HandleOpenExistingOptions handl
             error_information);
 }
 
-ImgDoc2ErrorCode CreateOptions_GetDocumentType(HandleDoc handle_document, std::uint8_t* document_type_interop, ImgDoc2ErrorInformation* error_information)
+ImgDoc2ErrorCode CreateOptions_GetDocumentType(HandleCreateOptions handle, std::uint8_t* document_type_interop, ImgDoc2ErrorInformation* error_information)
 {
     if (document_type_interop == nullptr)
     {
@@ -446,7 +446,7 @@ ImgDoc2ErrorCode CreateOptions_GetDocumentType(HandleDoc handle_document, std::u
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto object = reinterpret_cast<ICreateOptions*>(handle_document);  // NOLINT(performance-no-int-to-ptr)
+    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto document_type = object->GetDocumentType();
     *document_type_interop = static_cast<uint8_t>(document_type);
     return ImgDoc2_ErrorCode_OK;
