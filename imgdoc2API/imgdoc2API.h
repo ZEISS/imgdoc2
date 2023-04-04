@@ -122,8 +122,8 @@ EXTERNAL_API(void) DestroyReader2d(HandleDocRead2D handle);
 
 /// Method operating on a document-object: try to create a reader-3d-object on the document.
 ///
-/// \param          handle_document   Handle representing the document.
-/// \param [out] document_read2d      In case of success, the handle representing the reader-3d-object is put here.
+/// \param       handle_document      Handle representing the document.
+/// \param [out] document_read3d      In case of success, the handle representing the reader-3d-object is put here.
 /// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
@@ -135,8 +135,8 @@ EXTERNAL_API(void) DestroyReader3d(HandleDocRead2D handle);
 
 /// Method operating on a document-object: try to create a writer-2d-object on the document.
 ///
-/// \param          handle_document   Handle representing the document.
-/// \param [out] document_read2d      In case of success, the handle representing the writer-2d-object is put here.
+/// \param       handle_document      Handle representing the document.
+/// \param [out] document_write2d     In case of success, the handle representing the writer-2d-object is put here.
 /// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
@@ -148,8 +148,8 @@ EXTERNAL_API(void) DestroyWriter2d(HandleDocWrite2D handle);
 
 /// Method operating on a document-object: try to create a writer-3d-object on the document.
 ///
-/// \param          handle_document   Handle representing the document.
-/// \param [out] document_read2d      In case of success, the handle representing the writer-3d-object is put here.
+/// \param       handle_document      Handle representing the document.
+/// \param [out] document_write3d     In case of success, the handle representing the writer-3d-object is put here.
 /// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
@@ -296,7 +296,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetIndexedDimensions(HandleCreateOp
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_SetFilename(HandleOpenExistingOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information);
 
-/// Get the property 'filename' from the OpenExistingOptions-object (as an UTF8-encoded string).
+/// Method operating on a OpenExistingOptions-object: Get the property 'filename' from the OpenExistingOptions-object (as an UTF8-encoded string).
 /// On input, 'size' specifies the size of the buffer pointed to 'filename_utf8' in bytes. On return, the actual
 /// number of bytes required is put here (including the terminating zero character).
 /// If 'filename_utf8' is non-null, then at most as many bytes as indicated by 'size' (on input) are written.
@@ -308,7 +308,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_SetFilename(HandleOpenExistin
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_GetFilename(HandleOpenExistingOptions handle, char* filename_utf8, size_t* size, ImgDoc2ErrorInformation* error_information);
 
-/// Add a tile to an image2d-document. On success, a key for the newly added tile is returned ('result_pk').
+/// Method operating on a writer2d-object: Add a tile to an image2d-document. On success, a key for the newly added tile is returned ('result_pk').
 ///
 /// \param          handle                        The write2d-object.
 /// \param          tile_coordinate_interop       The interop-structure containing the coordinate information.
@@ -332,6 +332,18 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_AddTile(
     imgdoc2::dbIndex* result_pk,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a reader2d-object: query the tiles table. The two query clauses are
+/// used to filter the tiles. The first clause is used to filter the tiles by their
+/// coordinates, the second by other "per tile data". Matching tiles are returned in the
+/// 'result' structure.
+///
+/// \param          handle                              The reader2d object.
+/// \param          dim_coordinate_query_clause_interop The interop-structure containing the coordinate query clause.
+/// \param          tile_info_query_clause_interop      The interop-structure containing the tile-info query clause.
+/// \param [in,out] result                              The result structure.
+/// \param [out]    error_information                   If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_Query(
     HandleDocRead2D handle, 
     const DimensionQueryClauseInterop* dim_coordinate_query_clause_interop,
