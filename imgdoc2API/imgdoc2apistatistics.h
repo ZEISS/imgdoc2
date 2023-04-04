@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -17,7 +20,7 @@ struct ImgDoc2ApiStatistics
 
     ImgDoc2StatisticsInterop GetInteropStruct() const
     {
-        ImgDoc2StatisticsInterop interop;
+        ImgDoc2StatisticsInterop interop{0};
         interop.number_of_createoptions_objects_active = this->number_of_createoptions_objects_active.load();
         interop.number_of_openexistingoptions_objects_active = this->number_of_openexistingoptions_objects_active.load();
         interop.number_of_document_objects_active = this->number_of_document_objects_active.load();

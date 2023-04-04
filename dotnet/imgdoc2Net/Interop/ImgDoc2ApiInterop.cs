@@ -335,7 +335,7 @@ namespace ImgDoc2Net.Interop
             }
         }
 
-        /// <summary>   GSet the filename property of the specified "create-options" object.</summary>
+        /// <summary>   Get the filename property of the specified "create-options" object.</summary>
         /// <param name="handleCreateOptions">  The handle of the "create-options" object to be queried. </param>
         /// <returns>   The filename property. </returns>
         public string CreateOptionsGetFilename(IntPtr handleCreateOptions)
@@ -352,6 +352,9 @@ namespace ImgDoc2Net.Interop
                 nameof(this.CreateOptionsGetFilename));
         }
 
+        /// <summary> Method operating on a CreateOptions-object: set the document type.</summary>
+        /// <param name="handleCreateOptions"> The handle of the CreateOptions object.</param>
+        /// <param name="documentType">        Type of the document.</param>
         public void CreateOptionsSetDocumentType(IntPtr handleCreateOptions, DocumentType documentType)
         {
             this.ThrowIfNotInitialized();
@@ -365,6 +368,9 @@ namespace ImgDoc2Net.Interop
             this.HandleErrorCases(returnCode, in errorInformation);
         }
 
+        /// <summary> Method operating on a CreateOptions-object: set the document type.</summary>
+        /// <param name="handleCreateOptions"> The handle of the CreateOptions object.</param>
+        /// <returns> The document type.</returns>
         public DocumentType CreateOptionsGetDocumentType(IntPtr handleCreateOptions)
         {
             this.ThrowIfNotInitialized();
@@ -436,6 +442,9 @@ namespace ImgDoc2Net.Interop
             this.HandleErrorCases(returnCode, in errorInformation);
         }
 
+        /// <summary> Method operating on a CreateOptions-object: Add a dimension.</summary>
+        /// <param name="handleCreateOptions"> The handle of the "create-options" object.</param>
+        /// <param name="dimension">           The dimension to be added.</param>
         public void CreateOptionsAddDimension(IntPtr handleCreateOptions, Dimension dimension)
         {
             this.ThrowIfNotInitialized();
@@ -449,6 +458,9 @@ namespace ImgDoc2Net.Interop
             this.HandleErrorCases(returnCode, in errorInformation);
         }
 
+        /// <summary> Method operating on a CreateOptions-object: Specify a dimension for which an index is to be created..</summary>
+        /// <param name="handleCreateOptions"> The handle of the "create-options" object.</param>
+        /// <param name="dimension">           The dimension.</param>
         public void CreateOptionsAddIndexedDimension(IntPtr handleCreateOptions, Dimension dimension)
         {
             this.ThrowIfNotInitialized();
@@ -462,24 +474,26 @@ namespace ImgDoc2Net.Interop
             this.HandleErrorCases(returnCode, in errorInformation);
         }
 
+        /// <summary> Method operating on a CreateOptions-object: Get list of dimensions.</summary>
+        /// <param name="handleCreateOptions"> The handle of the "create-options" object.</param>
+        /// <returns> An array containing the dimensions.</returns>
         public Dimension[] CreateOptionsGetDimensions(IntPtr handleCreateOptions)
         {
             this.ThrowIfNotInitialized();
 
-            int returnCode;
             ImgDoc2ErrorInformation errorInformation;
 
             // for sake of simplicity, we only call once into native code with a buffer which is large enough for
             //  all conceivable cases
-            const int BufferSize = 64;
+            const int bufferSize = 64;
             unsafe
             {
-                byte* dimensionsBuffer = stackalloc byte[BufferSize];
+                byte* dimensionsBuffer = stackalloc byte[bufferSize];
 
                 // TODO(Jbl):  we are abusing UIntPtr as an equivalent to size_t, c.f. https://stackoverflow.com/questions/32906774/what-is-equal-to-the-c-size-t-in-c-sharp
-                UIntPtr sizeOfBuffer = new UIntPtr(BufferSize);
-                returnCode = this.createOptionsGetDimensions(handleCreateOptions, dimensionsBuffer, new IntPtr(&sizeOfBuffer), null);
-                if (sizeOfBuffer.ToUInt32() > BufferSize)
+                UIntPtr sizeOfBuffer = new UIntPtr(bufferSize);
+                var returnCode = this.createOptionsGetDimensions(handleCreateOptions, dimensionsBuffer, new IntPtr(&sizeOfBuffer), null);
+                if (sizeOfBuffer.ToUInt32() > bufferSize)
                 {
                     throw new NotImplementedException("Buffersize exceeded, may want to implement variable buffersizes.");
                 }
@@ -496,6 +510,9 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        /// <summary> Method operating on a CreateOptions-object: Get list of dimensions for which an index is to be created.</summary>
+        /// <param name="handleCreateOptions"> The handle of the "create-options" object.</param>
+        /// <returns> An array containing the dimensions for which an index is to be created.</returns>
         public Dimension[] CreateOptionsGetIndexedDimensions(IntPtr handleCreateOptions)
         {
             this.ThrowIfNotInitialized();
@@ -527,18 +544,26 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        /// <summary> Creates a new 'OpenExistingOptions' object.</summary>
+        /// <returns> A handle representing the newly create 'OpenExistingOptions' object.</returns>
         public IntPtr CreateOpenExistingOptions()
         {
             this.ThrowIfNotInitialized();
             return this.createOpenExistingOptions();
         }
 
-        public void DestroyOpenExistingOptions(IntPtr handle)
+        /// <summary> Destroys the 'OpenExistingOptions' object.</summary>
+        /// <param name="handleOpenExistingOptions"> The handle of the 'OpenExistingOptions' object to be destroyed.</param>
+        public void DestroyOpenExistingOptions(IntPtr handleOpenExistingOptions)
         {
             this.ThrowIfNotInitialized();
-            this.destroyOpenExistingOptions(handle);
+            this.destroyOpenExistingOptions(handleOpenExistingOptions);
         }
 
+        /// <summary> Method operating on an OpenExistingOptions-object: set the filename.</summary>
+        /// <exception cref="ArgumentNullException"> Thrown when one or more required arguments are null.</exception>
+        /// <param name="handleOpenExistingOptions"> The handle of the 'OpenExistingOptions' object.</param>
+        /// <param name="filename">                  The filename.</param>
         public void OpenExistingOptionsSetFilename(IntPtr handleOpenExistingOptions, string filename)
         {
             this.ThrowIfNotInitialized();
@@ -557,6 +582,9 @@ namespace ImgDoc2Net.Interop
             }
         }
 
+        /// <summary> Method operating on an OpenExistingOptions-object:  get the filename.</summary>
+        /// <param name="handleOpenExistingOptions"> The handle of the 'OpenExistingOptions' object.</param>
+        /// <returns> The filename.</returns>
         public string OpenExistingOptionsGetFilename(IntPtr handleOpenExistingOptions)
         {
             return this.GetStringInteropHelper(
@@ -570,6 +598,9 @@ namespace ImgDoc2Net.Interop
                 "OpenExistingOptionsGetFilename");
         }
 
+        /// <summary> Creates new document using the specified "CreateOptions"-object.</summary>
+        /// <param name="handleCreateOptions"> The handle of the "create-options" object to be used describing the operation.</param>
+        /// <returns> The handle representing the newly created document.</returns>
         public IntPtr CreateNewDocument(IntPtr handleCreateOptions)
         {
             this.ThrowIfNotInitialized();
@@ -586,9 +617,9 @@ namespace ImgDoc2Net.Interop
             return documentHandle;
         }
 
-        /// <summary>   Opens existing document. </summary>
+        /// <summary>   Creates new document using the specified "OpenExistingOptions"-object.</summary>
         /// <param name="handleOpenExistingOptions">    Options for controlling the operation. </param>
-        /// <returns>   A handle representing the document. </returns>
+        /// <returns>   The handle representing the newly created document.</returns>
         public IntPtr OpenExistingDocument(IntPtr handleOpenExistingOptions)
         {
             this.ThrowIfNotInitialized();
@@ -605,6 +636,8 @@ namespace ImgDoc2Net.Interop
             return documentHandle;
         }
 
+        /// <summary> Destroys the document described by handleDocument.</summary>
+        /// <param name="handleDocument"> The handle of the document-object.</param>
         public void DestroyDocument(IntPtr handleDocument)
         {
             this.ThrowIfNotInitialized();
