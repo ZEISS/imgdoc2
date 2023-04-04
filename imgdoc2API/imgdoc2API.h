@@ -37,24 +37,74 @@ typedef ObjectHandle HandleDocWrite2D;
 typedef ObjectHandle HandleDocRead3D;
 typedef ObjectHandle HandleDocWrite3D;
 
-EXTERNAL_API(void)GetStatistics(ImgDoc2StatisticsInterop* statistics_interop);
+/// Retrieve the 'ImgDoc2StatisticsInterop' structure, which contains various statistics about
+/// the state of library.In particular, we keep track of how many outstanding object-handles we
+/// have. This is useful for debugging purposes.
+/// \param [out] statistics_interop     If non-null, the statistics is put here. If null, the call is a no-op.
+EXTERNAL_API(void) GetStatistics(ImgDoc2StatisticsInterop* statistics_interop);
 
+/// Create a new environment object. The environment-object created here will route certain actions to the
+/// function pointers given here.
+/// IMPORTANT: The environment object created here must have a lifetime greater than any of usages.
+///
+/// \param          user_parameter                  A user parameter (which gets passed to the callback function following).
+/// \param [in,out] pfn_log                         If non-null, a function pointer which gets called for providing logging functionality.
+/// \param [in,out] pfn_is_level_active             If non-null, a function pointer which gets called to query if the specified logging level is active.
+/// \param [in,out] pfn_report_fatal_error_and_exit If non-null, a function pointer which gets called in case of a fatal internal error. This function is expected to *not* return, but terminate execution.
+///
+/// \returns A handle representing the new environment object.
 EXTERNAL_API(HandleEnvironmentObject) CreateEnvironmentObject(
     std::intptr_t user_parameter, 
     void (*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
     bool (*pfn_is_level_active)(std::intptr_t userparam, int level),
     void (*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage));
+
+/// Destroys the environment object described by the specified handle.
+/// NB: it is the caller's responsibility to ensure that the object is not in use when destroying it.
+///
+/// \param  handle The environment object handle.
 EXTERNAL_API(void) DestroyEnvironmentObject(HandleEnvironmentObject handle);
 
-// factory methods
+/// Create a new "CreateOptions" object.
+/// \returns A handle representing the new CreateOptions-object.
 EXTERNAL_API(HandleCreateOptions) CreateCreateOptions();
+
+/// Destroys the CreateOptions-object described by the specified handle.
+/// \param  handle The CreateOptions-object handle.
 EXTERNAL_API(void) DestroyCreateOptions(HandleCreateOptions handle);
 
+/// Create a new "OpenExistingOptions" object.
+/// \returns A handle representing the new OpenExistingOptions-object.
 EXTERNAL_API(HandleOpenExistingOptions) CreateOpenExistingOptions();
+
+/// Destroys the OpenExistingOptions-object described by the specified handle.
+/// \param  handle The OpenExistingOptions-object handle.
 EXTERNAL_API(void) DestroyOpenExistingOptions(HandleOpenExistingOptions handle);
 
+/// Creates a new document object. A handle representing the newly created object (in case of success)
+/// is returned with the 'document'-argument.
+///
+/// \param          create_options            Handle of the CreateOptions object.
+/// \param          handle_environment_object Optional handle of an environment object.
+/// \param [out]    document                  In case of success, the handle representing the document-object is put here.
+/// \param [out]    error_information         If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateNewDocument(HandleCreateOptions create_options, HandleEnvironmentObject handle_environment_object, HandleDoc* document, ImgDoc2ErrorInformation* error_information);
+
+/// Open an existing document (i.e. from some persistent storage) and creates a new document object representing it. A handle representing the newly created object (in case of success)
+/// is returned with the 'document'-argument.
+///
+/// \param          open_existing_options     Handle of the CreateOptions object.
+/// \param          handle_environment_object Optional handle of an environment object.
+/// \param [out]    document                  In case of success, the handle representing the document-object is put here.
+/// \param [out]    error_information         If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingDocument(HandleOpenExistingOptions open_existing_options, HandleEnvironmentObject handle_environment_object, HandleDoc* document, ImgDoc2ErrorInformation* error_information);
+
+/// Destroy the specified document.
+/// \param  handle Handle of a document object (which is to be destroyed).
 EXTERNAL_API(void) DestroyDocument(HandleDoc handle);
 
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* document_read2d, ImgDoc2ErrorInformation* error_information);
