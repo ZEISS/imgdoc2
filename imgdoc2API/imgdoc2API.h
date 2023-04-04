@@ -220,18 +220,80 @@ EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetFilename(HandleCreateOptions han
 ///
 /// \param          handle                The handle of the CreateOptions object.
 /// \param [out]    document_type_interop If non-null, the document type is put here.
-/// \param [out]    error_information     If non-null, information describing the error.
+/// \param [out]    error_information     If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetDocumentType(HandleCreateOptions handle, std::uint8_t* document_type_interop, ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a CreateOptions-object: get whether a spatial index is to be constructed.
+///
+/// \param          handle                The handle of the CreateOptions object.
+/// \param [out]    use_spatial_index     If non-null, a boolean indicating whether a spatial index is to be constructed is put here.
+/// \param [out]    error_information     If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bool* use_spatial_index, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: get whether a blob-table is to be constructed.
+///
+/// \param          handle                The handle of the CreateOptions object.
+/// \param [out]    create_blob_table     If non-null, a boolean indicating whether a blob-table is to be constructed is put here.
+/// \param [out]    error_information     If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool* create_blob_table, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: add a dimension.
+///
+/// \param          handle                The handle of the CreateOptions object.
+/// \param [out]    dimension             The dimension to be added.
+/// \param [out]    error_information     If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_AddDimension(HandleCreateOptions handle, std::uint8_t dimension, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: add a dimension for which an index is to be created. Or, more
+/// exactly: mark that for the specified dimension that an index is to created.
+///
+/// \param          handle                The handle of the CreateOptions object.
+/// \param [out]    dimension             The dimension to for which an index is to be created.
+/// \param [out]    error_information     If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_AddIndexedDimension(HandleCreateOptions handle, std::uint8_t dimension, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: get the list of dimension. On input, the value where 'elements_count' is pointing
+/// to must contain the size of the array where 'dimension' is pointing to (in units of elements); on output the actual number of
+/// elements available is put here, and at most as many elements that were initially indicated are placed at the 'dimension' array.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param [out]    dimension         If non-null, the set of dimensions is placed (up to the count that was given with 'elements_count').
+/// \param [in,out] elements_count    On input, the number of elements that can be places into the array 'dimension'; on output the total number of elements available.
+/// \param [out]    error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetDimensions(HandleCreateOptions handle, std::uint8_t* dimension, size_t* elements_count, ImgDoc2ErrorInformation* error_information);
+
+/// Method operating on a CreateOptions-object: get the list of dimensions for which an index is to be created. 
+/// On input, the value where 'elements_count' is pointing
+/// to must contain the size of the array where 'dimension' is pointing to (in units of elements); on output the actual number of
+/// elements available is put here, and at most as many elements that were initially indicated are placed at the 'dimension' array.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param [out]    dimension         If non-null, the set of dimensions is placed (up to the count that was given with 'elements_count').
+/// \param [in,out] elements_count    On input, the number of elements that can be places into the array 'dimension'; on output the total number of elements available.
+/// \param [out]    error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) CreateOptions_GetIndexedDimensions(HandleCreateOptions handle, std::uint8_t* dimension, size_t* elements_count, ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a OpenExistingOptions-object: Set the filename.
+///
+/// \param          handle            The handle of the CreateOptions object.
+/// \param          filename_utf8     The filename (given as an UTF-8 encoded string).
+/// \param [in,out] error_information If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingOptions_SetFilename(HandleOpenExistingOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information);
 
 /// Get the property 'filename' from the OpenExistingOptions-object (as an UTF8-encoded string).
