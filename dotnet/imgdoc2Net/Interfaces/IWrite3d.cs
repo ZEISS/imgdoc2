@@ -16,11 +16,11 @@ namespace ImgDoc2Net.Interfaces
         /// </summary>
         /// <param name="tileCoordinate">       The brick coordinate. </param>
         /// <param name="logicalPosition3d">    The logical position. </param>
-        /// <param name="brick3dBaseInfo">      Information describing the bricks's bitmap. </param>
+        /// <param name="brick3dBaseInfo">      Information describing the brick's bitmap. </param>
         /// <param name="dataType">             The data type (or type if representation) of the pixel data. </param>
         /// <param name="pointerTileData">      Pointer to the pixel data. </param>
         /// <param name="sizeTileData">         The size of the data (pointed to by "pointerTileData". </param>
-        /// <returns type="long">   The primary key of the newly added tile. </returns>
+        /// <returns type="long">   The primary key of the newly added brick. </returns>
         long AddBrick(
             ITileCoordinate tileCoordinate,
             in LogicalPosition3d logicalPosition3d,
