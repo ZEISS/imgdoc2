@@ -22,3 +22,7 @@ License: MIT
 Files: dotnet/imgdoc2Net/doc/*
 Copyright: 2023 Carl Zeiss Microscopy GmbH
 License: MIT
+
+Files: imgdoc2API/doc/*
+Copyright: 2023 Carl Zeiss Microscopy GmbH
+License: MIT

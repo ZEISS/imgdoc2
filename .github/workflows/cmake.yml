@@ -50,6 +50,10 @@ jobs:
         working-directory: ${{github.workspace}}/dotnet
         run: dotnet build /p:EnableWindowsTargeting=true
 
+      - name: Run .NET tests
+        working-directory: ${{github.workspace}}/dotnet
+        run: dotnet test /p:EnableWindowsTargeting=true
+
       - name: code-coverage
         run: |
           sudo apt-get -y install gcovr

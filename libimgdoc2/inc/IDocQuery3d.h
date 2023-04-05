@@ -49,7 +49,6 @@ namespace imgdoc2
         virtual void GetTilesIntersectingCuboid(const imgdoc2::CuboidD& cuboid, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause, const std::function<bool(imgdoc2::dbIndex)>& func) = 0;
 
         /// Gets tiles intersecting with the specified plane (and satisfying the other criteria).
-        /// Note: This method is not fully implemented yet.
         ///
         /// \param   plane               The plane.
         /// \param   coordinate_clause   The coordinate clause.
