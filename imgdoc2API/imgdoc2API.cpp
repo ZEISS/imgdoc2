@@ -81,9 +81,9 @@ void GetStatistics(ImgDoc2StatisticsInterop* statistics_interop)
 
 HandleEnvironmentObject CreateEnvironmentObject(
     std::intptr_t user_parameter,
-    void (*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
-    bool (*pfn_is_level_active)(std::intptr_t userparam, int level),
-    void (*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage))
+    void (LIBIMGDOC2_STDCALL*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
+    bool (LIBIMGDOC2_STDCALL*pfn_is_level_active)(std::intptr_t userparam, int level),
+    void (LIBIMGDOC2_STDCALL*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage))
 {
     const auto environment = ClassFactory::CreateHostingEnvironmentForFunctionPointers(
         user_parameter,
