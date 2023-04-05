@@ -34,6 +34,14 @@ namespace imgdoc2
         /// \returns Null if it fails, else the newly created "open existing options" object.
         static imgdoc2::IOpenExistingOptions* CreateOpenExistingOptions();
 
+        /// Creates an instance of the options-object for opening an existing file.
+        /// \returns Unique-pointer of a newly create options-object.
+        static std::unique_ptr<imgdoc2::IOpenExistingOptions> CreateOpenExistingOptionsUp();
+
+        /// Creates an instance of the options-object for opening an existing file.
+        /// \returns Shared-pointer of a newly create options-object.
+        static std::shared_ptr<imgdoc2::IOpenExistingOptions> CreateOpenExistingOptionsSp();
+
         /// Creates a "standard" hosting environment.
         /// \returns The newly created "standard" hosting environment object.
         static std::shared_ptr<IHostingEnvironment> CreateStandardHostingEnvironment();
@@ -43,7 +51,7 @@ namespace imgdoc2
         static std::shared_ptr<IHostingEnvironment> CreateNullHostingEnvironment();
 
         /// Creates hosting environment which routes the methods to the provided plan C-function pointers.
-        /// \param          userparam                  The userparam (which is passed to the functions).
+        /// \param          userparam                  The user-parameter (which is passed to the functions).
         /// \param [in]     pfnLog                     If non-null, function for the Log method.
         /// \param [in]     pfnIsLevelActive           If non-null, function for the IsLogLevelActive method.
         /// \param [in]     pfnReportFatalErrorAndExit If non-null, function for the ReportFatalErrorAndExit method.

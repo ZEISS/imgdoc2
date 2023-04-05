@@ -85,12 +85,12 @@ std::shared_ptr<DatabaseConfiguration3D> DbDiscovery::GetDatabaseConfiguration3D
 
 std::shared_ptr<DatabaseConfiguration2D> DbDiscovery::GetDatabaseConfiguration2DOrNull() const
 {
-    return std::static_pointer_cast<DatabaseConfiguration2D>(this->configuration_);
+    return dynamic_pointer_cast<DatabaseConfiguration2D>(this->configuration_);
 }
 
 std::shared_ptr<DatabaseConfiguration3D> DbDiscovery::GetDatabaseConfiguration3DOrNull() const
 {
-    return std::static_pointer_cast<DatabaseConfiguration3D>(this->configuration_);
+    return dynamic_pointer_cast<DatabaseConfiguration3D>(this->configuration_);
 }
 
 void DbDiscovery::FillInformationForConfiguration2D(const GeneralDataDiscoveryResult& general_data_discovery_result, DatabaseConfiguration2D& database_configuration_2d)

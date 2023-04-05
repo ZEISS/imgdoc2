@@ -36,16 +36,96 @@ namespace imgdoc2
             this->EnumCoordinates([&](imgdoc2::Dimension d, int v)->bool {return f(d); });
         }
 
+        /// Determine if the two specified ITileCoordinate objects are equal. Equality is defined as having the same
+        /// set of dimensions and the same values for each dimension. In addition, object identity is also regarded
+        /// as equality, but comparison with nullptr is not regarded as equality (also - two nullptrs are regarded as
+        /// unequal).
+        ///
+        /// \param  a   The first ITileCoordinate to compare.
+        /// \param  b   The second ITileCoordinate to compare.
+        ///
+        /// \returns    True if equal, false if not.
+        [[nodiscard]] static bool AreEqual(const ITileCoordinate* a, const ITileCoordinate* b)
+        {
+            if (a == b)
+            {
+                return true;
+            }
+
+            if (a == nullptr || b == nullptr)
+            {
+                return false;
+            }
+
+            bool are_equal = true;
+
+            // first, we enumerate the dimensions in a and check if they are also in b (and have the same value)
+            a->EnumCoordinates(
+                [=, &are_equal](imgdoc2::Dimension dimension, int value_a)->bool
+                {
+                    int value_b;
+                    if (!b->TryGetCoordinate(dimension, &value_b))
+                    {
+                        are_equal = false;
+                        return false;
+                    }
+
+                    if (value_a != value_b)
+                    {
+                        are_equal = false;
+                        return false;
+                    }
+
+                    return true;
+                });
+
+            if (are_equal)
+            {
+                // Ok, this means that for all dimensions present in a, we have the same value in b (and dimension is also present in b of course).
+                // However, it may be that b has more dimensions than a. So we need to check that as well (but we don't need to check the equality
+                // of the values any more this time).
+                b->EnumCoordinates(
+                   [=, &are_equal](imgdoc2::Dimension dimension, int)->bool
+                   {
+                       if (!a->TryGetCoordinate(dimension, nullptr))
+                       {
+                           are_equal = false;
+                           return false;
+                       }
+
+                       return true;
+                   });
+            }
+
+            return are_equal;
+        }
+
+        /// Equality operator.
+        /// \param  other   The other object to compare to.
+        /// \returns    True if equal, false if not.
+        bool operator==(const ITileCoordinate& other) const
+        {
+            return ITileCoordinate::AreEqual(this, &other);
+        }
+
+        /// Inequality operator.
+        /// \param  other   The other object to compare to.
+        /// \returns    True if unequal, false if not.
+        bool operator!=(const ITileCoordinate& other) const
+        {
+            return !ITileCoordinate::AreEqual(this, &other);
+        }
+
         /// Gets a vector with the dimensions contained in this object.
         /// \returns The dimensions.
         [[nodiscard]] std::vector<imgdoc2::Dimension> GetDimensions() const
         {
             std::vector<imgdoc2::Dimension> vec;
             this->EnumDimensions(
-                [&vec](imgdoc2::Dimension d)->bool 
+                [&vec](imgdoc2::Dimension d)->bool
                 {
-                    vec.push_back(d); 
-                    return true; 
+                    vec.push_back(d);
+                    return true;
                 });
 
             return vec;

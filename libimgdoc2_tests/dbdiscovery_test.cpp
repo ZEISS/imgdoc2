@@ -174,6 +174,53 @@ TEST(DbDiscoveryTest, CreateEmptyImage3dDocumentAndTryToGetReaderWriter2dObjectA
     EXPECT_TRUE(!!writer3d);
 }
 
+TEST(DbDiscoveryTest, CreateDocument2dAndUseOpenExistingAndCheckContent)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+
+    // This is using a special filename for sqlite, which creates a database in memory and allows it to be opened
+    //  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
+    //  The memory is reclaimed when the last connection to the database closes.
+    create_options->SetFilename("file:memdb1?mode=memory&cache=shared");
+    create_options->AddDimension('A');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    auto writer2d = doc->GetWriter2d();
+
+    LogicalPositionInfo position_info;
+    TileBaseInfo tile_info;
+    position_info.posX = 1;
+    position_info.posY = 2;
+    position_info.width = 3;
+    position_info.height = 4;
+    position_info.pyrLvl = 0;
+    tile_info.pixelWidth = 10;
+    tile_info.pixelHeight = 11;
+    tile_info.pixelType = PixelType::Gray32Float;
+    const TileCoordinate tile_coordinate({ { 'A', 3} });
+    dbIndex index = writer2d->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    writer2d.reset();
+
+    const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
+    open_existing_options->SetFilename("file:memdb1?mode=memory&cache=shared");
+    const auto doc2 = ClassFactory::OpenExisting(open_existing_options.get());
+    const auto reader2d = doc2->GetReader2d();
+    const uint64_t total_tile_count = reader2d->GetTotalTileCount();
+    EXPECT_EQ(total_tile_count, 1);
+    vector<dbIndex> tile_indices;
+    reader2d->Query(nullptr, nullptr, [&tile_indices](dbIndex tile_index)->bool {tile_indices.push_back(tile_index); return true; });
+    ASSERT_EQ(tile_indices.size(), 1);
+    TileCoordinate tile_coordinate_doc2;
+    LogicalPositionInfo logical_position_info_doc2;
+    TileBlobInfo tile_blob_info_doc2;
+    reader2d->ReadTileInfo(tile_indices[0], &tile_coordinate_doc2, &logical_position_info_doc2, &tile_blob_info_doc2);
+    EXPECT_EQ(tile_coordinate_doc2, tile_coordinate);
+    EXPECT_EQ(logical_position_info_doc2, position_info);
+    EXPECT_EQ(tile_blob_info_doc2.base_info.pixelWidth, 10);
+    EXPECT_EQ(tile_blob_info_doc2.base_info.pixelHeight, 11);
+    EXPECT_EQ(tile_blob_info_doc2.base_info.pixelType, PixelType::Gray32Float);
+    EXPECT_EQ(tile_blob_info_doc2.data_type, DataTypes::ZERO);
+}
+
 // -----------------------------------------------------------------------------------------
 
 TEST(DbDiscoveryTest, CreateAndDiscover3D)
@@ -252,4 +299,56 @@ TEST(DbDiscoveryTest, CreateWithSpatialIndexAndDiscover3D)
     EXPECT_TRUE(database_configuration_from_creation->GetTableNameForTilesSpatialIndexTableOrThrow() == database_configuration_from_discovery->GetTableNameForTilesSpatialIndexTableOrThrow());
     EXPECT_TRUE(database_configuration_from_creation->GetIsUsingSpatialIndex());
     EXPECT_TRUE(database_configuration_from_discovery->GetIsUsingSpatialIndex());
+}
+
+TEST(DbDiscoveryTest, CreateDocument3dAndUseOpenExistingAndCheckContent)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+
+    // This is using a special filename for sqlite, which creates a database in memory and allows it to be opened
+    //  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
+    //  The memory is reclaimed when the last connection to the database closes.
+    create_options->SetFilename("file:memdb2?mode=memory&cache=shared");
+    create_options->SetDocumentType(DocumentType::kImage3d);
+    create_options->AddDimension('A');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    auto writer3d = doc->GetWriter3d();
+
+    LogicalPositionInfo3D position_info_3d;
+    BrickBaseInfo brick_base_info;
+    position_info_3d.posX = 1;
+    position_info_3d.posY = 2;
+    position_info_3d.posZ = 3;
+    position_info_3d.width = 4;
+    position_info_3d.height = 5;
+    position_info_3d.depth = 6;
+    position_info_3d.pyrLvl = 0;
+    brick_base_info.pixelWidth = 10;
+    brick_base_info.pixelHeight = 11;
+    brick_base_info.pixelDepth = 12;
+    brick_base_info.pixelType = PixelType::Gray32Float;
+    const TileCoordinate tile_coordinate({ { 'A', 3} });
+    dbIndex index = writer3d->AddBrick(&tile_coordinate, &position_info_3d, &brick_base_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    writer3d.reset();
+
+    const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
+    open_existing_options->SetFilename("file:memdb2?mode=memory&cache=shared");
+    const auto doc2 = ClassFactory::OpenExisting(open_existing_options.get());
+    const auto reader3d = doc2->GetReader3d();
+    const uint64_t total_tile_count = reader3d->GetTotalTileCount();
+    EXPECT_EQ(total_tile_count, 1);
+    vector<dbIndex> tile_indices;
+    reader3d->Query(nullptr, nullptr, [&tile_indices](dbIndex tile_index)->bool {tile_indices.push_back(tile_index); return true; });
+    ASSERT_EQ(tile_indices.size(), 1);
+    TileCoordinate tile_coordinate_doc2;
+    LogicalPositionInfo3D logical_position_info_3d_doc2;
+    BrickBlobInfo tile_blob_info_3d_doc2;
+    reader3d->ReadBrickInfo(tile_indices[0], &tile_coordinate_doc2, &logical_position_info_3d_doc2, &tile_blob_info_3d_doc2);
+    EXPECT_EQ(tile_coordinate_doc2, tile_coordinate);
+    EXPECT_EQ(logical_position_info_3d_doc2, position_info_3d);
+    EXPECT_EQ(tile_blob_info_3d_doc2.base_info.pixelWidth, 10);
+    EXPECT_EQ(tile_blob_info_3d_doc2.base_info.pixelHeight, 11);
+    EXPECT_EQ(tile_blob_info_3d_doc2.base_info.pixelDepth, 12);
+    EXPECT_EQ(tile_blob_info_3d_doc2.base_info.pixelType, PixelType::Gray32Float);
+    EXPECT_EQ(tile_blob_info_3d_doc2.data_type, DataTypes::ZERO);
 }
