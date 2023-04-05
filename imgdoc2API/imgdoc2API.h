@@ -24,18 +24,44 @@
 #include "tilecountperlayerinterop.h"
 #include "planenormalanddistanceinterop.h"
 
+/** @file imgdoc2API.h
+ *  The flat API for the imgdoc2 module.
+ */
+
+ /// Defines an alias representing the underlying type of an object handle. It is a pointer size value.
 typedef std::intptr_t ObjectHandle;
 
 static constexpr ObjectHandle kInvalidObjectHandle = 0; ///< (Immutable) Reserved value indicating an invalid object handle.
 
+/// Defines an alias representing the handle of an environment object.
 typedef ObjectHandle HandleEnvironmentObject;
+
+/// Defines an alias representing the handle of an CreateOptions object.
 typedef ObjectHandle HandleCreateOptions;
+
+/// Defines an alias representing the handle of an OpenExistingOptions object.
 typedef ObjectHandle HandleOpenExistingOptions;
+
+/// Defines an alias representing the handle of an imgdoc2 document object.
 typedef ObjectHandle HandleDoc;
+
+/// Defines an alias representing the handle of an reader2d object.
 typedef ObjectHandle HandleDocRead2D;
+
+/// Defines an alias representing the handle of an writer2d object.
 typedef ObjectHandle HandleDocWrite2D;
+
+/// Defines an alias representing the handle of an reader3d object.
 typedef ObjectHandle HandleDocRead3D;
+
+/// Defines an alias representing the handle of an writer2d object.
 typedef ObjectHandle HandleDocWrite3D;
+
+/// Defines an alias representing a function pointer used for memory transfer operations. This function pointer is used with IDocRead2d_ReadTileData/IDocRead3d_ReadBrickData.
+typedef bool(LIBIMGDOC2_STDCALL* MemTransferReserveFunctionPointer)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*size*/); // NOLINT(readability/casting)
+
+/// Defines an alias representing a function pointer used for memory transfer operations. This function pointer is used with IDocRead2d_ReadTileData/IDocRead3d_ReadBrickData.
+typedef bool(LIBIMGDOC2_STDCALL* MemTransferSetDataFunctionPointer)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/); // NOLINT(readability/casting)
 
 /// Retrieve the 'ImgDoc2StatisticsInterop' structure, which contains various statistics about
 /// the state of library.In particular, we keep track of how many outstanding object-handles we
@@ -48,16 +74,16 @@ EXTERNAL_API(void) GetStatistics(ImgDoc2StatisticsInterop* statistics_interop);
 /// IMPORTANT: The environment object created here must have a lifetime greater than any of its usages.
 ///
 /// \param          user_parameter                  A user parameter (which gets passed to the callback function following).
-/// \param [in,out] pfn_log                         If non-null, a function pointer which gets called for providing logging functionality.
-/// \param [in,out] pfn_is_level_active             If non-null, a function pointer which gets called to query if the specified logging level is active.
-/// \param [in,out] pfn_report_fatal_error_and_exit If non-null, a function pointer which gets called in case of a fatal internal error. This function is expected to *not* return, but terminate execution.
+/// \param [in]     pfn_log                         If non-null, a function pointer which gets called for providing logging functionality.
+/// \param [in]     pfn_is_level_active             If non-null, a function pointer which gets called to query if the specified logging level is active.
+/// \param [in]     pfn_report_fatal_error_and_exit If non-null, a function pointer which gets called in case of a fatal internal error. This function is expected to *not* return, but terminate execution.
 ///
 /// \returns A handle representing the new environment object.
 EXTERNAL_API(HandleEnvironmentObject) CreateEnvironmentObject(
     std::intptr_t user_parameter, 
-    void (*pfn_log)(std::intptr_t /*userparam*/, int /*level*/, const char* /*szMessage*/),
-    bool (*pfn_is_level_active)(std::intptr_t /*userparam*/, int /*level*/),
-    void (*pfn_report_fatal_error_and_exit)(std::intptr_t /*userparam*/, const char* /*szMessage*/));
+    void (LIBIMGDOC2_STDCALL * pfn_log)(std::intptr_t /*userparam*/, int /*level*/, const char* /*szMessage*/),
+    bool (LIBIMGDOC2_STDCALL * pfn_is_level_active)(std::intptr_t /*userparam*/, int /*level*/),
+    void (LIBIMGDOC2_STDCALL * pfn_report_fatal_error_and_exit)(std::intptr_t /*userparam*/, const char* /*szMessage*/));
 
 /// Destroys the environment object described by the specified handle.
 /// NB: it is the caller's responsibility to ensure that the object is not in use when destroying it.
@@ -372,8 +398,8 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileData(
     HandleDocRead2D handle,
     std::int64_t pk,
     std::intptr_t blob_output_handle,
-    bool(LIBIMGDOC2_STDCALL* pfnReserve)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*size*/), // NOLINT(readability/casting)
-    bool(LIBIMGDOC2_STDCALL* pfnSetData)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/), // NOLINT(readability/casting)
+    MemTransferReserveFunctionPointer pfnReserve,
+    MemTransferSetDataFunctionPointer pfnSetData,
     ImgDoc2ErrorInformation* error_information);
 
 /// Method operating on a reader2d-object: query the tiles table. The three query clauses are
@@ -388,7 +414,6 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_ReadTileData(
 /// \param          tile_info_query_clause_interop      The interop-structure containing the tile-info query clause.
 /// \param [out]    result                              The result structure.
 /// \param [out]    error_information                   If non-null, in case of an error, additional information describing the error are put here.
-///     error.
 ///
 /// \returns    An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocRead2d_GetTilesIntersectingRect(
@@ -457,7 +482,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_AddBrick(
 /// \param [out] error_information                  If non-null, in case of an error, additional information describing the error are put here.
 ///
 /// \returns An error-code indicating success or failure of the operation.
-ImgDoc2ErrorCode IDocRead3d_ReadBrickInfo(
+EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickInfo(
     HandleDocRead3D handle,
     std::int64_t pk,
     TileCoordinateInterop* tile_coordinate_interop,
@@ -540,8 +565,8 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocRead3d_ReadBrickData(
     HandleDocRead3D handle,
     std::int64_t pk,
     std::intptr_t blob_output_handle,
-    bool(LIBIMGDOC2_STDCALL* pfnReserve)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*size*/), // NOLINT(readability/casting)
-    bool(LIBIMGDOC2_STDCALL* pfnSetData)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/), // NOLINT(readability/casting)
+    MemTransferReserveFunctionPointer pfnReserve,
+    MemTransferSetDataFunctionPointer pfnSetData,
     ImgDoc2ErrorInformation* error_information);
 
 /// Get the tile-dimensions used in the document. On input, the parameter 'count' must give the

@@ -51,3 +51,4 @@ libimgdoc2/doxygen
 .idea
 cmake-build-debug/
 megalinter-reports/
+imgdoc2API/doxygen
