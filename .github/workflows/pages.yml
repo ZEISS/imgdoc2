@@ -48,7 +48,7 @@ jobs:
           dotnet tool update -g docfx
           cd dotnet/docfx
           docfx
-          # currently, we are building the documentation in-tree, and we are manually 
+          # currently, we are building the documentation in-tree, and we are manually
           # deleting the files from the repo here
           rm docfx.json
           rm toc.yml
