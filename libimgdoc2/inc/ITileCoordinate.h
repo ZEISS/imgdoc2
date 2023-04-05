@@ -47,14 +47,14 @@ namespace imgdoc2
         /// \returns    True if equal, false if not.
         [[nodiscard]] static bool AreEqual(const ITileCoordinate* a, const ITileCoordinate* b)
         {
-            if (a == b)
-            {
-                return true;
-            }
-
             if (a == nullptr || b == nullptr)
             {
                 return false;
+            }
+
+            if (a == b)
+            {
+                return true;
             }
 
             bool are_equal = true;
