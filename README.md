@@ -20,6 +20,8 @@ Goal is to research and evaluate the feasibility of leveraging an RDBMS (and SQL
 ## Docs
 https://ZEISS.github.io/imgdoc2/libimgdoc2/
 
+https://ZEISS.github.io/imgdoc2/imgdoc2API/
+
 https://ZEISS.github.io/imgdoc2/imgdoc2net/
 
 ### Licensing

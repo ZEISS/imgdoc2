@@ -36,6 +36,11 @@ jobs:
         with:
           doxyfile-path: "./Doxyfile" # Path to Doxyfile
           working-directory: "libimgdoc2" # Working directory
+      - name: Doxygen action for imgdoc2API
+        uses: mattnotmitt/doxygen-action@v1.9.5
+        with:
+          doxyfile-path: "./Doxyfile" # Path to Doxyfile
+          working-directory: "imgdoc2API" # Working directory
       # ...and docfx to build the documentation for the .NET part
       # (main motivation for using docfx was that doxygen does not understand latest C# language features)
       - name: DocFx action for ImgDoc2Net
@@ -43,7 +48,7 @@ jobs:
           dotnet tool update -g docfx
           cd dotnet/docfx
           docfx
-          # currently, we are building the documentation in-tree, and we manually are
+          # currently, we are building the documentation in-tree, and we are manually 
           # deleting the files from the repo here
           rm docfx.json
           rm toc.yml
@@ -53,7 +58,9 @@ jobs:
           mkdir ${{github.workspace}}/documentation
           mkdir ${{github.workspace}}/documentation/libimgdoc2
           mkdir ${{github.workspace}}/documentation/imgdoc2net
+          mkdir ${{github.workspace}}/documentation/imgdoc2API
           cp -r ${{github.workspace}}/libimgdoc2/doxygen/html/* ${{github.workspace}}/documentation/libimgdoc2
+          cp -r ${{github.workspace}}/imgdoc2API/doxygen/html/* ${{github.workspace}}/documentation/imgdoc2API
           cp -r ${{github.workspace}}/dotnet/docfx/* ${{github.workspace}}/documentation/imgdoc2net
           # add a "top-level-HTML-file" redirecting to the actual documentation
           echo "<meta http-equiv=\"Refresh\" content=\"0; url='imgdoc2net/'\" />" >> ${{github.workspace}}/documentation/index.html
