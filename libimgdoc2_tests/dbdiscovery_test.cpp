@@ -197,7 +197,7 @@ TEST(DbDiscoveryTest, CreateDocument2dAndUseOpenExistingAndCheckContent)
     tile_info.pixelHeight = 11;
     tile_info.pixelType = PixelType::Gray32Float;
     const TileCoordinate tile_coordinate({ { 'A', 3} });
-    dbIndex index = writer2d->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    writer2d->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
     writer2d.reset();
 
     const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
@@ -328,7 +328,7 @@ TEST(DbDiscoveryTest, CreateDocument3dAndUseOpenExistingAndCheckContent)
     brick_base_info.pixelDepth = 12;
     brick_base_info.pixelType = PixelType::Gray32Float;
     const TileCoordinate tile_coordinate({ { 'A', 3} });
-    dbIndex index = writer3d->AddBrick(&tile_coordinate, &position_info_3d, &brick_base_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    writer3d->AddBrick(&tile_coordinate, &position_info_3d, &brick_base_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
     writer3d.reset();
 
     const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
