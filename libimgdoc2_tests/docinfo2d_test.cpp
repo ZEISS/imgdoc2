@@ -311,13 +311,21 @@ TEST(DocInfo2d, GetTilesBoundingBoxForSimpleDocumentAndCheckResult)
 
     // act
     DoubleInterval bounds_x, bounds_y;
+    DoubleInterval bounds_x_partial, bounds_y_partial;
     reader->GetTilesBoundingBox(&bounds_x, &bounds_y);
+    reader->GetTilesBoundingBox(&bounds_x_partial, nullptr);    // exercise variation for better code-coverage
+    reader->GetTilesBoundingBox(nullptr, &bounds_y_partial);    // exercise variation for better code-coverage
+    reader->GetTilesBoundingBox(nullptr, nullptr);              // exercise variation for better code-coverage, which is quite pointless here of course
 
     // assert
     EXPECT_EQ(bounds_x.minimum_value, 0);
     EXPECT_EQ(bounds_x.maximum_value, 15);
     EXPECT_EQ(bounds_y.minimum_value, 0);
     EXPECT_EQ(bounds_y.maximum_value, 13);
+    EXPECT_EQ(bounds_x_partial.minimum_value, 0);
+    EXPECT_EQ(bounds_x_partial.maximum_value, 15);
+    EXPECT_EQ(bounds_y_partial.minimum_value, 0);
+    EXPECT_EQ(bounds_y_partial.maximum_value, 13);
 }
 
 TEST(DocInfo2d, GetTilesBoundingBoxForEmptyDocumentAndCheckResult)
