@@ -12,10 +12,10 @@ using namespace std;
 using namespace imgdoc2;
 
 /*virtual*/imgdoc2::dbIndex DocumentWrite3d::AddBrick(
-            const imgdoc2::ITileCoordinate* coord,
-            const imgdoc2::LogicalPositionInfo3D* info,
+            const imgdoc2::ITileCoordinate* coordinate,
+            const imgdoc2::LogicalPositionInfo3D* logical_position_3d_info,
             const imgdoc2::BrickBaseInfo* brickInfo,
-            imgdoc2::DataTypes datatype,
+            imgdoc2::DataTypes data_type,
             imgdoc2::TileDataStorageType storage_type,
             const imgdoc2::IDataObjBase* data)
 {
@@ -23,7 +23,7 @@ using namespace imgdoc2;
         this->document_->GetDatabase_connection(),
         [&]()->dbIndex
         {
-            return this->AddBrickInternal(coord, info, brickInfo, datatype, storage_type, data);
+            return this->AddBrickInternal(coordinate, logical_position_3d_info, brickInfo, data_type, storage_type, data);
         }
     };
 
@@ -47,13 +47,13 @@ using namespace imgdoc2;
 
 imgdoc2::dbIndex DocumentWrite3d::AddBrickInternal(
         const imgdoc2::ITileCoordinate* coordinate,
-        const imgdoc2::LogicalPositionInfo3D* info,
-        const imgdoc2::BrickBaseInfo* tileInfo,
+        const imgdoc2::LogicalPositionInfo3D* logical_position_info_3d,
+        const imgdoc2::BrickBaseInfo* brick_base_info,
         imgdoc2::DataTypes data_type,
         imgdoc2::TileDataStorageType storage_type,
         const imgdoc2::IDataObjBase* data)
 {
-    const auto tiles_data_id = this->AddBrickData(tileInfo, data_type, storage_type, data);
+    const auto tiles_data_id = this->AddBrickData(brick_base_info, data_type, storage_type, data);
 
     ostringstream string_stream;
     string_stream << "INSERT INTO [" << this->document_->GetDataBaseConfiguration3d()->GetTableNameForTilesInfoOrThrow() << "] ("
@@ -85,13 +85,13 @@ imgdoc2::dbIndex DocumentWrite3d::AddBrickInternal(
 
     const auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     int binding_index = 1;
-    statement->BindDouble(binding_index++, info->posX);
-    statement->BindDouble(binding_index++, info->posY);
-    statement->BindDouble(binding_index++, info->posZ);
-    statement->BindDouble(binding_index++, info->width);
-    statement->BindDouble(binding_index++, info->height);
-    statement->BindDouble(binding_index++, info->depth);
-    statement->BindInt32(binding_index++, info->pyrLvl);
+    statement->BindDouble(binding_index++, logical_position_info_3d->posX);
+    statement->BindDouble(binding_index++, logical_position_info_3d->posY);
+    statement->BindDouble(binding_index++, logical_position_info_3d->posZ);
+    statement->BindDouble(binding_index++, logical_position_info_3d->width);
+    statement->BindDouble(binding_index++, logical_position_info_3d->height);
+    statement->BindDouble(binding_index++, logical_position_info_3d->depth);
+    statement->BindInt32(binding_index++, logical_position_info_3d->pyrLvl);
     statement->BindInt64(binding_index++, tiles_data_id);
 
     for (const int coordinate_value : coordinate_values)
@@ -103,13 +103,13 @@ imgdoc2::dbIndex DocumentWrite3d::AddBrickInternal(
 
     if (this->document_->GetDataBaseConfiguration3d()->GetIsUsingSpatialIndex())
     {
-        this->AddToSpatialIndex(row_id, *info);
+        this->AddToSpatialIndex(row_id, *logical_position_info_3d);
     }
 
     return row_id;
 }
 
-imgdoc2::dbIndex DocumentWrite3d::AddBrickData(const imgdoc2::BrickBaseInfo* tile_info, imgdoc2::DataTypes datatype, imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data)
+imgdoc2::dbIndex DocumentWrite3d::AddBrickData(const imgdoc2::BrickBaseInfo* brick_base_info, imgdoc2::DataTypes data_type, imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data)
 {
     // first, add the blob data
     dbIndex blob_db_index = 0;
@@ -132,11 +132,11 @@ imgdoc2::dbIndex DocumentWrite3d::AddBrickData(const imgdoc2::BrickBaseInfo* til
     const auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
 
     int binding_index = 1;
-    statement->BindInt32(binding_index++, tile_info->pixelWidth);
-    statement->BindInt32(binding_index++, tile_info->pixelHeight);
-    statement->BindInt32(binding_index++, tile_info->pixelDepth);
-    statement->BindInt32(binding_index++, tile_info->pixelType);
-    statement->BindInt32(binding_index++, static_cast<underlying_type_t<decltype(datatype)>>(datatype));
+    statement->BindInt32(binding_index++, brick_base_info->pixelWidth);
+    statement->BindInt32(binding_index++, brick_base_info->pixelHeight);
+    statement->BindInt32(binding_index++, brick_base_info->pixelDepth);
+    statement->BindInt32(binding_index++, brick_base_info->pixelType);
+    statement->BindInt32(binding_index++, static_cast<underlying_type_t<decltype(data_type)>>(data_type));
     if (data != nullptr)
     {
         // for data-type "zero" 
@@ -158,7 +158,7 @@ imgdoc2::dbIndex DocumentWrite3d::AddBlobData(imgdoc2::TileDataStorageType stora
         throw invalid_operation_exception("Storage-types other than 'blob-in-database' are not implemented.");
     }
 
-    if (!this->document_->GetDataBaseConfiguration2d()->GetHasBlobsTable())
+    if (!this->document_->GetDataBaseConfiguration3d()->GetHasBlobsTable())
     {
         throw invalid_operation_exception("The database does not have a blob-table.");
     }

@@ -114,19 +114,19 @@ namespace ImgDoc2Net.Implementation
         /// <inheritdoc/>
         public Dimension[] GetTileDimensions()
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetTileDimensions(this.reader2dObjectHandle);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetTileDimensions(this.reader2dObjectHandle);
         }
 
         /// <inheritdoc/>
         public Dictionary<Dimension, (int Minimum, int Maximum)> GetMinMaxForTileDimension(IEnumerable<Dimension> dimensions)
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetMinMaxForTileDimensions(this.reader2dObjectHandle, dimensions);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetMinMaxForTileDimensions(this.reader2dObjectHandle, dimensions);
         }
 
         /// <inheritdoc/>
         public Extent2d GetBoundingBox()
         {
-            var extent = ImgDoc2ApiInterop.Instance.DocInfoGetTilesBoundingBox(this.reader2dObjectHandle);
+            var extent = ImgDoc2ApiInterop.Instance.DocInfo2dGetTilesBoundingBox(this.reader2dObjectHandle);
             return new Extent2d
             {
                 MinX = extent.minX,
@@ -139,13 +139,13 @@ namespace ImgDoc2Net.Implementation
         /// <inheritdoc/>
         public long GetTotalNumberOfTiles()
         {
-            return ImgDoc2ApiInterop.Instance.DocInfoGetTotalTileCount(this.reader2dObjectHandle);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetTotalTileCount(this.reader2dObjectHandle);
         }
 
         /// <inheritdoc/>
         public Dictionary<int, long> GetTileCountPerPyramidLayer()
         {
-            return ImgDoc2ApiInterop.Instance.GetTileCountPerPyramidLayer(this.reader2dObjectHandle);
+            return ImgDoc2ApiInterop.Instance.DocInfo2dGetTileCountPerPyramidLayer(this.reader2dObjectHandle);
         }
     }
 

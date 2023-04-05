@@ -16,18 +16,18 @@ namespace imgdoc2
     {
     public:
         /// Adds a brick to the document, and if successful, return its primary key.
-        /// \param  coord        The coordinate.
-        /// \param  info         The logical position information.
-        /// \param  brickInfo     Information describing the brick.
-        /// \param  datatype     The datatype.
-        /// \param  storage_type Type of the storage.
-        /// \param  data         The data.
+        /// \param  coordinate                  The coordinate.
+        /// \param  logical_position_3d_info    The logical position information.
+        /// \param  brick_base_info             Information describing the brick.
+        /// \param  data_type                   The datatype.
+        /// \param  storage_type                Type of the storage.
+        /// \param  data                        The data.
         /// \returns If successful, the primary key of the newly added tile.
         virtual imgdoc2::dbIndex AddBrick(
-            const imgdoc2::ITileCoordinate* coord,
-            const imgdoc2::LogicalPositionInfo3D* info,
-            const imgdoc2::BrickBaseInfo* brickInfo,
-            imgdoc2::DataTypes datatype,
+            const imgdoc2::ITileCoordinate* coordinate,
+            const imgdoc2::LogicalPositionInfo3D* logical_position_3d_info,
+            const imgdoc2::BrickBaseInfo* brick_base_info,
+            imgdoc2::DataTypes data_type,
             imgdoc2::TileDataStorageType storage_type,
             const imgdoc2::IDataObjBase* data) = 0;
 

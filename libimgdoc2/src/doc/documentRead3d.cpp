@@ -166,9 +166,9 @@ using namespace imgdoc2;
     }
 
     int result_index = 0;
-    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
-    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
-    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_z, statement.get(), result_index);
+    result_index = DocumentReadBase::SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
+    result_index = DocumentReadBase::SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
+    DocumentReadBase::SetCoordinateBoundsValueIfNonNull(bounds_z, statement.get(), result_index);
 }
 
 /*virtual*/void DocumentRead3d::ReadBrickData(imgdoc2::dbIndex idx, imgdoc2::IBlobOutput* data)
@@ -555,7 +555,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
     statement->BindDouble(binding_index++, plane.normal.z);
     statement->BindDouble(binding_index++, plane.distance);
 
-    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
+    Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
 
     return statement;
 }
@@ -574,7 +574,7 @@ std::shared_ptr<IDbStatement> DocumentRead3d::GetTilesIntersectingWithPlaneQuery
 
     int binding_index = 1;
     binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(intersect_with_plane_clause), statement.get(), binding_index);
-    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
+    Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info_clause), statement.get(), binding_index);
 
     return statement;
 }

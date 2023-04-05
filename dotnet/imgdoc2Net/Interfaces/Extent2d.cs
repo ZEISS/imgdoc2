@@ -4,10 +4,6 @@
 
 namespace ImgDoc2Net.Interfaces
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     /// <summary>   
     /// This class is used to represent the "minimum and the maximum of the value range for
     /// the x- and y-position". 
@@ -38,8 +34,8 @@ namespace ImgDoc2Net.Interfaces
             get { return this.MinX <= this.MaxX; }
         }
 
-        /// <summary>   Gets a value indicating whether the extent for the x coordinate is valid. </summary>
-        /// <value> True if the extent for the x coordinate is valid, false if not. </value>
+        /// <summary>   Gets a value indicating whether the extent for the y coordinate is valid. </summary>
+        /// <value> True if the extent for the y coordinate is valid, false if not. </value>
         public bool IsExtentYValid
         {
             get { return this.MinY <= this.MaxY; }

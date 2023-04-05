@@ -144,7 +144,12 @@ TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
 
     // act
     DoubleInterval interval_x, interval_y, interval_z;
+    DoubleInterval interval_x_partial, interval_y_partial, interval_z_partial;
     reader->GetBricksBoundingBox(&interval_x, &interval_y, &interval_z);
+    reader->GetBricksBoundingBox(&interval_x_partial, nullptr, nullptr);    // exercise variation for better code-coverage
+    reader->GetBricksBoundingBox(nullptr, &interval_y_partial, nullptr);    // exercise variation for better code-coverage
+    reader->GetBricksBoundingBox(nullptr, nullptr, &interval_z_partial);    // exercise variation for better code-coverage
+    reader->GetBricksBoundingBox(nullptr, nullptr, nullptr);                // exercise variation for better code-coverage, which is quite pointless here of course
 
     // assert
     ASSERT_DOUBLE_EQ(interval_x.minimum_value, min_x);
@@ -153,4 +158,7 @@ TEST(DocInfo3d, GetMBoundingBoxForXyzForRandomDocumentAndCheckResult)
     ASSERT_DOUBLE_EQ(interval_y.maximum_value, max_y);
     ASSERT_DOUBLE_EQ(interval_z.minimum_value, min_z);
     ASSERT_DOUBLE_EQ(interval_z.maximum_value, max_z);
+    ASSERT_EQ(interval_x, interval_x_partial);
+    ASSERT_EQ(interval_y, interval_y_partial);
+    ASSERT_EQ(interval_z, interval_z_partial);
 }

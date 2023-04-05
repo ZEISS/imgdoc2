@@ -14,7 +14,9 @@ namespace ImgDoc2Net_UnitTests
                 statisticsBefore.NumberOfOpenExistingOptionsObjectsActive == statisticsAfter.NumberOfOpenExistingOptionsObjectsActive &&
                 statisticsBefore.NumberOfDocumentObjectsActive == statisticsAfter.NumberOfDocumentObjectsActive &&
                 statisticsBefore.NumberOfReader2dObjectsActive == statisticsAfter.NumberOfReader2dObjectsActive &&
-                statisticsBefore.NumberOfWriter2dObjectsActive == statisticsAfter.NumberOfWriter2dObjectsActive)
+                statisticsBefore.NumberOfWriter2dObjectsActive == statisticsAfter.NumberOfWriter2dObjectsActive &&
+                statisticsBefore.NumberOfReader3dObjectsActive == statisticsAfter.NumberOfReader3dObjectsActive &&
+                statisticsBefore.NumberOfWriter3dObjectsActive == statisticsAfter.NumberOfWriter3dObjectsActive)
             {
                 return true;
             }

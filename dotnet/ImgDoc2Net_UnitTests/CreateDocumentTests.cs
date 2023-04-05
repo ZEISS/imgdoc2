@@ -38,6 +38,30 @@ namespace ImgDoc2Net_UnitTests
         }
 
         [Fact]
+        public void CreateNewDocument3DAndCheckIfItIsOperationalAtInteropLevel()
+        {
+            // this test is operating on "interop"-level
+            var instance = ImgDoc2ApiInterop.Instance;
+
+            // we get the "statistics" before running our test - the statistics contains counters of active objects,
+            //  and we check before leaving the test that it is where is was before (usually zero)
+            var statisticsBeforeTest = instance.GetStatistics();
+
+            var createOptionsHandle = instance.CreateCreateOptions();
+            instance.CreateOptionsSetDocumentType(createOptionsHandle, DocumentType.Image3d);
+            instance.CreateOptionsSetFilename(createOptionsHandle, ":memory:");
+            var documentHandle = instance.CreateNewDocument(createOptionsHandle);
+            Assert.NotEqual(documentHandle, IntPtr.Zero);
+            var reader3dHandle = instance.DocumentGetReader3d(documentHandle);
+            Assert.NotEqual(reader3dHandle, IntPtr.Zero);
+            instance.DestroyCreateOptions(createOptionsHandle);
+            instance.DestroyDocument(documentHandle);
+            instance.DestroyReader3d(reader3dHandle);
+
+            Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
+        }
+
+        [Fact]
         public void CreateNewDocumentWithInvalidCreateOptionsAndExpectExceptionAtInteropLevel()
         {
             // this test is operating on "interop"-level
@@ -54,6 +78,15 @@ namespace ImgDoc2Net_UnitTests
             using var createOptions = new CreateOptions() { Filename = ":memory:" };
             using var document = Document.CreateNew(createOptions);
             using var reader2d = document.Get2dReader();
+            Assert.NotNull(reader2d);
+        }
+
+        [Fact]
+        public void CreateNewDocument3DAndCheckIfItIsOperational()
+        {
+            using var createOptions = new CreateOptions() { Filename = ":memory:", DocumentType = DocumentType.Image3d };
+            using var document = Document.CreateNew(createOptions);
+            using var reader2d = document.Get3dReader();
             Assert.NotNull(reader2d);
         }
 

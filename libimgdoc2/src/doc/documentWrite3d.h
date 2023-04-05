@@ -20,10 +20,10 @@ public:
     {}
 
     imgdoc2::dbIndex AddBrick(
-        const imgdoc2::ITileCoordinate* coord,
-        const imgdoc2::LogicalPositionInfo3D* info,
-        const imgdoc2::BrickBaseInfo* tileInfo,
-        imgdoc2::DataTypes datatype,
+        const imgdoc2::ITileCoordinate* coordinate,
+        const imgdoc2::LogicalPositionInfo3D* logical_position_3d_info,
+        const imgdoc2::BrickBaseInfo* brick_base_info,
+        imgdoc2::DataTypes data_type,
         imgdoc2::TileDataStorageType storage_type,
         const imgdoc2::IDataObjBase* data) override;
 
@@ -36,15 +36,15 @@ public:
 private:
     imgdoc2::dbIndex AddBrickInternal(
         const imgdoc2::ITileCoordinate* coordinate,
-        const imgdoc2::LogicalPositionInfo3D* info,
-        const imgdoc2::BrickBaseInfo* tileInfo,
+        const imgdoc2::LogicalPositionInfo3D* logical_position_info_3d,
+        const imgdoc2::BrickBaseInfo* brick_base_info,
         imgdoc2::DataTypes data_type,
         imgdoc2::TileDataStorageType storage_type,
         const imgdoc2::IDataObjBase* data);
 
     void AddToSpatialIndex(imgdoc2::dbIndex index, const imgdoc2::LogicalPositionInfo3D& logical_position_info);
 
-    imgdoc2::dbIndex AddBrickData(const imgdoc2::BrickBaseInfo* tile_info, imgdoc2::DataTypes datatype, imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
+    imgdoc2::dbIndex AddBrickData(const imgdoc2::BrickBaseInfo* brick_base_info, imgdoc2::DataTypes data_type, imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
     imgdoc2::dbIndex AddBlobData(imgdoc2::TileDataStorageType storage_type, const imgdoc2::IDataObjBase* data);
 
     std::shared_ptr<IDbStatement> CreateInsertDataStatement(const imgdoc2::IDataObjBase* data);

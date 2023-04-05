@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 add_library(imgdoc2API  SHARED
-                imgdoc2API.h
-                imgdoc2API.cpp 
+                "imgdoc2API.h"
+                "imgdoc2API.cpp"
                 "importexport.h" 
                 "errorcodes.h" 
                 "tilecoordinateinterop.h" 
@@ -14,14 +14,23 @@ add_library(imgdoc2API  SHARED
                 "queryresultinterop.h" 
                 "dimcoordinatequeryclauseinterop.h" 
                 "tilebaseinfointerop.h" 
-                "statisticsinterop.h"
+                "imgdoc2statisticsinterop.h"
                 "rectangledoubleinterop.h" 
                 "tileinfoqueryclauseinterop.h" 
                 "tileblobinfointerop.h" 
                 "minmaxfortiledimensioninterop.h" 
-                "tilecountperlayerinterop.h")
+                "tilecountperlayerinterop.h" 
+                "logicalpositioninfo3dinterop.h" 
+                "brickbaseinfointerop.h" 
+                "brickblobinfointerop.h" 
+                "cuboiddoubleinterop.h" 
+                "planenormalanddistanceinterop.h" 
+                "imgdoc2apistatistics.h")
 
 target_link_libraries(imgdoc2API PRIVATE libimgdoc2)
+
+# Link against the GSL interface library (i.e. header only library)
+target_link_libraries(imgdoc2API PRIVATE GSL)
 
 target_compile_definitions(imgdoc2API PUBLIC LIBIMGDOC2_EXPORTS)
 

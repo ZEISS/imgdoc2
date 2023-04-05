@@ -7,8 +7,8 @@
 #
 cmake_minimum_required (VERSION 3.7)
 
-# Needed to enable -MT compile switch
-cmake_policy(SET CMP0091 NEW)
+cmake_policy(SET CMP0091 NEW) # Needed to enable -MT compile switch
+cmake_policy(SET CMP0079 NEW) # necessary to make coverage build work, not sure why it is needed
 
 include(FetchContent)
 
@@ -20,6 +20,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(IMGDOC2_BUILD_CLANGTIDY "Build with Clang-Tidy" OFF)
+
+# Enable code-coverage for unit-tests (only works with GCC/Clang)
+# Usage is something like: cmake .. -DCMAKE_BUILD_TYPE=Debug -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF && make && make code_coverage
+# This will generate a coverage-report in the build-directory (code_coverage.xml)
+option(IMGDOC2_CODECOV "Build with Code-Coverage (for unit-tests)" OFF)
+
+option(IMGDOC2_BUILD_CONVCZI "Whether to build the convczi-tool" ON)
+
 
 if (IMGDOC2_BUILD_CLANGTIDY)
   # How "clang-tidy" organization works (if this option is enable here):
@@ -46,8 +54,6 @@ FetchContent_Declare(GSL
 
 FetchContent_MakeAvailable(GSL)
 
-option(IMGDOC2_BUILD_CONVCZI "Whether to build the convczi-tool" ON)
-
 add_subdirectory(external/sqlite3)
 
 add_subdirectory(libimgdoc2)
@@ -64,6 +70,14 @@ endif()
 enable_testing()
 add_subdirectory(libimgdoc2_tests)
 
-
-
-
+if (IMGDOC2_CODECOV)
+  include("${CMAKE_SOURCE_DIR}/cmake/CodeCoverage.cmake")
+  append_coverage_compiler_flags_to_target(libimgdoc2_tests)
+  append_coverage_compiler_flags_to_target(libimgdoc2)
+  setup_target_for_coverage_gcovr_xml(
+		    NAME code_coverage
+        EXECUTABLE ctest
+		    DEPENDENCIES   libimgdoc2 libimgdoc2_tests
+		    BASE_DIRECTORY "${PROJECT_SOURCE_DIR}"
+		    EXCLUDE "${PROJECT_SOURCE_DIR}/libimgdoc2_tests/*" "${PROJECT_BINARY_DIR}/_deps/*" "/usr/include/*")
+endif()

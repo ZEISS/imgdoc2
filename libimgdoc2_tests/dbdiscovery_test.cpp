@@ -99,14 +99,14 @@ TEST(DbDiscoveryTest, CreateAndAlterGeneralTableToHaveInconsistentInformationAnd
 
     {
         DbCreator db_creator(dbConnection);
-        auto create_options = ClassFactory::CreateCreateOptionsUp();
+        const auto create_options = ClassFactory::CreateCreateOptionsUp();
         create_options->AddDimension('a');
         create_options->AddDimension('b');
         create_options->AddDimension('c');
         create_options->AddIndexForDimension('a');
         create_options->AddIndexForDimension('c');
         create_options->SetUseSpatialIndex(false);
-        auto configuration = db_creator.CreateTables2d(create_options.get());
+        const auto configuration = db_creator.CreateTables2d(create_options.get());
         database_configuration_from_creation = dynamic_pointer_cast<DatabaseConfiguration2D>(configuration);
     }
 
@@ -139,6 +139,39 @@ TEST(DbDiscoveryTest, CreateEmptyDataBaseAndExpectDiscoverToReportError)
 
     DbDiscovery db_discovery(dbConnection);
     EXPECT_THROW(db_discovery.DoDiscovery(), imgdoc2::discovery_exception);
+}
+
+TEST(DbDiscoveryTest, CreateEmptyImage2dDocumentAndTryToGetReaderWriter3dObjectAndExpectError)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto reader3d = doc->GetReader3d();
+    EXPECT_FALSE(!!reader3d);
+    const auto writer3d = doc->GetWriter3d();
+    EXPECT_FALSE(!!writer3d);
+    const auto reader2d = doc->GetReader2d();
+    EXPECT_TRUE(!!reader2d);
+    const auto writer2d = doc->GetWriter2d();
+    EXPECT_TRUE(!!writer2d);
+}
+
+TEST(DbDiscoveryTest, CreateEmptyImage3dDocumentAndTryToGetReaderWriter2dObjectAndExpectError)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetDocumentType(DocumentType::kImage3d);
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto reader2d = doc->GetReader2d();
+    EXPECT_FALSE(!!reader2d);
+    const auto writer2d = doc->GetWriter2d();
+    EXPECT_FALSE(!!writer2d);
+    const auto reader3d = doc->GetReader3d();
+    EXPECT_TRUE(!!reader3d);
+    const auto writer3d = doc->GetWriter3d();
+    EXPECT_TRUE(!!writer3d);
 }
 
 // -----------------------------------------------------------------------------------------

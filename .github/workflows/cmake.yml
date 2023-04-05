@@ -53,3 +53,18 @@ jobs:
       - name: Run .NET tests
         working-directory: ${{github.workspace}}/dotnet
         run: dotnet test /p:EnableWindowsTargeting=true
+
+      - name: code-coverage
+        run: |
+          sudo apt-get -y install gcovr
+          cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF
+          cd ${{github.workspace}}/coveragebuild
+          make code_coverage
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          directory: ${{github.workspace}}/coveragebuild
+          files: code_coverage.xml
+          verbose: true

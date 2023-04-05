@@ -7,7 +7,7 @@
 namespace imgdoc2
 {
     /// Values that represent different document types.
-    enum class DocumentType
+    enum class DocumentType : std::uint8_t
     {
         kInvalid = 0,    ///< An enum constant representing the invalid option.
         kImage2d,        ///< An enum constant representing the "image 2D" option.

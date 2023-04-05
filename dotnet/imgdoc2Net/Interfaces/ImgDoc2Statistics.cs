@@ -33,5 +33,15 @@ namespace ImgDoc2Net.Interfaces
         ///
         /// <value> The total number of currently existing "writer 2d" objects.</value>
         public int NumberOfWriter2dObjectsActive { get; set; }
+
+        /// <summary> Gets or sets the number of currently existing "reader 3d" objects.</summary>
+        ///
+        /// <value> The total number of currently existing "reader 3d" objects.</value>
+        public int NumberOfReader3dObjectsActive { get; set; }
+
+        /// <summary> Gets or sets the number of currently existing "writer 3d" objects.</summary>
+        ///
+        /// <value> The total number of currently existing "writer 3d" objects.</value>
+        public int NumberOfWriter3dObjectsActive { get; set; }
     }
 }

@@ -30,5 +30,12 @@ namespace imgdoc2
         [[nodiscard]] virtual const std::string& GetFilename() const = 0;
 
         virtual ~IOpenExistingOptions() = default;
+
+        // no copy and no move (-> https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all )
+        IOpenExistingOptions() = default;
+        IOpenExistingOptions(const IOpenExistingOptions&) = delete;             // copy constructor
+        IOpenExistingOptions& operator=(const IOpenExistingOptions&) = delete;  // copy assignment
+        IOpenExistingOptions(IOpenExistingOptions&&) = delete;                  // move constructor
+        IOpenExistingOptions& operator=(IOpenExistingOptions&&) = delete;       // move assignment
     };
 }

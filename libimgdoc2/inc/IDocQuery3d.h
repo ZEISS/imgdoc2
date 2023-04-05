@@ -6,7 +6,6 @@
 #include "LogicalPositionInfo.h"
 #include "BrickBaseInfo.h"
 #include "ITileCoordinate.h"
-#include "LogicalPositionInfo.h"
 #include "IDimCoordinateQueryClause.h"
 #include "ITIleInfoQueryClause.h"
 #include "IBlobOutput.h"
@@ -31,7 +30,10 @@ namespace imgdoc2
         /// \param [out]    brick_blob_info If non-null and the operation is successful, the brick-blob-info will be put here.
         virtual void ReadBrickInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo3D* info, imgdoc2::BrickBlobInfo* brick_blob_info) = 0;
 
-        /// Query the tiles table. The 
+        /// Query the tiles table. The two query clauses are used to filter the tiles. The first clause is used to filter the tiles by their
+        /// coordinates, the second by other "per tile data". The functor is called for each tile which matches the query. If the functor
+        /// returns false, the enumeration is canceled, and no more calls to the functor will occur any more. The two query clauses are
+        /// logically ANDed together.
         /// \param clause        The query clause (dealing with dimension indexes).
         /// \param tileInfoQuery The query clause (dealing with other "per tile data").
         /// \param func          A functor which we will called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no

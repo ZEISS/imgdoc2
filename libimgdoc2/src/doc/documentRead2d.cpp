@@ -38,8 +38,8 @@ using namespace imgdoc2;
     }
 
     int result_index = 0;
-    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
-    result_index = this->SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
+    result_index = DocumentReadBase::SetCoordinateBoundsValueIfNonNull(bounds_x, statement.get(), result_index);
+    DocumentReadBase::SetCoordinateBoundsValueIfNonNull(bounds_y, statement.get(), result_index);
 }
 
 /*virtual*/std::map<imgdoc2::Dimension, imgdoc2::Int32Interval> DocumentRead2d::GetMinMaxForTileDimension(const std::vector<imgdoc2::Dimension>& dimensions_to_query_for)
@@ -275,7 +275,7 @@ shared_ptr<IDbStatement> DocumentRead2d::CreateQueryStatement(const imgdoc2::IDi
     auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
 
     int binding_index = 1;
-    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
+    Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
 
     return statement;
 }
@@ -347,7 +347,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     statement->BindDouble(binding_index++, rect.y);
     statement->BindDouble(binding_index++, rect.y + rect.h);
 
-    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
+    Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
 
     return statement;
 }
@@ -379,7 +379,7 @@ std::shared_ptr<IDbStatement> DocumentRead2d::GetTilesIntersectingRectQueryAndCo
     statement->BindDouble(binding_index++, rect.y);
     statement->BindDouble(binding_index++, rect.y + rect.h);
 
-    binding_index = Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
+    Utilities::AddDataBindInfoListToDbStatement(get<1>(query_statement_and_binding_info), statement.get(), binding_index);
 
     return statement;
 }

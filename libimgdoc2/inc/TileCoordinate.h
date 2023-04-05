@@ -42,10 +42,11 @@ namespace imgdoc2
         {
             for (auto d : list)
             {
-                this->Set(d.dimension, d.value);
+                this->TileCoordinate::Set(d.dimension, d.value);
             }
         }
 
+        //! @copydoc imgdoc2::ITileCoordinateMutate::Set(imgdoc2::Dimension d, int value)
         void Set(imgdoc2::Dimension d, int value) override
         {
             const auto it = std::find_if(
@@ -65,6 +66,7 @@ namespace imgdoc2
             }
         }
 
+        //! @copydoc imgdoc2::ITileCoordinateMutate::Clear()
         void Clear() override
         {
             this->coordinates.clear();

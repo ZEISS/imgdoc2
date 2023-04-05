@@ -31,6 +31,12 @@ namespace ImgDoc2Net.Implementation
             get { return this.objectHandle; }
         }
 
+        public DocumentType DocumentType
+        {
+            get { return ImgDoc2ApiInterop.Instance.CreateOptionsGetDocumentType(this.objectHandle); }
+            set { ImgDoc2ApiInterop.Instance.CreateOptionsSetDocumentType(this.objectHandle, value); }
+        }
+
         /// <summary> Gets or sets the filename of the file.</summary>
         ///
         /// <value> The filename.</value>
