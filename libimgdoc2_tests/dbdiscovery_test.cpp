@@ -172,7 +172,6 @@ TEST(DbDiscoveryTest, CreateEmptyImage3dDocumentAndTryToGetReaderWriter2dObjectA
     EXPECT_TRUE(!!reader3d);
     const auto writer3d = doc->GetWriter3d();
     EXPECT_TRUE(!!writer3d);
-
 }
 
 // -----------------------------------------------------------------------------------------
