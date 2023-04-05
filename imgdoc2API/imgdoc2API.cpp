@@ -81,9 +81,9 @@ void GetStatistics(ImgDoc2StatisticsInterop* statistics_interop)
 
 HandleEnvironmentObject CreateEnvironmentObject(
     std::intptr_t user_parameter,
-    void (*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
-    bool (*pfn_is_level_active)(std::intptr_t userparam, int level),
-    void (*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage))
+    void (LIBIMGDOC2_STDCALL*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
+    bool (LIBIMGDOC2_STDCALL*pfn_is_level_active)(std::intptr_t userparam, int level),
+    void (LIBIMGDOC2_STDCALL*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage))
 {
     const auto environment = ClassFactory::CreateHostingEnvironmentForFunctionPointers(
         user_parameter,
@@ -888,8 +888,8 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileData(
     HandleDocRead2D handle,
     std::int64_t pk,
     std::intptr_t blob_output_handle,
-    bool(LIBIMGDOC2_STDCALL* pfnReserve)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*size*/), // NOLINT(readability/casting)
-    bool(LIBIMGDOC2_STDCALL* pfnSetData)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/), // NOLINT(readability/casting)
+    MemTransferReserveFunctionPointer pfnReserve,
+    MemTransferSetDataFunctionPointer pfnSetData,
     ImgDoc2ErrorInformation* error_information)
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
@@ -913,8 +913,8 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickData(
     HandleDocRead3D handle,
     std::int64_t pk,
     std::intptr_t blob_output_handle,
-    bool(LIBIMGDOC2_STDCALL* pfnReserve)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*size*/), // NOLINT(readability/casting)
-    bool(LIBIMGDOC2_STDCALL* pfnSetData)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/), // NOLINT(readability/casting)
+    MemTransferReserveFunctionPointer pfnReserve,
+    MemTransferSetDataFunctionPointer pfnSetData,
     ImgDoc2ErrorInformation* error_information)
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
