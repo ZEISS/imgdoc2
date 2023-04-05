@@ -22,17 +22,17 @@ TEST(Miscellaneous, TileCoordinateEquality)
     EXPECT_NE(tile_coordinate_a, tile_coordinate_b);
 
     tile_coordinate_a = { { 'A', 5 }, { 'B', 3} };
-    tile_coordinate_b = { { 'A', 5 }, { 'B', 3}, {'C', 12} };
+    tile_coordinate_b = { { 'A', 5 }, { 'B', 3}, { 'C', 12} };
     EXPECT_NE(tile_coordinate_a, tile_coordinate_b);
     EXPECT_NE(tile_coordinate_b, tile_coordinate_a);
 
-    tile_coordinate_a = { { 'U', 5 }, { 'V', 3}, {'W', 53} };
-    tile_coordinate_b = { { 'U', 5 }, { 'V', 3}, {'W', 52} };
+    tile_coordinate_a = { { 'U', 5 }, { 'V', 3}, { 'W', 53} };
+    tile_coordinate_b = { { 'U', 5 }, { 'V', 3}, { 'W', 52} };
     EXPECT_NE(tile_coordinate_a, tile_coordinate_b);
     EXPECT_NE(tile_coordinate_b, tile_coordinate_a);
 
-    tile_coordinate_a = { { 'U', 5 }, { 'V', 3}, {'W', 53} };
-    tile_coordinate_b = { { 'U', 5 }, { 'V', 3}, {'W', 53} };
+    tile_coordinate_a = { { 'U', 5 }, { 'V', 3}, { 'W', 53} };
+    tile_coordinate_b = { { 'U', 5 }, { 'V', 3}, { 'W', 53} };
     EXPECT_EQ(tile_coordinate_a, tile_coordinate_b);
     EXPECT_EQ(tile_coordinate_b, tile_coordinate_a);
 
