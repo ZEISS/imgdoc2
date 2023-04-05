@@ -43,7 +43,7 @@ jobs:
           working-directory: "imgdoc2API" # Working directory
       # ...and docfx to build the documentation for the .NET part
       # (main motivation for using docfx was that doxygen does not understand latest C# language features)
-      - name: DocFx action for ImgDoc2Net
+      - name: docfx action for ImgDoc2Net
         run: |
           dotnet tool update -g docfx
           cd dotnet/docfx
@@ -53,15 +53,24 @@ jobs:
           rm docfx.json
           rm toc.yml
           rm index.md
+      - name: generate GCC Coverage Report
+        run: |
+          sudo apt-get -y install gcovr
+          cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV_GCOVRHTML=ON -DIMGDOC2_BUILD_CONVCZI=OFF
+          cd ${{github.workspace}}/coveragebuild
+          make code_coverage_gcovr_html
       - name: Prepare doxygen-generated documentation for upload
         run: |
           mkdir ${{github.workspace}}/documentation
           mkdir ${{github.workspace}}/documentation/libimgdoc2
           mkdir ${{github.workspace}}/documentation/imgdoc2net
           mkdir ${{github.workspace}}/documentation/imgdoc2API
+          mkdir ${{github.workspace}}/documentation/coverage
+          mkdir ${{github.workspace}}/documentation/coverage/libimgdoc2
           cp -r ${{github.workspace}}/libimgdoc2/doxygen/html/* ${{github.workspace}}/documentation/libimgdoc2
           cp -r ${{github.workspace}}/imgdoc2API/doxygen/html/* ${{github.workspace}}/documentation/imgdoc2API
           cp -r ${{github.workspace}}/dotnet/docfx/* ${{github.workspace}}/documentation/imgdoc2net
+          cp -r ${{github.workspace}}/coveragebuild/code_coverage_gcovr_html/* ${{github.workspace}}/documentation/coverage/libimgdoc2
           # add a "top-level-HTML-file" redirecting to the actual documentation
           echo "<meta http-equiv=\"Refresh\" content=\"0; url='imgdoc2net/'\" />" >> ${{github.workspace}}/documentation/index.html
       - name: Setup Pages

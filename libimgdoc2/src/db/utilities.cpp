@@ -280,7 +280,7 @@ using namespace imgdoc2;
     // where ?1=plane_normal.x, ?2=plane_normal.y, ?3=plane_normal.z and ?4=plane_normal.distance
     // (in the code below, we use '?' instead of '?1..' and add the parameters multiple times).
     string_stream <<
-        "(2*abs(-?+([" << column_name_tile_w << "]/2+[" + column_name_tile_x << "])*?+" <<
+        "(2*abs(-?+([" << column_name_tile_w << "]/2+[" << column_name_tile_x << "])*?+" <<
         "([" << column_name_tile_h << "]/2+[" + column_name_tile_y << "])*?+" <<
         "([" << column_name_tile_d << "]/2+[" + column_name_tile_z << "])*?)" <<
         "<=" <<
