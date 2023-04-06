@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <limits>
