@@ -4,6 +4,7 @@
 
 #include "utilities.h"
 #include <sstream>
+#include <cstring>
 
 using namespace std;
 
