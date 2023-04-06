@@ -46,7 +46,8 @@ add_executable( libimgdoc2_tests
  "docinfo3d_test.cpp" 
  "utilities.h" 
  "read3d_test.cpp" 
- "miscellaneous_test.cpp")
+ "miscellaneous_test.cpp" 
+ "documentoperation_test.cpp")
 
 target_include_directories(libimgdoc2_tests PRIVATE ${GTEST_INCLUDE_DIRS})
 
