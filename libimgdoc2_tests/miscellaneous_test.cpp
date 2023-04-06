@@ -77,6 +77,6 @@ TEST(Miscellaneous, Cuboid)
     EXPECT_FALSE(cuboidD.IsPointInside(Point3dD(1.5, 0.5, 0.5)));
 
     CuboidF cuboidF(0, 0, 0, 1, 1, 1);
-    EXPECT_TRUE(cuboidF.IsPointInside(Point3dD(0.5f, 0.5f, 0.5f)));
-    EXPECT_FALSE(cuboidF.IsPointInside(Point3dD(1.5f, 0.5f, 0.5f)));
+    EXPECT_TRUE(cuboidF.IsPointInside(Point3dF(0.5f, 0.5f, 0.5f)));
+    EXPECT_FALSE(cuboidF.IsPointInside(Point3dF(1.5f, 0.5f, 0.5f)));
 }

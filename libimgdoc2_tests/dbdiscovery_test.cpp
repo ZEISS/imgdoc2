@@ -310,9 +310,9 @@ TEST(DbDiscoveryTest, CreateWithSpatialIndexAndDiscover3D)
 TEST(DbDiscoveryTest, CreateDocument3dAndUseOpenExistingAndCheckContent)
 {
     // This is using a special filename for sqlite, which creates a database in memory and allows it to be opened
-//  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
-//  The memory is reclaimed when the last connection to the database closes.
-//  In addition, we use some preprocessor-trickery in order to create a unique filename for each test (by just adding filename and linenumber).
+    //  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
+    //  The memory is reclaimed when the last connection to the database closes.
+    //  In addition, we use some preprocessor-trickery in order to create a unique filename for each test (by just adding filename and linenumber).
     static const char* kDocumentFileName = "file:" STRINGIFY(__FILE__) STRINGIFY(__LINE__) "memdb?mode=memory&cache=shared";
 
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
