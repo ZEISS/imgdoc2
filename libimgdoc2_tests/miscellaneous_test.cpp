@@ -55,8 +55,8 @@ TEST(Miscellaneous, IsDimensionValid)
 
 TEST(Miscellaneous, Rectangle)
 {
-    EXPECT_THROW(RectangleF(0, 0, -1, -1), invalid_argument);   // check that we cannot construct a rectangle with negative witdh or height
-    EXPECT_THROW(RectangleD(0, 0, -1, -1), invalid_argument);   // check that we cannot construct a rectangle with negative witdh or height
+    EXPECT_THROW(RectangleF(0, 0, -1, -1), invalid_argument);   // check that we cannot construct a rectangle with negative width or height
+    EXPECT_THROW(RectangleD(0, 0, -1, -1), invalid_argument);   // check that we cannot construct a rectangle with negative width or height
 
     RectangleD rectangleD(0, 0, 1, 1);
     EXPECT_TRUE(rectangleD.IsPointInside(PointD(0.5, 0.5)));
@@ -69,8 +69,8 @@ TEST(Miscellaneous, Rectangle)
 
 TEST(Miscellaneous, Cuboid)
 {
-    EXPECT_THROW(CuboidF(0, 0, 0, 1, -1, -1), invalid_argument);   // check that we cannot construct a cuboidD with negative witdh, height or depth
-    EXPECT_THROW(CuboidD(0, 0, 0, 0, -1, -1), invalid_argument);      // check that we cannot construct a cuboidD with negative witdh, height or depth
+    EXPECT_THROW(CuboidF(0, 0, 0, 1, -1, -1), invalid_argument);   // check that we cannot construct a cuboidD with negative width, height or depth
+    EXPECT_THROW(CuboidD(0, 0, 0, 0, -1, -1), invalid_argument);   // check that we cannot construct a cuboidD with negative width, height or depth
 
     CuboidD cuboidD(0, 0, 0, 1, 1, 1);
     EXPECT_TRUE(cuboidD.IsPointInside(Point3dD(0.5, 0.5, 0.5)));
