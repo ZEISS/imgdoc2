@@ -144,7 +144,7 @@ public:
 {
     // TODO(JBL): here would be the place where we'd allow for "other databases than Sqlite", for the time being,
     //            we just deal with Sqlite here
-    auto db_connection = DbFactory::SqliteCreateNewDatabase(open_existing_options->GetFilename().c_str(), environment);
+    auto db_connection = DbFactory::SqliteOpenExistingDatabase(open_existing_options->GetFilename().c_str(), open_existing_options->GetOpenReadonly(), environment);
 
     DbDiscovery database_discovery{ db_connection };
     database_discovery.DoDiscovery();

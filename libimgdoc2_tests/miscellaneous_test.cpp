@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <limits>
+#include <stdexcept>
 
 #include "../libimgdoc2/inc/imgdoc2.h"
 
@@ -41,4 +43,40 @@ TEST(Miscellaneous, TileCoordinateEquality)
     EXPECT_FALSE(ITileCoordinate::AreEqual(nullptr, nullptr));
 
     EXPECT_TRUE(ITileCoordinate::AreEqual(&tile_coordinate_a, &tile_coordinate_a));
+}
+
+TEST(Miscellaneous, IsDimensionValid)
+{
+    EXPECT_TRUE(IsDimensionValid('a'));
+    EXPECT_NO_THROW(IsDimensionValid('a'));
+    EXPECT_FALSE(IsDimensionValid(numeric_limits<Dimension>::max()));
+    EXPECT_THROW(ThrowIfDimensionInvalid(numeric_limits<Dimension>::max()), invalid_argument);
+}
+
+TEST(Miscellaneous, Rectangle)
+{
+    EXPECT_THROW(RectangleF(0, 0, -1, -1), invalid_argument);   // check that we cannot construct a rectangle with negative witdh or height
+    EXPECT_THROW(RectangleD(0, 0, -1, -1), invalid_argument);   // check that we cannot construct a rectangle with negative witdh or height
+
+    RectangleD rectangleD(0, 0, 1, 1);
+    EXPECT_TRUE(rectangleD.IsPointInside(PointD(0.5, 0.5)));
+    EXPECT_FALSE(rectangleD.IsPointInside(PointD(1.5, 0.5)));
+
+    RectangleF rectangleF(0, 0, 1, 1);
+    EXPECT_TRUE(rectangleF.IsPointInside(PointF(0.5f, 0.5f)));
+    EXPECT_FALSE(rectangleF.IsPointInside(PointF(1.5f, 0.5f)));
+}
+
+TEST(Miscellaneous, Cuboid)
+{
+    EXPECT_THROW(CuboidF(0, 0, 0, 1, -1, -1), invalid_argument);   // check that we cannot construct a cuboidD with negative witdh, height or depth
+    EXPECT_THROW(CuboidD(0, 0, 0, 0, -1, -1), invalid_argument);      // check that we cannot construct a cuboidD with negative witdh, height or depth
+
+    CuboidD cuboidD(0, 0, 0, 1, 1, 1);
+    EXPECT_TRUE(cuboidD.IsPointInside(Point3dD(0.5, 0.5, 0.5)));
+    EXPECT_FALSE(cuboidD.IsPointInside(Point3dD(1.5, 0.5, 0.5)));
+
+    CuboidF cuboidF(0, 0, 0, 1, 1, 1);
+    EXPECT_TRUE(cuboidF.IsPointInside(Point3dD(0.5f, 0.5f, 0.5f)));
+    EXPECT_FALSE(cuboidF.IsPointInside(Point3dD(1.5f, 0.5f, 0.5f)));
 }

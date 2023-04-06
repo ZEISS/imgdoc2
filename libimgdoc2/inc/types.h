@@ -158,7 +158,7 @@ namespace imgdoc2
         /// Query if the specified point 'p' is inside the rectangle.
         /// \param  p The point to test.
         /// \returns True if point inside, false if not.
-        inline bool IsPointInside(const PointD& p) const
+        inline bool IsPointInside(const PointT<t>& p) const
         {
             if (this->x <= p.x && (this->x + this->w) >= p.x && this->y <= p.y && (this->y + this->h) >= p.y)
             {

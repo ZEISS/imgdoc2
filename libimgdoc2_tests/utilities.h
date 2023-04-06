@@ -4,6 +4,10 @@
 #pragma once
 #include <map>
 
+// some pre-processor magic (-> https://gcc.gnu.org/onlinedocs/gcc-3.4.3/cpp/Stringification.html)
+#define STRINGIFY(s) STRINGIFY_INTERNAL(s)
+#define STRINGIFY_INTERNAL(s) #s
+
 /// Simply utility for compare two maps for equality.
 ///
 /// \tparam Tkey   Type of the map's key.
