@@ -203,7 +203,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(cons
 
 std::string DbCreator::GenerateSqlStatementForCreatingGeneralTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common)
 {
-    stringstream string_stream ;
+    stringstream string_stream;
     string_stream << "CREATE TABLE[" << database_configuration_common->GetTableNameForGeneralTableOrThrow() << "](" <<
         "[" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_Key) << "] TEXT(40) UNIQUE," <<
         "[" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_ValueString) << "] TEXT);";
