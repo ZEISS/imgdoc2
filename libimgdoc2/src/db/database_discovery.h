@@ -51,10 +51,29 @@ public:
     /// \returns    The document type.
     [[nodiscard]] imgdoc2::DocumentType GetDocumentType() const;
 
+    /// Gets database configuration, i.e. the least common denominator, the base type from which all 
+    /// configuration have to derive from.
+    /// \returns    The base database configuration if available; otherwise, null.
     [[nodiscard]] std::shared_ptr<DatabaseConfigurationCommon> GetDatabaseConfigurationCommon() const;
+
+    /// Gets database configuration object for an image-2D document. If the document is not an image-2D document,
+    /// an internal_error_exception is thrown.
+    /// \returns   The database configuration object for an image-2D document.
     [[nodiscard]] std::shared_ptr<DatabaseConfiguration2D> GetDatabaseConfiguration2DOrThrow() const;
+
+    /// Gets database configuration object for an image-3D document. If the document is not an image-3D document,
+    /// an internal_error_exception is thrown.
+    /// \returns   The database configuration object for an image-3D document.
     [[nodiscard]] std::shared_ptr<DatabaseConfiguration3D> GetDatabaseConfiguration3DOrThrow() const;
+
+    /// Gets database configuration object for an image-2D document. If the document is not an image-2D document,
+    /// null is returned.
+   /// \returns   The database configuration object for an image-2D document if available; otherwise, null.
     [[nodiscard]] std::shared_ptr<DatabaseConfiguration2D> GetDatabaseConfiguration2DOrNull() const;
+
+    /// Gets database configuration object for an image-3D document. If the document is not an image-3D document,
+    /// null is returned.
+    /// \returns   The database configuration object for an image-3D document if available; otherwise, null.
     [[nodiscard]] std::shared_ptr<DatabaseConfiguration3D> GetDatabaseConfiguration3DOrNull() const;
 private:
     GeneralDataDiscoveryResult DiscoverGeneralTable();

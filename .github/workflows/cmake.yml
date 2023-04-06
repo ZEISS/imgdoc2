@@ -57,14 +57,14 @@ jobs:
       - name: code-coverage
         run: |
           sudo apt-get -y install gcovr
-          cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF
+          cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV_GCOVRXML=ON -DIMGDOC2_BUILD_CONVCZI=OFF
           cd ${{github.workspace}}/coveragebuild
-          make code_coverage
+          make code_coverage_gcovr_xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
           directory: ${{github.workspace}}/coveragebuild
-          files: code_coverage.xml
+          files: code_coverage_gcovr_xml.xml
           verbose: true

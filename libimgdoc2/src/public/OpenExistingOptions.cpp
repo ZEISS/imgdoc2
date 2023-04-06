@@ -41,3 +41,13 @@ public:
 {
     return new OpenExistingOptions();
 }
+
+/*static*/std::unique_ptr<imgdoc2::IOpenExistingOptions> imgdoc2::ClassFactory::CreateOpenExistingOptionsUp()
+{
+    return make_unique<OpenExistingOptions>();
+}
+
+/*static*/std::shared_ptr<imgdoc2::IOpenExistingOptions> imgdoc2::ClassFactory::CreateOpenExistingOptionsSp()
+{
+    return make_shared<OpenExistingOptions>();
+}

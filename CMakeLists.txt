@@ -21,10 +21,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(IMGDOC2_BUILD_CLANGTIDY "Build with Clang-Tidy" OFF)
 
-# Enable code-coverage for unit-tests (only works with GCC/Clang)
-# Usage is something like: cmake .. -DCMAKE_BUILD_TYPE=Debug -DIMGDOC2_CODECOV=ON -DIMGDOC2_BUILD_CONVCZI=OFF && make && make code_coverage
-# This will generate a coverage-report in the build-directory (code_coverage.xml)
-option(IMGDOC2_CODECOV "Build with Code-Coverage (for unit-tests)" OFF)
+# Enable code-coverage for unit-tests (only works with GCC/Clang), generating coverage report in XML-format.
+# A target with name "code_coverage_gcovr_xml" will be added which can be used to generate the coverage report.
+# Usage is something like: cmake .. -DCMAKE_BUILD_TYPE=Debug -DIMGDOC2_CODECOV_GCOVRXML=ON -DIMGDOC2_BUILD_CONVCZI=OFF && make code_coverage_gcovr_xml
+# This will generate a coverage-report in the build-directory (code_coverage_gcovr_xml.xml).
+option(IMGDOC2_CODECOV_GCOVRXML "Build with Code-Coverage (for unit-tests) in XML-format" OFF)
+
+# Enable code-coverage for unit-tests (only works with GCC/Clang), generating coverage report in the form of an HTML-report.
+# A target with name "code_coverage_gcovr_html" will be added which can be used to generate the HTML-report.
+# Usage is something like: cmake .. -DCMAKE_BUILD_TYPE=Debug -DIMGDOC2_CODECOV_GCOVRHTML=ON -DIMGDOC2_BUILD_CONVCZI=OFF && make code_coverage_gcovr_html
+# This HTML-coverage-report will be found in the build-directory in the folder "code_coverage_gcovr_html".
+option(IMGDOC2_CODECOV_GCOVRHTML "Build with Code-Coverage (for unit-tests) as an HTML-report" OFF)
 
 option(IMGDOC2_BUILD_CONVCZI "Whether to build the convczi-tool" ON)
 
@@ -70,14 +77,26 @@ endif()
 enable_testing()
 add_subdirectory(libimgdoc2_tests)
 
-if (IMGDOC2_CODECOV)
+if (IMGDOC2_CODECOV_GCOVRXML OR IMGDOC2_CODECOV_GCOVRHTML)
   include("${CMAKE_SOURCE_DIR}/cmake/CodeCoverage.cmake")
   append_coverage_compiler_flags_to_target(libimgdoc2_tests)
   append_coverage_compiler_flags_to_target(libimgdoc2)
-  setup_target_for_coverage_gcovr_xml(
-		    NAME code_coverage
+  target_compile_options(libimgdoc2 PRIVATE -O0)        # disable all optimizations
+  target_compile_options(libimgdoc2_tests PRIVATE -O0)  # disable all optimizations
+  if (IMGDOC2_CODECOV_GCOVRXML)
+    setup_target_for_coverage_gcovr_xml(
+		      NAME code_coverage_gcovr_xml
+          EXECUTABLE ctest
+		      DEPENDENCIES   libimgdoc2 libimgdoc2_tests
+		      BASE_DIRECTORY "${PROJECT_SOURCE_DIR}"
+		      EXCLUDE "${PROJECT_SOURCE_DIR}/libimgdoc2_tests/*" "${PROJECT_BINARY_DIR}/_deps/*" "/usr/include/*")
+  endif()
+  if (IMGDOC2_CODECOV_GCOVRHTML)
+    setup_target_for_coverage_gcovr_html(
+		    NAME code_coverage_gcovr_html
         EXECUTABLE ctest
 		    DEPENDENCIES   libimgdoc2 libimgdoc2_tests
 		    BASE_DIRECTORY "${PROJECT_SOURCE_DIR}"
 		    EXCLUDE "${PROJECT_SOURCE_DIR}/libimgdoc2_tests/*" "${PROJECT_BINARY_DIR}/_deps/*" "/usr/include/*")
+   endif()
 endif()
