@@ -99,7 +99,7 @@ std::shared_ptr<DatabaseConfiguration3D> DbCreator::CreateTables3d(const imgdoc2
 
 std::string DbCreator::GenerateSqlStatementForCreatingTilesDataTable_Sqlite(const DatabaseConfiguration2D* database_configuration)
 {
-    auto string_stream = stringstream();
+    stringstream string_stream;
     string_stream << "CREATE TABLE[" << database_configuration->GetTableNameForTilesDataOrThrow() << "](" <<
         "[" << database_configuration->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration2D::kTilesDataTable_Column_Pk) << "] INTEGER PRIMARY KEY," <<
         "[" << database_configuration->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration2D::kTilesDataTable_Column_PixelWidth) << "] INTEGER(4) NOT NULL," <<
@@ -115,7 +115,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingTilesDataTable_Sqlite(cons
 
 std::string DbCreator::GenerateSqlStatementForCreatingTilesDataTable_Sqlite(const DatabaseConfiguration3D* database_configuration)
 {
-    auto string_stream = stringstream();
+    stringstream string_stream;
     string_stream << "CREATE TABLE[" << database_configuration->GetTableNameForTilesDataOrThrow() << "](" <<
         "[" << database_configuration->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration3D::kTilesDataTable_Column_Pk) << "] INTEGER PRIMARY KEY," <<
         "[" << database_configuration->GetColumnNameOfTilesDataTableOrThrow(DatabaseConfiguration3D::kTilesDataTable_Column_PixelWidth) << "] INTEGER(4) NOT NULL," <<
@@ -132,7 +132,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingTilesDataTable_Sqlite(cons
 
 std::string DbCreator::GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(const DatabaseConfiguration2D* database_configuration)
 {
-    auto string_stream = stringstream();
+    stringstream string_stream;
     // Notes:
     // * "INTEGER PRIMARY KEY" makes the column-name an alias for the RowId-column
     string_stream << "CREATE TABLE[" << database_configuration->GetTableNameForTilesInfoOrThrow() << "](" <<
@@ -166,7 +166,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(cons
 
 std::string DbCreator::GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(const DatabaseConfiguration3D* database_configuration)
 {
-    auto string_stream = stringstream();
+    stringstream string_stream;
     // Notes:
     // * "INTEGER PRIMARY KEY" makes the column-name an alias for the RowId-column
     string_stream << "CREATE TABLE[" << database_configuration->GetTableNameForTilesInfoOrThrow() << "](" <<
@@ -203,7 +203,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(cons
 
 std::string DbCreator::GenerateSqlStatementForCreatingGeneralTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common)
 {
-    auto string_stream = stringstream();
+    stringstream string_stream ;
     string_stream << "CREATE TABLE[" << database_configuration_common->GetTableNameForGeneralTableOrThrow() << "](" <<
         "[" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_Key) << "] TEXT(40) UNIQUE," <<
         "[" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_ValueString) << "] TEXT);";
@@ -227,7 +227,7 @@ void DbCreator::SetGeneralTableInfoForSpatialIndex(const DatabaseConfigurationCo
 
 std::string DbCreator::GenerateSqlStatementForFillingGeneralTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common)
 {
-    auto string_stream = stringstream();
+    stringstream string_stream;
     string_stream << "INSERT INTO [" << database_configuration_common->GetTableNameForGeneralTableOrThrow() << "]" <<
         "([" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_Key) << "], " <<
         "[" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_ValueString) << "])" <<
@@ -323,7 +323,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingSpatialTilesIndex_Sqlite(c
 {
     Expects(database_configuration != nullptr && database_configuration->GetIsUsingSpatialIndex() == true);
 
-    auto string_stream = ostringstream();
+    ostringstream string_stream;
     string_stream << "CREATE VIRTUAL TABLE " << database_configuration->GetTableNameForTilesSpatialIndexTableOrThrow() << " USING rtree(" <<
         database_configuration->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_Pk) << "," <<         // Integer primary key
         database_configuration->GetColumnNameOfTilesSpatialIndexTableOrThrow(DatabaseConfiguration3D::kTilesSpatialIndexTable_Column_MinX) << "," <<       // Minimum X coordinate"
@@ -339,7 +339,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingBlobTable_Sqlite(const Dat
 {
     Expects(database_configuration != nullptr && database_configuration->GetHasBlobsTable() == true);
 
-    auto string_stream = ostringstream();
+    ostringstream string_stream;
     string_stream << "CREATE TABLE [" << database_configuration->GetTableNameForBlobTableOrThrow() << "] (" <<
         "[" << database_configuration->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration2D::kBlobTable_Column_Pk) << "] INTEGER PRIMARY KEY," <<
         "[" << database_configuration->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration2D::kBlobTable_Column_Data) << "] BLOB );";
@@ -351,7 +351,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingBlobTable_Sqlite(const Dat
 {
     Expects(database_configuration != nullptr && database_configuration->GetHasBlobsTable() == true);
 
-    auto string_stream = ostringstream();
+    ostringstream string_stream;
     string_stream << "CREATE TABLE [" << database_configuration->GetTableNameForBlobTableOrThrow() << "] (" <<
         "[" << database_configuration->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration3D::kBlobTable_Column_Pk) << "] INTEGER PRIMARY KEY," <<
         "[" << database_configuration->GetColumnNameOfBlobTableOrThrow(DatabaseConfiguration3D::kBlobTable_Column_Data) << "] BLOB );";
@@ -361,7 +361,7 @@ std::string DbCreator::GenerateSqlStatementForCreatingBlobTable_Sqlite(const Dat
 
 void DbCreator::SetBlobTableNameInGeneralTable(const DatabaseConfigurationCommon* database_configuration_common)
 {
-    auto string_stream = stringstream();
+    ostringstream string_stream;
     string_stream << "INSERT INTO [" << database_configuration_common->GetTableNameForGeneralTableOrThrow() << "]" <<
         "([" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_Key) << "], " <<
         "[" << database_configuration_common->GetColumnNameOfGeneralInfoTableOrThrow(DatabaseConfigurationCommon::kGeneralInfoTable_Column_ValueString) << "])" <<
