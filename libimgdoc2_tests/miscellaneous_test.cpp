@@ -80,3 +80,32 @@ TEST(Miscellaneous, Cuboid)
     EXPECT_TRUE(cuboidF.IsPointInside(Point3dF(0.5f, 0.5f, 0.5f)));
     EXPECT_FALSE(cuboidF.IsPointInside(Point3dF(1.5f, 0.5f, 0.5f)));
 }
+
+TEST(Miscellaneous, CheckTransactionSemantic)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('p');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
+    const auto writer2d = doc->GetWriter2d();
+
+    // trying to end a transaction without starting one should throw
+    EXPECT_THROW(writer2d->CommitTransaction(), database_exception);
+
+    // trying to rollback a transaction without starting one should throw as well
+    EXPECT_THROW(writer2d->RollbackTransaction(), database_exception);
+
+    writer2d->BeginTransaction();
+    // trying to start a transaction while another one is already active should throw
+    EXPECT_THROW(writer2d->BeginTransaction(), database_exception);
+    writer2d->CommitTransaction();
+
+    // commiting while there is no active transaction should throw
+    EXPECT_THROW(writer2d->CommitTransaction(), database_exception);
+
+    // rollback while there is no active transaction should throw as well
+    EXPECT_THROW(writer2d->CommitTransaction(), database_exception);
+}

@@ -45,6 +45,7 @@ add_executable( libimgdoc2_tests
  "query3d_test.cpp" 
  "docinfo3d_test.cpp" 
  "utilities.h" 
+ "utilities.cpp" 
  "read3d_test.cpp" 
  "miscellaneous_test.cpp" 
  "documentoperation_test.cpp")

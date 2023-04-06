@@ -73,6 +73,16 @@ namespace imgdoc2
         [[nodiscard]] virtual bool GetCreateBlobTable() const = 0;
 
         virtual ~ICreateOptions() = default;
+
+        /// Sets the filename. For a Sqlite-based database, this string allows for additional functionality
+        /// (like an in-memory database) - cf. https://sqlite.org/inmemorydb.html, https://sqlite.org/uri.html.
+        /// The string must be given in UTF-8 encoding.
+        ///
+        /// \param  filename  The filename (in UTF8-encoding).
+        void SetFilename(const std::string& filename)
+        {
+            this->SetFilename(filename.c_str());
+        }
     public:
         /// Adds the dimensions from the specified iterator.
         /// \tparam ForwardIterator Type of the forward iterator.

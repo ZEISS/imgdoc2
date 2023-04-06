@@ -178,15 +178,10 @@ TEST(DbDiscoveryTest, CreateEmptyImage3dDocumentAndTryToGetReaderWriter2dObjectA
 
 TEST(DbDiscoveryTest, CreateDocument2dAndUseOpenExistingAndCheckContent)
 {
-    // This is using a special filename for sqlite, which creates a database in memory and allows it to be opened
-    //  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
-    //  The memory is reclaimed when the last connection to the database closes.
-    //  In addition, we use some preprocessor-trickery in order to create a unique filename for each test (by just adding filename and linenumber).
-    static const char* kDocumentFileName = "file:" STRINGIFY(__FILE__) STRINGIFY(__LINE__) "memdb?mode=memory&cache=shared";
+    const auto document_file_name = GenerateUniqueSharedInMemoryFileNameForSqlite(__FILE__, __LINE__);
 
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
-
-    create_options->SetFilename(kDocumentFileName);
+    create_options->SetFilename(document_file_name);
     create_options->AddDimension('A');
     const auto doc = ClassFactory::CreateNew(create_options.get());
     auto writer2d = doc->GetWriter2d();
@@ -206,7 +201,7 @@ TEST(DbDiscoveryTest, CreateDocument2dAndUseOpenExistingAndCheckContent)
     writer2d.reset();
 
     const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
-    open_existing_options->SetFilename(kDocumentFileName);
+    open_existing_options->SetFilename(document_file_name);
     open_existing_options->SetOpenReadonly(true);
     const auto doc2 = ClassFactory::OpenExisting(open_existing_options.get());
     const auto reader2d = doc2->GetReader2d();
@@ -309,14 +304,10 @@ TEST(DbDiscoveryTest, CreateWithSpatialIndexAndDiscover3D)
 
 TEST(DbDiscoveryTest, CreateDocument3dAndUseOpenExistingAndCheckContent)
 {
-    // This is using a special filename for sqlite, which creates a database in memory and allows it to be opened
-    //  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
-    //  The memory is reclaimed when the last connection to the database closes.
-    //  In addition, we use some preprocessor-trickery in order to create a unique filename for each test (by just adding filename and linenumber).
-    static const char* kDocumentFileName = "file:" STRINGIFY(__FILE__) STRINGIFY(__LINE__) "memdb?mode=memory&cache=shared";
+    const auto document_file_name = GenerateUniqueSharedInMemoryFileNameForSqlite(__FILE__, __LINE__);
 
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
-    create_options->SetFilename(kDocumentFileName);
+    create_options->SetFilename(document_file_name);
     create_options->SetDocumentType(DocumentType::kImage3d);
     create_options->AddDimension('A');
     const auto doc = ClassFactory::CreateNew(create_options.get());
@@ -340,7 +331,7 @@ TEST(DbDiscoveryTest, CreateDocument3dAndUseOpenExistingAndCheckContent)
     writer3d.reset();
 
     const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
-    open_existing_options->SetFilename(kDocumentFileName);
+    open_existing_options->SetFilename(document_file_name);
     const auto doc2 = ClassFactory::OpenExisting(open_existing_options.get());
     const auto reader3d = doc2->GetReader3d();
     const uint64_t total_tile_count = reader3d->GetTotalTileCount();

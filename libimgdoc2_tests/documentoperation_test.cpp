@@ -11,17 +11,11 @@ using namespace std;
 using namespace testing;
 
 
-TEST(DocumentOperation, OpenDocumentReadOnlyAndTryToWriteAndExpectFailure)
+TEST(DocumentOperation, InATransactionAddTilesThenRollbackExpectOperationsToBeUndone)
 {
-    // This is using a special filename for sqlite, which creates a database in memory and allows it to be opened
-    //  again by another connection (which is what we do in the test, c.f. https://www.sqlite.org/inmemorydb.html).
-    //  The memory is reclaimed when the last connection to the database closes.
-    //  In addition, we use some preprocessor-trickery in order to create a unique filename for each test (by just adding filename and linenumber).
-    static const char* kDocumentFileName = "file:" STRINGIFY(__FILE__) STRINGIFY(__LINE__) "memdb?mode=memory&cache=shared";
+     // arrange
 
-    // arrange
-
-    // create an empty document
+     // create an empty document
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
     create_options->SetFilename(":memory:");
     create_options->AddDimension('l');
@@ -29,14 +23,13 @@ TEST(DocumentOperation, OpenDocumentReadOnlyAndTryToWriteAndExpectFailure)
     create_options->SetUseSpatialIndex(false);
     create_options->SetCreateBlobTable(false);
     const auto doc = ClassFactory::CreateNew(create_options.get());
-
     const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
-    open_existing_options->SetFilename(kDocumentFileName);
-    open_existing_options->SetOpenReadonly(true);
-    const auto doc2 = ClassFactory::OpenExisting(open_existing_options.get());
-    const auto writer2d = doc2->GetWriter2d();
+    const auto writer2d = doc->GetWriter2d();
 
     // act
+
+    // start a transaction, add two tiles, then rollback
+    writer2d->BeginTransaction();
 
     // now, try to add a tile to the document
     LogicalPositionInfo position_info;
@@ -49,6 +42,18 @@ TEST(DocumentOperation, OpenDocumentReadOnlyAndTryToWriteAndExpectFailure)
     tile_info.pixelWidth = 10;
     tile_info.pixelHeight = 11;
     tile_info.pixelType = PixelType::Gray32Float;
-    const TileCoordinate tile_coordinate({ { 'l', 3}, {'u',1} });
+    TileCoordinate tile_coordinate({ { 'l', 3}, {'u',1} });
     writer2d->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+
+    tile_coordinate = { { { 'l', 1}, {'u', 2} } };
+    writer2d->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+    writer2d->RollbackTransaction();
+
+    // assert
+
+    // since we rolled back, the tile count should be zero
+    //writer2d->RollbackTransaction();
+    const auto reader2d = doc->GetReader2d();
+    const auto total_tile_count = reader2d->GetTotalTileCount();
+    EXPECT_EQ(total_tile_count, 0);
 }
