@@ -17,9 +17,9 @@ using namespace testing;
 
 TEST(DocumentOperation, InATransactionAddTilesThenRollbackExpectOperationsToBeUndone)
 {
-     // arrange
+    // arrange
 
-     // create an empty document
+    // create an empty document
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
     create_options->SetFilename(":memory:");
     create_options->AddDimension('l');
@@ -46,7 +46,7 @@ TEST(DocumentOperation, InATransactionAddTilesThenRollbackExpectOperationsToBeUn
     tile_info.pixelWidth = 10;
     tile_info.pixelHeight = 11;
     tile_info.pixelType = PixelType::Gray32Float;
-    TileCoordinate tile_coordinate({ { 'l', 3}, {'u',1} });
+    TileCoordinate tile_coordinate({ { 'l', 3}, { 'u', 1} });
     writer2d->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
 
     tile_coordinate = { { { 'l', 1}, {'u', 2} } };
