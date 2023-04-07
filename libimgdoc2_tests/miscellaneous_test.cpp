@@ -185,3 +185,49 @@ TEST(Miscellaneous, Document3dCheckTransactionSemantic)
     // rollback while there is no active transaction should throw as well
     EXPECT_THROW(writer3d->CommitTransaction(), database_exception);
 }
+
+TEST(Miscellaneous, DoubleInterval)
+{
+    const DoubleInterval interval1{ 1.0, 2.0 };
+    const DoubleInterval interval2{ 1.0, 2.0 };
+    const DoubleInterval interval3{ 1.5, 2.0 };
+
+    EXPECT_TRUE(interval1 == interval2);
+    EXPECT_FALSE(interval1 == interval3);
+
+    EXPECT_FALSE(interval1 != interval2);
+    EXPECT_TRUE(interval1 != interval3);
+
+    EXPECT_TRUE(interval1.IsValid());
+    EXPECT_TRUE(interval2.IsValid());
+    EXPECT_TRUE(interval3.IsValid());
+
+    const DoubleInterval interval4;
+    const DoubleInterval interval5{ 5, 3 };
+    EXPECT_FALSE(interval4.IsValid());
+    EXPECT_FALSE(interval5.IsValid());
+    EXPECT_TRUE(interval4 == interval5);
+}
+
+TEST(Miscellaneous, Int32Interval)
+{
+    const Int32Interval interval1{ 10, 20 };
+    const Int32Interval interval2{ 10, 20 };
+    const Int32Interval interval3{ 15, 20 };
+
+    EXPECT_TRUE(interval1 == interval2);
+    EXPECT_FALSE(interval1 == interval3);
+
+    EXPECT_FALSE(interval1 != interval2);
+    EXPECT_TRUE(interval1 != interval3);
+
+    EXPECT_TRUE(interval1.IsValid());
+    EXPECT_TRUE(interval2.IsValid());
+    EXPECT_TRUE(interval3.IsValid());
+
+    const Int32Interval interval4;
+    const Int32Interval interval5{ 5, 3 };
+    EXPECT_FALSE(interval4.IsValid());
+    EXPECT_FALSE(interval5.IsValid());
+    EXPECT_TRUE(interval4 == interval5);
+}
