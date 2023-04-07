@@ -47,4 +47,8 @@ public:
     [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const override;
 
     ~SqliteDbConnection() override;
+
+private:
+    void LogSqlExecution(const char* function_name, sqlite3_stmt* pStmt, int return_value) const;
+    void LogSqlExecution(const char* function_name, const char* sql_statement, int return_value) const;
 };

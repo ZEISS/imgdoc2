@@ -11,6 +11,7 @@
 #include "sqlite_DbConnection.h"
 #include "sqlite_DbStatement.h"
 #include "custom_functions.h"
+#include "loglevel.h"
 
 using namespace std;
 using namespace imgdoc2;
@@ -79,6 +80,7 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
 {
     // https://www.sqlite.org/c3ref/exec.html
     const int return_value = sqlite3_exec(this->database_, sql_statement, nullptr, nullptr, nullptr);
+    this->LogSqlExecution("sqlite3_exec", sql_statement, return_value);
     if (return_value != SQLITE_OK)
     {
         throw database_exception("Error from 'sqlite3_exec'", return_value);
@@ -99,6 +101,7 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
     }
 
     const int return_value = sqlite3_step(sqlite_statement->GetSqliteSqlStatement());
+    this->LogSqlExecution("sqlite3_step", sqlite_statement->GetSqliteSqlStatement(), return_value);
 
     // see https://www.sqlite.org/c3ref/step.html
     // Note that we intend that Execute-methods are used only for commands which do not return data,
@@ -147,16 +150,17 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
     }
 
     const int return_value = sqlite3_step(sqlite_statement->GetSqliteSqlStatement());
+    this->LogSqlExecution("sqlite3_step", sqlite_statement->GetSqliteSqlStatement(), return_value);
 
     // https://www.sqlite.org/c3ref/step.html
     switch (return_value)
     {
-    case SQLITE_ROW:
-        return true;
-    case SQLITE_DONE:
-        return false;
-    default:
-        throw database_exception("Error from 'sqlite3_step'.", return_value);
+        case SQLITE_ROW:
+            return true;
+        case SQLITE_DONE:
+            return false;
+        default:
+            throw database_exception("Error from 'sqlite3_step'.", return_value);
     }
 }
 
@@ -226,4 +230,32 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
 /*virtual*/const std::shared_ptr<imgdoc2::IHostingEnvironment>& SqliteDbConnection::GetHostingEnvironment() const
 {
     return this->environment_;
+}
+
+void SqliteDbConnection::LogSqlExecution(const char* function_name, sqlite3_stmt* pStmt, int return_value) const
+{
+    if (this->GetHostingEnvironment()->IsLogLevelActive(LogLevel::Sql))
+    {
+        // https://www.sqlite.org/c3ref/expanded_sql.html -> may return NULL if the expansion fails (e.g. due to an OOM error)
+        // (sqlite3_free is the correct function to free the memory allocated by sqlite3_expanded_sql, and it does nothing if called with NULL)
+        const unique_ptr<char, decltype(sqlite3_free)*> up_expanded_sql_statement(sqlite3_expanded_sql(pStmt), sqlite3_free);
+        if (up_expanded_sql_statement != nullptr)
+        {
+            this->LogSqlExecution(function_name, up_expanded_sql_statement.get(), return_value);
+        }
+        else
+        {
+            this->LogSqlExecution(function_name, "**expansion failed**", return_value);
+        }
+    }
+}
+
+void SqliteDbConnection::LogSqlExecution(const char* function_name, const char* sql_statement, int return_value) const
+{
+    if (this->GetHostingEnvironment()->IsLogLevelActive(LogLevel::Sql))
+    {
+        ostringstream string_stream;
+        string_stream << "[" << function_name << "] -> (" << return_value << ", " << sqlite3_errstr(return_value) << "): " << sql_statement;
+        this->GetHostingEnvironment()->Log(LogLevel::Sql, string_stream.str().c_str());
+    }
 }

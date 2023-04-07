@@ -231,3 +231,59 @@ TEST(Miscellaneous, Int32Interval)
     EXPECT_FALSE(interval5.IsValid());
     EXPECT_TRUE(interval4 == interval5);
 }
+
+struct HostingEnvironmentCallCount
+{
+    uint32_t count_log{ 0 };
+    uint32_t count_is_level_active{ 0 };
+};
+
+static void CallbackLog(std::intptr_t userparam, int level, const char* szMessage)
+{
+    const auto call_count = reinterpret_cast<HostingEnvironmentCallCount*>(userparam);  // NOLINT(performance-no-int-to-ptr)
+    ++call_count->count_log;
+}
+
+static bool CallbackIsLevelActive(std::intptr_t userparam, int level)
+{
+    const auto call_count = reinterpret_cast<HostingEnvironmentCallCount*>(userparam);  // NOLINT(performance-no-int-to-ptr)
+    ++call_count->count_is_level_active;
+    return true;
+}
+
+TEST(Miscellaneous, HostingEnvironmentForFunctionPointers)
+{
+    // We construct an environment object that uses function pointers to call back into the functions defined above,
+    //  which in turn increment the call count in the HostingEnvironmentCallCount struct. In the end, we check that
+    //  the functions have been called during the document creation/adding of a tile we do here.
+    HostingEnvironmentCallCount call_count;
+    const auto hosting_environment = ClassFactory::CreateHostingEnvironmentForFunctionPointers(
+        reinterpret_cast<std::intptr_t>(&call_count),
+        CallbackLog,
+        CallbackIsLevelActive,
+        nullptr);
+
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get(), hosting_environment);
+    const auto writer = doc->GetWriter2d();
+
+    LogicalPositionInfo position_info;
+    TileBaseInfo tile_info;
+    const TileCoordinate tile_coordinate({ { 'M', 5 } });
+    position_info.posX = 0;
+    position_info.posY = 0;
+    position_info.width = 10;
+    position_info.height = 10;
+    position_info.pyrLvl = 0;
+    tile_info.pixelWidth = 10;
+    tile_info.pixelHeight = 10;
+    tile_info.pixelType = 0;
+    writer->AddTile(&tile_coordinate, &position_info, &tile_info, DataTypes::ZERO, TileDataStorageType::Invalid, nullptr);
+
+    EXPECT_GT(call_count.count_log, 0);
+    EXPECT_GT(call_count.count_is_level_active, 0);
+}
