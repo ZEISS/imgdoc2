@@ -58,7 +58,7 @@ jobs:
           sudo apt-get -y install gcovr
           cmake -B ${{github.workspace}}/coveragebuild -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DIMGDOC2_CODECOV_GCOVRHTML=ON -DIMGDOC2_BUILD_CONVCZI=OFF
           cd ${{github.workspace}}/coveragebuild
-          make code_coverage_gcovr_html
+          make code_coverage_gcovr_html -j
       - name: Prepare doxygen-generated documentation for upload
         run: |
           mkdir ${{github.workspace}}/documentation

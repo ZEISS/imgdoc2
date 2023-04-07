@@ -103,6 +103,30 @@ TEST(Miscellaneous, LogicalPositionInfo3D)
     EXPECT_NE(logical_position_info_3d_b, logical_position_info_3d_c);
 }
 
+TEST(Miscellaneous, BlobOutputOnHeap)
+{
+    BlobOutputOnHeap blob_output_on_heap1;
+
+    EXPECT_TRUE(blob_output_on_heap1.Reserve(4));
+    EXPECT_THROW((void)blob_output_on_heap1.Reserve(4), logic_error); // check that we cannot reserve more than once
+
+    uint8_t data[4] = { 1, 2, 3, 4 };
+    BlobOutputOnHeap blob_output_on_heap2;
+    EXPECT_THROW((void)blob_output_on_heap2.SetData(0,sizeof(data),data), logic_error); // check that we cannot set data without reserving first
+
+    BlobOutputOnHeap blob_output_on_heap3;
+    EXPECT_TRUE(blob_output_on_heap3.Reserve(4));
+    EXPECT_THROW((void)blob_output_on_heap3.SetData(1, sizeof(data), data), logic_error); // check that we cannot set data which is out of bounds
+}
+
+TEST(Miscellaneous, CDimCoordinateQueryClauseQueryNonExistingDimensionExpectNull)
+{
+    CDimCoordinateQueryClause dim_coordinate_query_clause;
+    dim_coordinate_query_clause.AddRangeClause('q', IDimCoordinateQueryClause::RangeClause{ 1, 2 });
+    const auto range_clause = dim_coordinate_query_clause.GetRangeClause('o');    // try to query a range clause which does not exist
+    EXPECT_TRUE(range_clause == nullptr);
+}
+
 TEST(Miscellaneous, CheckTransactionSemantic)
 {
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
