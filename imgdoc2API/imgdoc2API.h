@@ -693,7 +693,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetBoundingBoxForBricks(
 /// \param [out]    total_tile_count    The total number of tiles (must be non-null).
 /// \param [in,out] error_information   If non-null, in case of an error, additional information describing the error are put here.
 ///
-/// \returns    An ImgDoc2ErrorCode.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTotalTileCount(
         HandleDocRead2D handle,
         std::uint64_t* total_tile_count, 
@@ -707,7 +707,7 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTotalTileCount(
 /// \param [out]    total_tile_count    The total number of tiles (must be non-null).
 /// \param [in,out] error_information   If non-null, in case of an error, additional information describing the error are put here.
 ///
-/// \returns    An ImgDoc2ErrorCode.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTotalTileCount(
         HandleDocRead3D handle,
         std::uint64_t* total_tile_count,
@@ -723,9 +723,9 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTotalTileCount(
 ///
 /// \param          handle                          The handle.
 /// \param [in,out] tile_count_per_layer_interop    If non-null, the tile count per layer interop.
-/// \param [in,out] error_information               If non-null, information describing the error.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
 ///
-/// \returns    An ImgDoc2ErrorCode.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileCountPerLayer(
         HandleDocRead2D handle,
         TileCountPerLayerInterop* tile_count_per_layer_interop,
@@ -741,34 +741,58 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo2d_GetTileCountPerLayer(
 ///
 /// \param          handle                          The handle.
 /// \param [in,out] tile_count_per_layer_interop    If non-null, the tile count per layer interop.
-/// \param [in,out] error_information               If non-null, information describing the error.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
 ///
-/// \returns    An ImgDoc2ErrorCode.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileCountPerLayer(
         HandleDocRead3D handle,
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer2d-object: start a transaction.
+/// \param          handle                          The handle of a writer2d object.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_BeginTransaction(
     HandleDocWrite2D handle,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer2d-object: commit a transaction.
+/// \param          handle                          The handle of a writer2d object.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_CommitTransaction(
     HandleDocWrite2D handle,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer2d-object: rollback a transaction.
+/// \param          handle                          The handle of a writer2d object.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_RollbackTransaction(
     HandleDocWrite2D handle,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer3d-object: start a transaction.
+/// \param          handle                          The handle of a writer3d object.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_BeginTransaction(
     HandleDocWrite3D handle,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer3d-object: commit a transaction.
+/// \param          handle                          The handle of a writer3d object.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_CommitTransaction(
     HandleDocWrite3D handle,
     ImgDoc2ErrorInformation* error_information);
 
+/// Method operating on a writer3d-object: rollback a transaction.
+/// \param          handle                          The handle of a writer3d object.
+/// \param [in,out] error_information               If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
 EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_RollbackTransaction(
     HandleDocWrite3D handle,
     ImgDoc2ErrorInformation* error_information);

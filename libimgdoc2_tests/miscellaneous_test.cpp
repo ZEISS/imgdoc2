@@ -127,7 +127,7 @@ TEST(Miscellaneous, CDimCoordinateQueryClauseQueryNonExistingDimensionExpectNull
     EXPECT_TRUE(range_clause == nullptr);
 }
 
-TEST(Miscellaneous, CheckTransactionSemantic)
+TEST(Miscellaneous, Document2dCheckTransactionSemantic)
 {
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
     create_options->SetFilename(":memory:");
@@ -154,4 +154,34 @@ TEST(Miscellaneous, CheckTransactionSemantic)
 
     // rollback while there is no active transaction should throw as well
     EXPECT_THROW(writer2d->CommitTransaction(), database_exception);
+}
+
+TEST(Miscellaneous, Document3dCheckTransactionSemantic)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetDocumentType(DocumentType::kImage3d);
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('p');
+    create_options->SetUseSpatialIndex(false);
+    create_options->SetCreateBlobTable(false);
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto open_existing_options = ClassFactory::CreateOpenExistingOptionsUp();
+    const auto writer3d = doc->GetWriter3d();
+
+    // trying to end a transaction without starting one should throw
+    EXPECT_THROW(writer3d->CommitTransaction(), database_exception);
+
+    // trying to rollback a transaction without starting one should throw as well
+    EXPECT_THROW(writer3d->RollbackTransaction(), database_exception);
+
+    writer3d->BeginTransaction();
+    // trying to start a transaction while another one is already active should throw
+    EXPECT_THROW(writer3d->BeginTransaction(), database_exception);
+    writer3d->CommitTransaction();
+
+    // commiting while there is no active transaction should throw
+    EXPECT_THROW(writer3d->CommitTransaction(), database_exception);
+
+    // rollback while there is no active transaction should throw as well
+    EXPECT_THROW(writer3d->CommitTransaction(), database_exception);
 }

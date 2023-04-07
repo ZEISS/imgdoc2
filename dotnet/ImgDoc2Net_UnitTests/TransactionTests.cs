@@ -42,7 +42,7 @@ namespace ImgDoc2Net_UnitTests
                         PyramidLevel = 0
                     };
                     var testData = new byte[] { 8, 4, 3, 2, 85, 32, 9, 4, 1, 58 };
-                    long pkOfAddedTile = writer2d.AddTile(
+                    writer2d.AddTile(
                         new TileCoordinate(new[] { Tuple.Create(new Dimension('A'), i) }),
                         in logicalPosition,
                         new Tile2dBaseInfo(1, 2, PixelType.Gray8),
@@ -62,6 +62,48 @@ namespace ImgDoc2Net_UnitTests
             }
 
             Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, ImgDoc2ApiInterop.Instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
+        }
+
+        [Fact]
+        public void Document2dCheckTransactionSemantic()
+        {
+            using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true };
+            createOptions.AddDimension(new Dimension('A'));
+            using var document = Document.CreateNew(createOptions);
+            using var writer2d = document.Get2dWriter();
+
+            // trying to end a transaction without starting one should throw
+            Assert.Throws<ImgDoc2Exception>(() => writer2d.CommitTransaction());
+
+            // trying to rollback a transaction without starting one should throw as well
+            Assert.Throws<ImgDoc2Exception>(() => writer2d.RollbackTransaction());
+
+            writer2d.BeginTransaction();
+
+            // trying to start a transaction while another one is already active should throw
+            Assert.Throws<ImgDoc2Exception>(() => writer2d.BeginTransaction());
+            writer2d.CommitTransaction();
+        }
+
+        [Fact]
+        public void Document3dCheckTransactionSemantic()
+        {
+            using var createOptions = new CreateOptions() { Filename = ":memory:", UseBlobTable = true, DocumentType = DocumentType.Image3d};
+            createOptions.AddDimension(new Dimension('A'));
+            using var document = Document.CreateNew(createOptions);
+            using var writer3d = document.Get3dWriter();
+
+            // trying to end a transaction without starting one should throw
+            Assert.Throws<ImgDoc2Exception>(() => writer3d.CommitTransaction());
+
+            // trying to rollback a transaction without starting one should throw as well
+            Assert.Throws<ImgDoc2Exception>(() => writer3d.RollbackTransaction());
+
+            writer3d.BeginTransaction();
+
+            // trying to start a transaction while another one is already active should throw
+            Assert.Throws<ImgDoc2Exception>(() => writer3d.BeginTransaction());
+            writer3d.CommitTransaction();
         }
     }
 }
