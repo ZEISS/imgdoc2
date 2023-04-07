@@ -13,9 +13,8 @@ namespace imgdoc2
     /// the pyramid-level.
     struct LogicalPositionInfo
     {
-        /// Default constructor, all properties are initialized to zero.
-        LogicalPositionInfo() : posX(0), posY(0), width(0), height(0), pyrLvl(0)
-        {}
+        /// Default constructor, all properties are initialized to invalid values.
+        LogicalPositionInfo() = default;
 
         /// Constructor initializing the rectangle and setting the pyramid-level to zero.
         /// \param  x The x coordinate of the top left point.
@@ -74,6 +73,30 @@ namespace imgdoc2
         double height{ std::numeric_limits<double>::quiet_NaN() };      ///< The height.
         double depth{ std::numeric_limits<double>::quiet_NaN() };       ///< The depth.
         int pyrLvl{ std::numeric_limits<int>::min() };                  ///< The pyramid level.
+
+        /// Default constructor, all properties are initialized to invalid values.
+        LogicalPositionInfo3D() = default;
+
+        /// Constructor initializing the cuboid and setting the pyramid-level to invalid values.
+        /// \param  x The x coordinate of the top left point.
+        /// \param  y The y coordinate of the top left point.
+        /// \param  z The z coordinate of the top left point.
+        /// \param  w The width.
+        /// \param  h The height.
+        /// \param  d The depth.
+        LogicalPositionInfo3D(double x, double y, double z, double w, double h, double d) : posX(x), posY(y), posZ(z), width(w), height(h), depth(d), pyrLvl(0)
+        {}
+
+        /// Constructor.
+        /// \param  x The x coordinate of the top left point.
+        /// \param  y The y coordinate of the top left point.
+        /// \param  z The z coordinate of the top left point.
+        /// \param  w The width.
+        /// \param  h The height.
+        /// \param  d The depth.
+        /// \param  pyrLvl The pyramid level.
+        LogicalPositionInfo3D(double x, double y, double z, double w, double h, double d, int pyrLvl) : posX(x), posY(y), posZ(z), width(w), height(h), depth(d), pyrLvl(pyrLvl)
+        {}
 
         /// Equality operator (where the coordinates are compared with an epsilon).
         /// \param  rhs The right hand side.

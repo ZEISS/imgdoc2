@@ -81,6 +81,28 @@ TEST(Miscellaneous, Cuboid)
     EXPECT_FALSE(cuboidF.IsPointInside(Point3dF(1.5f, 0.5f, 0.5f)));
 }
 
+TEST(Miscellaneous, LogicalPositionInfo)
+{
+    const LogicalPositionInfo logical_position_info_a{ 1, 2, 3, 4 };
+    const LogicalPositionInfo logical_position_info_b{ 1, 2, 3, 4, 0 };
+    const LogicalPositionInfo logical_position_info_c{ 1, 2, 3, 4, 4 };
+    EXPECT_EQ(logical_position_info_a, logical_position_info_b);
+    EXPECT_EQ(logical_position_info_b, logical_position_info_a);
+    EXPECT_NE(logical_position_info_a, logical_position_info_c);
+    EXPECT_NE(logical_position_info_b, logical_position_info_c);
+}
+
+TEST(Miscellaneous, LogicalPositionInfo3D)
+{
+    const LogicalPositionInfo3D logical_position_info_3d_a{ 1, 2, 3, 4, 6, 7 };
+    const LogicalPositionInfo3D logical_position_info_3d_b{ 1, 2, 3, 4, 6, 7, 0 };
+    const LogicalPositionInfo3D logical_position_info_3d_c{ 1, 2, 3, 4, 6, 7, 4 };
+    EXPECT_EQ(logical_position_info_3d_a, logical_position_info_3d_b);
+    EXPECT_EQ(logical_position_info_3d_b, logical_position_info_3d_a);
+    EXPECT_NE(logical_position_info_3d_a, logical_position_info_3d_c);
+    EXPECT_NE(logical_position_info_3d_b, logical_position_info_3d_c);
+}
+
 TEST(Miscellaneous, CheckTransactionSemantic)
 {
     const auto create_options = ClassFactory::CreateCreateOptionsUp();

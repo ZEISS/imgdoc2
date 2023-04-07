@@ -74,6 +74,10 @@ if (IMGDOC2_BUILD_CONVCZI)
   add_subdirectory(convczi)
 endif()
 
+include (CTest)
+set(MEMORYCHECK_COMMAND valgrind)
+#set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --track-origins=yes")
+set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=yes")
 enable_testing()
 add_subdirectory(libimgdoc2_tests)
 
