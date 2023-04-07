@@ -112,7 +112,7 @@ TEST(Miscellaneous, BlobOutputOnHeap)
 
     uint8_t data[4] = { 1, 2, 3, 4 };
     BlobOutputOnHeap blob_output_on_heap2;
-    EXPECT_THROW((void)blob_output_on_heap2.SetData(0,sizeof(data),data), logic_error); // check that we cannot set data without reserving first
+    EXPECT_THROW((void)blob_output_on_heap2.SetData(0, sizeof(data), data), logic_error); // check that we cannot set data without reserving first
 
     BlobOutputOnHeap blob_output_on_heap3;
     EXPECT_TRUE(blob_output_on_heap3.Reserve(4));
