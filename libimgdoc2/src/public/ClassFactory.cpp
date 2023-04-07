@@ -135,6 +135,8 @@ public:
 
             break;
         }
+        case DocumentType::kInvalid:
+            break;
     }
 
     return {};
