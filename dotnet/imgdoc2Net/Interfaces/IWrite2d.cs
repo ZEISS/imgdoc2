@@ -9,7 +9,7 @@ namespace ImgDoc2Net.Interfaces
     /// <summary>   
     /// This interface is used to give write-access to the document. 
     /// </summary>
-    public interface IWrite2d : IDisposable
+    public interface IWrite2d : ITransaction, IDisposable
     {
         /// <summary>   
         /// Adds a tile with the specified content. 

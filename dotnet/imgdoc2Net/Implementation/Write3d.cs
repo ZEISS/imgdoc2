@@ -10,19 +10,31 @@ namespace ImgDoc2Net.Implementation
     using ImgDoc2Net.Interfaces;
     using ImgDoc2Net.Interop;
 
+    /// <summary>   
+    /// Implementation of the "IWrite3d" interface. 
+    /// </summary>
+    /// <remarks>
+    /// TODO: guard against multiple dispose-calls
+    /// </remarks>
     internal partial class Write3d : IWrite3d
     {
         private IntPtr writer3dObjectHandle;
 
+        /// <summary> 
+        /// Initializes a new instance of the <see cref="Write3d"/> class.
+        /// </summary>
+        /// <param name="handle"> The handle of a writer3d object.</param>
         public Write3d(IntPtr handle)
         {
             this.writer3dObjectHandle = handle;
         }
 
+        /// <summary> Prevents a default instance of the <see cref="Write3d"/> class from being created.</summary>
         private Write3d()
         {
         }
 
+        /// <inheritdoc/>
         public long AddBrick(
             ITileCoordinate tileCoordinate,
             in LogicalPosition3d logicalPosition3d,
@@ -39,6 +51,30 @@ namespace ImgDoc2Net.Implementation
                 dataType,
                 pointerTileData,
                 sizeTileData);
+        }
+    }
+
+    /// <content>
+    /// This part contains the implementation of ITransaction. 
+    /// </content>
+    internal partial class Write3d
+    {
+        /// <inheritdoc/>
+        public void BeginTransaction()
+        {
+            ImgDoc2ApiInterop.Instance.Writer3dBeginTransaction(this.writer3dObjectHandle);
+        }
+
+        /// <inheritdoc/>
+        public void CommitTransaction()
+        {
+            ImgDoc2ApiInterop.Instance.Writer3dCommitTransaction(this.writer3dObjectHandle);
+        }
+
+        /// <inheritdoc/>
+        public void RollbackTransaction()
+        {
+            ImgDoc2ApiInterop.Instance.Writer3dRollbackTransaction(this.writer3dObjectHandle);
         }
     }
 

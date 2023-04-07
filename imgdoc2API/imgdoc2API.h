@@ -748,3 +748,27 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDocInfo3d_GetTileCountPerLayer(
         HandleDocRead3D handle,
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_BeginTransaction(
+    HandleDocWrite2D handle,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_CommitTransaction(
+    HandleDocWrite2D handle,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite2d_RollbackTransaction(
+    HandleDocWrite2D handle,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_BeginTransaction(
+    HandleDocWrite3D handle,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_CommitTransaction(
+    HandleDocWrite3D handle,
+    ImgDoc2ErrorInformation* error_information);
+
+EXTERNAL_API(ImgDoc2ErrorCode) IDocWrite3d_RollbackTransaction(
+    HandleDocWrite3D handle,
+    ImgDoc2ErrorInformation* error_information);
