@@ -26,10 +26,10 @@ namespace imgdoc2
         /// thrown.
         ///
         /// \param          idx             The primary key of the tile.
-        /// \param [out]    coord           If non-null and the operation is successful, the tile-coordinate will be put here.
+        /// \param [out]    coordinate      If non-null and the operation is successful, the tile-coordinate will be put here.
         /// \param [out]    info            If non-null and the operation is successful, the logical position will be put here.
         /// \param [out]    tile_blob_info  If non-null and the operation is successful, the tile-blob-info will be put here.
-        virtual void ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info) = 0;
+        virtual void ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coordinate, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info) = 0;
 
        /// Query the tiles table. The two query clauses are used to filter the tiles. The first clause is used to filter the tiles by their
        /// coordinates, the second by other "per tile data". The functor is called for each tile which matches the query. If the functor

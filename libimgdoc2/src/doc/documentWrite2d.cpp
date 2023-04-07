@@ -12,7 +12,7 @@ using namespace std;
 using namespace imgdoc2;
 
 /*virtual*/imgdoc2::dbIndex DocumentWrite2d::AddTile(
-    const imgdoc2::ITileCoordinate* coord,
+    const imgdoc2::ITileCoordinate* coordinate,
     const imgdoc2::LogicalPositionInfo* info,
     const imgdoc2::TileBaseInfo* tileInfo,
     imgdoc2::DataTypes datatype,
@@ -23,7 +23,7 @@ using namespace imgdoc2;
         this->document_->GetDatabase_connection(),
         [&]()->dbIndex
         {
-            return this->AddTileInternal(coord, info, tileInfo, datatype, storage_type, data);
+            return this->AddTileInternal(coordinate, info, tileInfo, datatype, storage_type, data);
         }
     };
 
@@ -46,7 +46,7 @@ using namespace imgdoc2;
 }
 
 imgdoc2::dbIndex DocumentWrite2d::AddTileInternal(
-    const imgdoc2::ITileCoordinate* coord,
+    const imgdoc2::ITileCoordinate* coordinate,
     const imgdoc2::LogicalPositionInfo* info,
     const imgdoc2::TileBaseInfo* tileInfo,
     imgdoc2::DataTypes datatype,
@@ -65,7 +65,7 @@ imgdoc2::dbIndex DocumentWrite2d::AddTileInternal(
         << "[" << this->document_->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_TileDataId) << "]";
 
     vector<int> coordinate_values;
-    coord->EnumCoordinates(
+    coordinate->EnumCoordinates(
         [&](Dimension dimension, int value)->bool
         {
             string_stream << ", [" << this->document_->GetDataBaseConfiguration2d()->GetDimensionsColumnPrefix() << dimension << ']';

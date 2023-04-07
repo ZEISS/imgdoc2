@@ -19,7 +19,7 @@ public:
     {}
 
     imgdoc2::dbIndex AddTile(
-        const imgdoc2::ITileCoordinate* coord, 
+        const imgdoc2::ITileCoordinate* coordinate, 
         const imgdoc2::LogicalPositionInfo* info, 
         const imgdoc2::TileBaseInfo* tileInfo, 
         imgdoc2::DataTypes datatype,
@@ -34,7 +34,7 @@ public:
 
 private:
     imgdoc2::dbIndex AddTileInternal(
-        const imgdoc2::ITileCoordinate* coord,
+        const imgdoc2::ITileCoordinate* coordinate,
         const imgdoc2::LogicalPositionInfo* info,
         const imgdoc2::TileBaseInfo* tileInfo,
         imgdoc2::DataTypes datatype,
