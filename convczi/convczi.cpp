@@ -102,7 +102,7 @@ static TileBaseInfo DeriveTileBaseInfo(const SubBlockInfo& sbBlkInfo)
         tile_base_info.pixelType = imgdoc2::PixelType::Bgr48;;
         break;
     case libCZI::PixelType::Gray8:
-        tile_base_info.pixelType = imgdoc2::PixelType::Gray8;;
+        tile_base_info.pixelType = imgdoc2::PixelType::Gray8;
         break;
     case libCZI::PixelType::Gray16:
         tile_base_info.pixelType = imgdoc2::PixelType::Gray16;
