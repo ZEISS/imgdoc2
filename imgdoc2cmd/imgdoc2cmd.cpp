@@ -58,7 +58,7 @@ static void Test1()
 
 static void Test2()
 {
-    unique_ptr<imgdoc2::IOpenExistingOptions> open_existing_options( ClassFactory::CreateOpenExistingOptions() );
+    unique_ptr<imgdoc2::IOpenExistingOptions> open_existing_options(ClassFactory::CreateOpenExistingOptions());
     open_existing_options->SetFilename("D:\\test.db");
 
     auto doc = ClassFactory::OpenExisting(open_existing_options.get());
@@ -128,14 +128,32 @@ static void Test3()
     coordinate_query_clause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 0, 0 });
     vector<dbIndex> indices;
     reader->Query(&coordinate_query_clause, nullptr, [&](dbIndex index)->bool {indices.push_back(index); return true; });
-    
+}
+
+static void Test4()
+{
+    auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename("N:\\Test\\test.db");
+    //create_options->SetFilename("d:\\test.db");
+    create_options->AddDimension('M');
+    create_options->SetCreateBlobTable(true);
+
+    auto doc = ClassFactory::CreateNew(create_options.get());
+    //auto writer = doc->GetWriter2d();
+    auto meta_writer = doc->GetDocumentMetadataWriter();
+    auto id1 = meta_writer->AddItem(nullopt, "Node1", DocumentMetadataType::Double, IDocumentMetadataWrite::metadata_item_variant(33.443));
+    auto id1_1 = meta_writer->AddItem(id1, "Node1_1", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    auto id1_2 = meta_writer->AddItem(id1, "Node1_2", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+    auto id1_1_1 = meta_writer->AddItem(id1_1, "Node1_1_1", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3"));
+    auto id1_1_2 = meta_writer->AddItem(id1_1, "Node1_1_2", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3"));
 }
 
 int main(int argc, char** argv)
 {
     //Test1();
     //Test2();
-    Test3();
+    //Test3();
+    Test4();
     return 0;
 
     auto create_options = ClassFactory::CreateCreateOptionsUp();

@@ -47,6 +47,9 @@ public:
     /// \returns The read-object (for 3D-document).
     std::shared_ptr<imgdoc2::IDocRead3d> GetReader3d() override;
 
+    std::shared_ptr<imgdoc2::IDocumentMetadataWrite> GetDocumentMetadataWriter() override;
+    std::shared_ptr<imgdoc2::IDocumentMetadataRead> GetDocumentMetadataReader() override;
+
     ~Document() override = default;
 public:
     [[nodiscard]] const std::shared_ptr<IDbConnection>& GetDatabase_connection() const { return this->database_connection_; }

@@ -38,11 +38,14 @@ std::shared_ptr<DatabaseConfiguration2D> DbCreator::CreateTables2d(const imgdoc2
     sql_statement = this->GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(database_configuration.get());
     this->db_connection_->Execute(sql_statement);
 
+    sql_statement = this->GenerateSqlStatementForCreatingMetadataTable_Sqlite(database_configuration.get());
+    this->db_connection_->Execute(sql_statement);
+
     if (create_options->GetUseSpatialIndex())
     {
         sql_statement = this->GenerateSqlStatementForCreatingSpatialTilesIndex_Sqlite(database_configuration.get());
         this->db_connection_->Execute(sql_statement);
-        
+
         // and, add its name to the "General" table
         this->SetGeneralTableInfoForSpatialIndex(database_configuration.get());
     }
@@ -377,26 +380,19 @@ void DbCreator::SetBlobTableNameInGeneralTable(const DatabaseConfigurationCommon
     }
 }
 
-// ----------------------------------------------------------------------------
-
-#if 0
-/*static*/std::shared_ptr<imgdoc2::IDoc> imgdoc2::ClassFactory::OpenExisting(imgdoc2::IOpenExistingOptions* open_existing_options)
+std::string DbCreator::GenerateSqlStatementForCreatingMetadataTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common)
 {
-    // TODO(JBL): here would be the place where we'd allow for "other databases than Sqlite", for the time being,
-    //            we just deal with Sqlite here
-    auto db_connection = DbFactory::SqliteCreateNewDatabase(open_existing_options->GetFilename().c_str());
+    ostringstream string_stream;
+    string_stream << "CREATE TABLE [" << "METADATA"/*database_configuration_common->GetTableNameForMetadataTableOrThrow()*/ << "] (" <<
+        "[" << "Pk"/*database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk)*/ << "] INTEGER PRIMARY KEY," <<
+        "[" << "Name"/*database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Key)*/ << "] TEXT NOT NULL," <<
+        "[" << "AncestorId"/*database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueString)*/ << "] INTEGER," <<
+        "[" << "TypeDiscriminator" << "] INTEGER," <<
+        "[" << "ValueDouble" << "] REAL," <<
+        "[" << "ValueInteger" << "] INTEGER," <<
+        "[" << "ValueString" << "] TEXT," <<
+        "[" << "ValueJson" << "] JSON,"
+        "FOREIGN KEY(AncestorId) REFERENCES METADATA(Pk) )" << ";";
 
-    DbDiscovery database_discovery{ db_connection };
-    database_discovery.DoDiscovery();
-
-    const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(database_discovery.GetDatabaseConfiguration());
-    if (database_configuration_2d)
-    {
-        return make_shared<Document>(db_connection, database_configuration_2d);
-    }
-
-    // TODO(JBL): 3d version should follow here
-
-    return {};
+    return string_stream.str();
 }
-#endif

@@ -26,6 +26,7 @@ So - this is the only file which is to be included by a client application.
 #include "exceptions.h"
 #include "DimCoordinateQueryClause.h"
 #include "TileInfoQueryClause.h"
+#include "IDocumentMetadata.h"
 
 #include "impl/BlobOutputImplementations.h"
 #include "impl/DataObjectImplementations.h"

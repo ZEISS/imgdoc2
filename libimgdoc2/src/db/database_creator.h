@@ -36,6 +36,8 @@ private:
     std::string GenerateSqlStatementForCreatingSpatialTilesIndex_Sqlite(const DatabaseConfiguration3D* database_configuration);
     std::string GenerateSqlStatementForCreatingBlobTable_Sqlite(const DatabaseConfiguration3D* database_configuration);
 
+    std::string GenerateSqlStatementForCreatingMetadataTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common);
+
     void SetBlobTableNameInGeneralTable(const DatabaseConfigurationCommon* database_configuration_common);
 
     void SetGeneralTableInfoForSpatialIndex(const DatabaseConfigurationCommon* database_configuration_common);

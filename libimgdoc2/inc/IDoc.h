@@ -10,6 +10,8 @@ namespace imgdoc2
 {
     class IDocWrite2d;
     class IDocRead2d;
+    class IDocumentMetadataWrite;
+    class IDocumentMetadataRead;
 
     /// This interface is representing a 'document'. The discovery phase of the document has been completed successfully.
     /// Depending on the type of the document, objects for interacting with it can be created.
@@ -35,6 +37,10 @@ namespace imgdoc2
         /// if such an object cannot be constructed.
         /// \returns The read-object (for 3D-document).
         virtual std::shared_ptr<imgdoc2::IDocRead3d> GetReader3d() = 0;
+
+        virtual std::shared_ptr<imgdoc2::IDocumentMetadataWrite> GetDocumentMetadataWriter() = 0;
+
+        virtual std::shared_ptr<imgdoc2::IDocumentMetadataRead> GetDocumentMetadataReader() = 0;
 
         virtual ~IDoc() = default;
 

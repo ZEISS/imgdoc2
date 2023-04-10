@@ -78,7 +78,12 @@ set(LibImgDoc2_Srcfiles
          "src/doc/documentReadBase.cpp" 
          "inc/IDocInfo2d.h" 
          "inc/Intervals.h" 
-         "inc/loglevel.h")
+         "inc/loglevel.h" 
+         "inc/IDocumentMetadata.h" 
+         "src/doc/documentMetadataWriter.h" 
+         "src/doc/documentMetadataWriter.cpp"
+         "src/doc/documentMetadataReader.h"
+         "src/doc/documentMetadataReader.cpp")
 
 add_library(libimgdoc2 STATIC
                 ${LibImgDoc2_Srcfiles})

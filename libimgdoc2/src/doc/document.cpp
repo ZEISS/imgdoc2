@@ -9,6 +9,9 @@
 #include "documentRead3d.h"
 #include "documentWrite3d.h"
 
+#include "documentMetadataReader.h"
+#include "documentMetadataWriter.h"
+
 using namespace std;
 using namespace imgdoc2;
 
@@ -50,4 +53,14 @@ using namespace imgdoc2;
     }
 
     return {};
+}
+
+/*virtual*/std::shared_ptr<imgdoc2::IDocumentMetadataWrite> Document::GetDocumentMetadataWriter()
+{
+    return make_shared<DocumentMetadataWriter>(shared_from_this());
+}
+
+/*virtual*/std::shared_ptr<imgdoc2::IDocumentMetadataRead> Document::GetDocumentMetadataReader()
+{
+    return make_shared<DocumentMetadataReader>(shared_from_this());
 }
