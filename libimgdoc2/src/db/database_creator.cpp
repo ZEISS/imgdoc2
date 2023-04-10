@@ -391,8 +391,8 @@ std::string DbCreator::GenerateSqlStatementForCreatingMetadataTable_Sqlite(const
         "[" << "ValueDouble" << "] REAL," <<
         "[" << "ValueInteger" << "] INTEGER," <<
         "[" << "ValueString" << "] TEXT," <<
-        "[" << "ValueJson" << "] JSON,"
-        "FOREIGN KEY(AncestorId) REFERENCES METADATA(Pk) )" << ";";
+        "FOREIGN KEY(AncestorId) REFERENCES METADATA(Pk),"
+        "UNIQUE(Name,AncestorId) )" << ";"; // the combination of Name and AncestorId must be unique, in other words, the names of items with the same ancestor must be unique
 
     return string_stream.str();
 }

@@ -3,31 +3,187 @@
 using namespace std;
 using namespace imgdoc2;
 
-static int DetermineDiscriminator(const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
+//static int DetermineDiscriminator(const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
+//{
+//    if (std::holds_alternative<std::string>(value))
+//    {
+//        return 1;
+//    }
+//    else if (std::holds_alternative<int>(value))
+//    {
+//        return 2;
+//    }
+//    else if (std::holds_alternative<double>(value))
+//    {
+//        return 3;
+//    }
+//    //else if (std::holds_alternative<json>(value))
+//    //{
+//    //    return 4;
+//    //}
+//    else
+//    {
+//        throw std::invalid_argument("Unknown metadata item type");
+//    }
+//}
+
+imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItem(
+                  std::optional<imgdoc2::dbIndex> parent,
+                  bool create_node_if_not_exists,
+                  const string& name,
+                  DocumentMetadataType type,
+                  const IDocumentMetadata::metadata_item_variant& value)
 {
-    if (std::holds_alternative<std::string>(value))
+    this->CheckNodeNameAndThrowIfInvalid(name);
+    const DatabaseDataTypeValue item_type = DocumentMetadataBase::DetermineDatabaseDataTypeValueOrThrow(type, value);
+    auto statement = this->CreateStatementForUpdateOrCreateItem(create_node_if_not_exists, parent, name, item_type, value);
+    /* int binding_index = 1;
+     statement->BindString(binding_index++, name);
+     this->BindAncestorId(statement, binding_index++, parent);
+     this->BindTypeDiscriminatorAndData(statement, binding_index, item_type, value);*/
+    this->document_->GetDatabase_connection()->Execute(statement.get());
+    statement.reset();
+
+    // Ok this worked the new item was inserted or updated. Now we need to get the id of the item.
+    // TODO(Jbl): It is of course a bit unfortunate that we do another lookup here. However, I didn't find a
+    //             a way around this (for all the cases we need to support).
+    const auto select_statement = this->CreateQueryForNameAndAncestorIdStatement(name, parent);
+
+    // we are expecting exactly one result, or zero in case of "not found"
+    if (!this->document_->GetDatabase_connection()->StepStatement(select_statement.get()))
     {
-        return 1;
+        throw std::logic_error("Could not find the item we just inserted or updated");
     }
-    else if (std::holds_alternative<int>(value))
-    {
-        return 2;
-    }
-    else if (std::holds_alternative<double>(value))
-    {
-        return 3;
-    }
-    //else if (std::holds_alternative<json>(value))
-    //{
-    //    return 4;
-    //}
-    else
-    {
-        throw std::invalid_argument("Unknown metadata item type");
-    }
+
+    const dbIndex pk_of_updated_or_created_item = select_statement->GetResultInt64(0);
+
+    return pk_of_updated_or_created_item;
 }
 
-/*virtual*/imgdoc2::dbIndex DocumentMetadataWriter::AddItem(std::optional<imgdoc2::dbIndex> parent_id, std::string name, imgdoc2::DocumentMetadataType type, const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
+bool DocumentMetadataWriter::DeleteItem(
+            std::optional<imgdoc2::dbIndex> parent,
+            bool recursively)
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+bool DocumentMetadataWriter::DeleteItemForPath(
+           const std::string& path,
+           bool recursively)
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItemForPath(
+            bool create_path_if_not_exists,
+            bool create_node_if_not_exists,
+            const std::string& path,
+            DocumentMetadataType type,
+            const IDocumentMetadata::metadata_item_variant& value)
+{
+    throw std::logic_error("The method or operation is not implemented.");
+}
+
+std::shared_ptr<IDbStatement> DocumentMetadataWriter::CreateStatementForUpdateOrCreateItem(bool create_node_if_not_exists, std::optional<imgdoc2::dbIndex> parent, const std::string& name,
+                DatabaseDataTypeValue database_data_type_value,
+                const IDocumentMetadata::metadata_item_variant& value)
+{
+    const bool parent_has_value = parent.has_value();
+    ostringstream string_stream;
+
+    // CAUTION: it seems if we want to check for a NULL, we cannot simply use the "=" operator, but need to use the "IS" operator.
+    //          This is because the "=" operator does not work for NULL values, and it means that we cannot use data-binding, we have to modify
+    //          the query string itself. This is not a problem, but it is something to keep in mind. 
+    //          TODO(Jbl): maybe there is a better way to do this?
+    if (create_node_if_not_exists == false)
+    {
+        string_stream << "UPDATE [" << "METADATA" << "] SET " <<
+            "[" << "TypeDiscriminator" << "] = ?3, " <<
+            "[" << "ValueDouble" << "] = ?4, " <<
+            "[" << "ValueInteger" << "] = ?5, " <<
+            "[" << "ValueString" << "] = ?6 " <<
+            "WHERE [" << "Name" << "] = ?1 AND ";
+        if (parent_has_value)
+        {
+            string_stream << "[" << "AncestorId" << "] = ?2";
+        }
+        else
+        {
+            string_stream << "[" << "AncestorId" << "] IS NULL";
+        }
+    }
+    else
+    {
+        string_stream << "INSERT" << " INTO [" << "METADATA" << "] (" <<
+            "[" << "Name" << "]," <<
+            "[" << "AncestorId" << "]," <<
+            "[" << "TypeDiscriminator" << "]," <<
+            "[" << "ValueDouble" << "]," <<
+            "[" << "ValueInteger" << "]," <<
+            "[" << "ValueString" << "]) " <<
+            "VALUES(" << "?1, ?2, ?3, ?4, ?5, ?6" << ") " <<
+            // There is a constraint on the table that ensures that the combination of name and ancestor id is unique.
+            // So, if the insert fails because of a constraint violation, we update the existing row.
+            "ON CONFLICT([" << "Name" << "], [" << "AncestorId" << "]) DO UPDATE " <<
+            "SET [" << "TypeDiscriminator" << "] = ?3, " <<
+            "[" << "ValueDouble" << "] = ?4, " <<
+            "[" << "ValueInteger" << "] = ?5, " <<
+            "[" << "ValueString" << "] = ?6 " <<
+            "WHERE [" << "Name" << "] = ?1 AND ";
+        if (parent_has_value)
+        {
+            string_stream << "[" << "AncestorId" << "] = ?2";
+        }
+        else
+        {
+            string_stream << "[" << "AncestorId" << "] IS NULL";
+        }
+    }
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+
+    int binding_index = 1;
+    statement->BindString(binding_index++, name);
+    if (parent_has_value)
+    {
+        statement->BindInt64(binding_index++, parent.value());
+    }
+    else
+    {
+        ++binding_index;
+    }
+
+    this->BindTypeDiscriminatorAndData(statement, binding_index, database_data_type_value, value); // this will bind 3 values
+
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentMetadataWriter::CreateQueryForNameAndAncestorIdStatement(const std::string& name, std::optional<imgdoc2::dbIndex> parent)
+{
+    const bool parent_has_value = parent.has_value();
+    ostringstream string_stream;
+    string_stream << "SELECT [" << "Pk" << "] FROM [" << "METADATA" << "] WHERE [" << "Name" << "]=?1 AND ";
+    if (parent_has_value)
+    {
+        string_stream << "[" << "AncestorId" << "] = ?2";
+    }
+    else
+    {
+        string_stream << "[" << "AncestorId" << "] IS NULL";
+    }
+
+    string_stream << ";";
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    statement->BindString(1, name);
+    if (parent_has_value)
+    {
+        statement->BindInt64(2, parent.value());
+    }
+
+    return statement;
+}
+
+/*
+imgdoc2::dbIndex DocumentMetadataWriter::AddItem(std::optional<imgdoc2::dbIndex> parent_id, std::string name, imgdoc2::DocumentMetadataType type, const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
 {
     ostringstream string_stream;
     string_stream << "INSERT INTO [" << "METADATA" << "] (" <<
@@ -86,68 +242,68 @@ static int DetermineDiscriminator(const imgdoc2::IDocumentMetadata::metadata_ite
 
     auto id = this->document_->GetDatabase_connection()->ExecuteAndGetLastRowId(statement.get());
     return id;
-}
+}*/
 
-DocumentMetadataWriter::DataType DocumentMetadataWriter::DetermineDataType(imgdoc2::DocumentMetadataType type, const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
-{
-    if (!std::holds_alternative<monostate>(value))
-    {
-        return DataType::null;
-    }
-
-    switch (type)
-    {
-        case DocumentMetadataType::Text:
-            // in this case the value must contain a string
-            if (!std::holds_alternative<std::string>(value))
-            {
-                throw std::invalid_argument("The value must be a string");
-            }
-
-            return DataType::utf8string;
-        case DocumentMetadataType::Int32:
-            // in this case the value must contain an integer
-            if (!std::holds_alternative<int>(value))
-            {
-                throw std::invalid_argument("The value must be an integer");
-            }
-
-            return DataType::int32;
-        case DocumentMetadataType::Double:
-            // in this case the value must contain a double
-            if (!std::holds_alternative<double>(value))
-            {
-                throw std::invalid_argument("The value must be a double");
-            }
-
-            return DataType::doublefloat;
-        case DocumentMetadataType::Json:
-            // in this case the value must contain a string
-            if (!std::holds_alternative<string>(value))
-            {
-                throw std::invalid_argument("The value must be a string");
-            }
-
-            return DataType::json;
-        case DocumentMetadataType::Default:
-            if (!std::holds_alternative<std::string>(value))
-            {
-                return DataType::utf8string;
-            }
-            else if (!std::holds_alternative<int>(value))
-            {
-                return DataType::int32;
-            }
-            else if (!std::holds_alternative<double>(value))
-            {
-                return DataType::doublefloat;
-            }
-            else
-            {
-                throw std::invalid_argument("Unknown metadata item type");
-            }
-    }
-}
+//DocumentMetadataWriter::DataType DocumentMetadataWriter::DetermineDataType(imgdoc2::DocumentMetadataType type, const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
+//{
+//    if (!std::holds_alternative<monostate>(value))
+//    {
+//        return DataType::null;
+//    }
+//
+//    switch (type)
+//    {
+//        case DocumentMetadataType::Text:
+//            // in this case the value must contain a string
+//            if (!std::holds_alternative<std::string>(value))
+//            {
+//                throw std::invalid_argument("The value must be a string");
+//            }
+//
+//            return DataType::utf8string;
+//        case DocumentMetadataType::Int32:
+//            // in this case the value must contain an integer
+//            if (!std::holds_alternative<int>(value))
+//            {
+//                throw std::invalid_argument("The value must be an integer");
+//            }
+//
+//            return DataType::int32;
+//        case DocumentMetadataType::Double:
+//            // in this case the value must contain a double
+//            if (!std::holds_alternative<double>(value))
+//            {
+//                throw std::invalid_argument("The value must be a double");
+//            }
+//
+//            return DataType::doublefloat;
+//        case DocumentMetadataType::Json:
+//            // in this case the value must contain a string
+//            if (!std::holds_alternative<string>(value))
+//            {
+//                throw std::invalid_argument("The value must be a string");
+//            }
+//
+//            return DataType::json;
+//        case DocumentMetadataType::Default:
+//            if (!std::holds_alternative<std::string>(value))
+//            {
+//                return DataType::utf8string;
+//            }
+//            else if (!std::holds_alternative<int>(value))
+//            {
+//                return DataType::int32;
+//            }
+//            else if (!std::holds_alternative<double>(value))
+//            {
+//                return DataType::doublefloat;
+//            }
+//            else
+//            {
+//                throw std::invalid_argument("Unknown metadata item type");
+//            }
+//    }
+//}
 
 
 /*
@@ -155,9 +311,21 @@ DocumentMetadataWriter::DataType DocumentMetadataWriter::DetermineDataType(imgdo
     select Pk, Name, Name, 0 from METADATA where AncestorId is null AND Name='Node1'
     union
     select METADATA.Pk, METADATA.name, paths.path || '/' || METADATA.name, level+1
-    from METADATA join paths where METADATA.AncestorId = paths.id AND 
+    from METADATA join paths where METADATA.AncestorId = paths.id AND
          ((level = 0 AND METADATA.Name="Node1_1") OR
           (level = 1 AND METADATA.Name="Node1_1_2"))
 )
-select id, path, level from paths            
+select id, path, level from paths
  */
+
+
+
+void DocumentMetadataWriter::CheckNodeNameAndThrowIfInvalid(const std::string& name)
+{
+    // the string must not be empty and it must not contain a slash
+    // TODO(JBL): is the check for '/' sufficient (for UTF8-strings)?
+    if (name.empty() || name.find('/') != std::string::npos)
+    {
+        throw imgdoc2::invalid_argument_exception("The 'name' must not be empty and it must not contain a slash");
+    }
+}

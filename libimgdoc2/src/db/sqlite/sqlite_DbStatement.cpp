@@ -57,6 +57,12 @@ SqliteDbStatement::SqliteDbStatement(sqlite3_stmt* sql_statement)  :
     this->ThrowIfBindError(return_code, "sqlite3_bind_text");
 }
 
+/*virtual*/void SqliteDbStatement::BingStringView(int index, const std::string_view& value)
+{
+    const int return_code = sqlite3_bind_text(this->sql_statement_, index, value.data(), value.size(), SQLITE_TRANSIENT);
+    this->ThrowIfBindError(return_code, "sqlite3_bind_text");
+}
+
 /*virtual*/void SqliteDbStatement::BindBlob_Static(int index, const void* data, size_t size)
 {
     const int return_code = sqlite3_bind_blob64(this->sql_statement_, index, data, size, SQLITE_STATIC);
