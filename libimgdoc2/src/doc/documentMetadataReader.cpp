@@ -175,7 +175,7 @@ imgdoc2::DocumentMetadataItem DocumentMetadataReader::RetrieveDocumentMetadataIt
     if ((flags & DocumentMetadataItemFlags::DocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::DocumentMetadataTypeAndValueValid)
     {
         const auto database_item_type_value = statement->GetResultInt32(2);
-        switch (database_item_type_value)
+        switch (static_cast<DatabaseDataTypeValue>(database_item_type_value))
         {
             case DatabaseDataTypeValue::null:
                 item.value = std::monostate();
