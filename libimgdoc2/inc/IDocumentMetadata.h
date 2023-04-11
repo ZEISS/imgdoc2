@@ -76,12 +76,12 @@ namespace imgdoc2
             std::optional<imgdoc2::dbIndex> parent,
             bool recursive,
             DocumentMetadataItemFlags flags,
-            std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback) = 0;
+            const std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)>& func) = 0;
         virtual void EnumerateItemsForPath(
             const std::string& path,
             bool recursive,
             DocumentMetadataItemFlags flags,
-            std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback) = 0;
+            const std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)>& func) = 0;
     };
 
     class IDocumentMetadataWrite : public IDocumentMetadata

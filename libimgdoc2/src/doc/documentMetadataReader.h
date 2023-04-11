@@ -7,8 +7,6 @@
 
 class DocumentMetadataReader : public DocumentMetadataBase, public imgdoc2::IDocumentMetadataRead
 {
-private:
-    //std::shared_ptr<Document> document_;
 public:
     DocumentMetadataReader(std::shared_ptr<Document> document) : DocumentMetadataBase(std::move(document)) {}
     ~DocumentMetadataReader() override = default;
@@ -19,12 +17,12 @@ public:
       std::optional<imgdoc2::dbIndex> parent,
       bool recursive,
       imgdoc2::DocumentMetadataItemFlags flags,
-      std::function<bool(imgdoc2::dbIndex, const imgdoc2::DocumentMetadataItem& item)> callback) override;
+      const std::function<bool(imgdoc2::dbIndex, const imgdoc2::DocumentMetadataItem& item)>& func) override;
     void EnumerateItemsForPath(
       const std::string& path,
       bool recursive,
       imgdoc2::DocumentMetadataItemFlags flags,
-      std::function<bool(imgdoc2::dbIndex, const imgdoc2::DocumentMetadataItem& item)> callback) override;
+      const std::function<bool(imgdoc2::dbIndex, const imgdoc2::DocumentMetadataItem& item)>& func) override;
 
 private:
     std::shared_ptr<IDbStatement> CreateStatementForRetrievingItem(imgdoc2::DocumentMetadataItemFlags flags);

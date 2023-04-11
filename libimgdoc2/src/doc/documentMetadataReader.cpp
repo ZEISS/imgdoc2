@@ -72,7 +72,7 @@ void DocumentMetadataReader::EnumerateItems(
   std::optional<imgdoc2::dbIndex> parent,
   bool recursive,
   DocumentMetadataItemFlags flags,
-  std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback)
+  const std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)>& func)
 {
     const auto statement = this->CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(recursive, parent);
 
@@ -80,7 +80,7 @@ void DocumentMetadataReader::EnumerateItems(
     {
         const imgdoc2::dbIndex index = statement->GetResultInt64(0);
         DocumentMetadataItem document_metadata_item = this->RetrieveDocumentMetadataItemFromStatement(statement, flags);
-        const bool continue_operation = callback(index, document_metadata_item);
+        const bool continue_operation = func(index, document_metadata_item);
         if (!continue_operation)
         {
             break;
@@ -92,7 +92,7 @@ void DocumentMetadataReader::EnumerateItemsForPath(
   const std::string& path,
   bool recursive,
   DocumentMetadataItemFlags flags,
-  std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback)
+  const std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)>& func)
 {
     throw runtime_error("DocumentMetadataReader::EnumerateItems");
 }
