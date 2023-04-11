@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "IDocumentMetadata.h"
-#include "Document.h"
+#include "document.h"
 #include "documentMetadataBase.h"
 
 class DocumentMetadataReader : public DocumentMetadataBase, public imgdoc2::IDocumentMetadataRead
