@@ -109,10 +109,19 @@ namespace imgdoc2
                     DocumentMetadataType type,
                     const IDocumentMetadata::metadata_item_variant& value) = 0;
 
-        virtual bool DeleteItem(
-                    std::optional<imgdoc2::dbIndex> parent,
+        /// Deletes the item specified by 'primary_key'. If 'recursively' is true, all child nodes are
+        /// also deleted. If 'recursively' is false, the node is only deleted if it has no child nodes.
+        /// The method returns the number of deleted nodes - it does not throw an exception if the
+        /// primary key does not exist or if the node has child nodes and 'recursively' is false.
+        /// 
+        /// \param  primary_key Key of the node to be deleted. If this the optional has no value, this means "the root".
+        /// \param  recursively True if all child nodes should be deleted, false if only the node itself should be deleted.
+        ///
+        /// \returns    The number of deleted nodes as a result by this call.
+        virtual std::uint64_t DeleteItem(
+                    std::optional<imgdoc2::dbIndex> primary_key,
                     bool recursively) = 0;
-        virtual bool DeleteItemForPath(
+        virtual std::uint64_t DeleteItemForPath(
                    const std::string& path,
                    bool recursively) = 0;
         virtual imgdoc2::dbIndex UpdateOrCreateItemForPath(

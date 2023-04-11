@@ -1,5 +1,7 @@
 #include "documentMetadataWriter.h"
 
+#include "gsl/util"
+
 using namespace std;
 using namespace imgdoc2;
 
@@ -44,33 +46,37 @@ imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItemForPath(
 
     // If the size of the "pks of nodes on path" is smaller than the size of the path parts, then we 
     // need to create the missing nodes. Or - only if the caller requested it - we need to create the missing nodes.
-    if (pk_of_nodes_on_path.size() < path_parts.size()-1)
+    if (pk_of_nodes_on_path.size() < path_parts.size() - 1)
     {
-       if (!create_path_if_not_exists)
-       {
-           // TODO(JBl): find a better exception type
-           throw std::invalid_argument("The path does not exist and the caller did not request to create it.");
-       }
+        if (!create_path_if_not_exists)
+        {
+            // TODO(JBl): find a better exception type
+            throw std::invalid_argument("The path does not exist and the caller did not request to create it.");
+        }
 
-       this->CreateMissingNodesOnPath(path_parts, pk_of_nodes_on_path);
+        this->CreateMissingNodesOnPath(path_parts, pk_of_nodes_on_path);
     }
 
     return this->UpdateOrCreateItem(
-        pk_of_nodes_on_path.back(), 
-        create_node_if_not_exists, 
+        pk_of_nodes_on_path.back(),
+        create_node_if_not_exists,
         string{ path_parts.back() },
-        type, 
+        type,
         value);
 }
 
-bool DocumentMetadataWriter::DeleteItem(
-            std::optional<imgdoc2::dbIndex> parent,
+uint64_t DocumentMetadataWriter::DeleteItem(
+            std::optional<imgdoc2::dbIndex> primary_key,
             bool recursively)
 {
-    throw std::logic_error("The method or operation is not implemented.");
+    const auto statement = this->CreateStatementForDeleteItemAndBindData(recursively, primary_key);
+
+    int64_t number_of_modified_rows;
+    this->document_->GetDatabase_connection()->Execute(statement.get(), &number_of_modified_rows);
+    return gsl::narrow_cast<uint64_t>(number_of_modified_rows);
 }
 
-bool DocumentMetadataWriter::DeleteItemForPath(
+uint64_t DocumentMetadataWriter::DeleteItemForPath(
            const std::string& path,
            bool recursively)
 {
@@ -316,15 +322,53 @@ select id, path, level from paths
 void DocumentMetadataWriter::CreateMissingNodesOnPath(const std::vector<std::string_view>& path_parts, std::vector<imgdoc2::dbIndex>& pks_existing)
 {
     const size_t count_existing_pks = pks_existing.size();
-    for (size_t i = count_existing_pks; i < path_parts.size()-1; ++i)
+    for (size_t i = count_existing_pks; i < path_parts.size() - 1; ++i)
     {
         const auto new_node = this->UpdateOrCreateItem(
             i > 0 ? std::optional<imgdoc2::dbIndex>(pks_existing[i - 1]) : std::optional<imgdoc2::dbIndex>(),
             true,
-            string{path_parts[i]},
+            string{ path_parts[i] },
             DocumentMetadataType::Null,
             std::monostate());
         pks_existing.push_back(new_node);
+    }
+}
+
+std::shared_ptr<IDbStatement> DocumentMetadataWriter::CreateStatementForDeleteItemAndBindData(bool recursively, std::optional<imgdoc2::dbIndex> parent)
+{
+    ostringstream string_stream;
+
+    if (parent.has_value())
+    {
+
+        if (!recursively)
+        {
+            string_stream << "DELETE FROM [" << "METADATA" << "] WHERE " <<
+                "[" << "Pk" << "]=?1 AND NOT EXISTS(" <<
+                "SELECT 1 FROM [" << "METADATA" << "] WHERE " << "[" << "AncestorId" << "]=?1" << ");";
+        }
+        else
+        {
+            // To delete all items below a given node recursively we use a CTE (Common Table Expression) to get all child nodes
+            // of the given node and then delete all items with a PK that is in the result set of the CTE.
+            // The WITH RECURSIVE clause defines a recursive CTE called children that selects all child nodes of the given node 
+            // recursively. The first SELECT statement selects all direct child nodes of the given node, while the second SELECT 
+            // statement selects all child nodes of the child nodes recursively by joining with the children CTE.
+            // After the children CTE is defined, a separate DELETE statement is executed that deletes all rows in the hierarchy 
+            // table that have an id that matches any of the id values returned by the children CTE, and we also delete the
+            // specified node itself.
+            string_stream << "WITH RECURSIVE children(id) AS (" <<
+                "SELECT [" << "Pk" << "] FROM [" << "METADATA" << "] WHERE " << "[" << "AncestorId" << "]=?1" <<
+                "UNION ALL " <<
+                "SELECT [" << "METADATA" << "].[" << "Pk" << "] FROM [" << "METADATA" << "] JOIN children ON [" << "METADATA" << "].[" << "AncestorId" << "]=children.id" <<
+                ") " <<
+                "DELETE FROM [" << "METADATA" << "] WHERE " << "[" << "Pk" << "] IN (SELECT id FROM children) OR " << "[" << "Pk" << "]=?1;";
+        }
+
+
+        auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+        statement->BindInt64(1, parent.value());
+        return statement;
     }
 }
 

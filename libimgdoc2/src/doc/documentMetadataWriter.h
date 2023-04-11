@@ -30,10 +30,10 @@ public:
                    const std::string& name,
                    imgdoc2::DocumentMetadataType type,
                    const IDocumentMetadata::metadata_item_variant& value) override;
-    bool DeleteItem(
-                std::optional<imgdoc2::dbIndex> parent,
+    std::uint64_t DeleteItem(
+                std::optional<imgdoc2::dbIndex> primary_key,
                 bool recursively) override;
-    bool DeleteItemForPath(
+    std::uint64_t DeleteItemForPath(
                const std::string& path,
                bool recursively) override;
     imgdoc2::dbIndex UpdateOrCreateItemForPath(
@@ -49,5 +49,7 @@ private:
                 const IDocumentMetadata::metadata_item_variant& value);
     std::shared_ptr<IDbStatement> CreateQueryForNameAndAncestorIdStatement(const std::string& name, std::optional<imgdoc2::dbIndex> parent);
 
-    void CreateMissingNodesOnPath(const std::vector<std::string_view>& path_parts, std::vector<imgdoc2::dbIndex>& pks_existing );
+    void CreateMissingNodesOnPath(const std::vector<std::string_view>& path_parts, std::vector<imgdoc2::dbIndex>& pks_existing);
+
+    std::shared_ptr<IDbStatement> CreateStatementForDeleteItemAndBindData(bool recursively, std::optional<imgdoc2::dbIndex> parent);
 };
