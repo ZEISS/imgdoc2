@@ -5,6 +5,7 @@
 #include <variant>
 #include <functional>
 #include <optional>
+#include <type_traits>
 #include "types.h"
 
 namespace imgdoc2
@@ -13,6 +14,7 @@ namespace imgdoc2
     enum class DocumentMetadataType : std::uint8_t
     {
         Default,
+        Null,
         Text,
         Int32,
         Json,
@@ -29,14 +31,20 @@ namespace imgdoc2
     {
         None = 0,
         NameValid = 1,
-        DocumentMetadataTypeValid = 2,
-        ValueValid = 4,
+        DocumentMetadataTypeAndValueValid = 2,
+
+        All = NameValid | DocumentMetadataTypeAndValueValid
     };
 
     // -> https://stackoverflow.com/a/34220050/522591
-    inline constexpr DocumentMetadataItemFlags operator|(DocumentMetadataItemFlags X, DocumentMetadataItemFlags Y)
+    inline constexpr DocumentMetadataItemFlags operator|(DocumentMetadataItemFlags x, DocumentMetadataItemFlags y)
     {
-        return static_cast<DocumentMetadataItemFlags>(static_cast<unsigned int>(X) | static_cast<unsigned int>(Y));
+        return static_cast<DocumentMetadataItemFlags>(static_cast<std::underlying_type_t<DocumentMetadataItemFlags>>(x) | static_cast<std::underlying_type_t<DocumentMetadataItemFlags>>(y));
+    }
+
+    inline constexpr DocumentMetadataItemFlags operator&(DocumentMetadataItemFlags x, DocumentMetadataItemFlags y)
+    {
+        return static_cast<DocumentMetadataItemFlags>(static_cast<std::underlying_type_t<DocumentMetadataItemFlags>>(x) & static_cast<std::underlying_type_t<DocumentMetadataItemFlags>>(y));
     }
 
     inline DocumentMetadataItemFlags& operator|=(DocumentMetadataItemFlags& x, DocumentMetadataItemFlags y)

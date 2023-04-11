@@ -17,12 +17,42 @@ using namespace imgdoc2;
     }
 
     DocumentMetadataItem item;
-    item.name = statement->GetResultString(0);
-    item.type = static_cast<DocumentMetadataType>(statement->GetResultInt32(1));
+    if ((flags & DocumentMetadataItemFlags::NameValid) == DocumentMetadataItemFlags::NameValid)
+    {
+        item.name = statement->GetResultString(0);
+    }
 
+    if ((flags & DocumentMetadataItemFlags::DocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::DocumentMetadataTypeAndValueValid)
+    {
+        const auto database_item_type_value = statement->GetResultInt32(1);
+        switch (database_item_type_value)
+        {
+            case DatabaseDataTypeValue::null:
+                item.value = std::monostate();
+                item.type = DocumentMetadataType::Null;
+                break;
+            case DatabaseDataTypeValue::int32:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultInt32(3));
+                item.type = DocumentMetadataType::Int32;
+                break;
+            case DatabaseDataTypeValue::doublefloat:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultDouble(2));
+                item.type = DocumentMetadataType::Double;
+                break;
+            case DatabaseDataTypeValue::utf8string:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultString(4));
+                item.type = DocumentMetadataType::Text;
+                break;
+            case DatabaseDataTypeValue::json:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultString(4));
+                item.type = DocumentMetadataType::Json;
+                break;
+            default:
+                throw runtime_error("DocumentMetadataReader::GetItem: Unknown data type");
+        }
+    }
 
     return item;
-    //throw runtime_error("DocumentMetadataReader::GetItem");
 }
 
 /*virtual*/imgdoc2::DocumentMetadataItem DocumentMetadataReader::GetItemForPath(const std::string& path, imgdoc2::DocumentMetadataItemFlags flags)

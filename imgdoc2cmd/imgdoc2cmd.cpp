@@ -150,7 +150,7 @@ static void Test4()
 
     auto r = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_1", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3 modified"));
 
-    auto item = meta_reader->GetItemForPath("Node1/Node1_1", DocumentMetadataItemFlags::ValueValid);
+    auto item = meta_reader->GetItemForPath("Node1/Node1_1", DocumentMetadataItemFlags::All);
 
     return;
 }

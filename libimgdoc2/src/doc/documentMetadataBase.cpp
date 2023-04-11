@@ -27,7 +27,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
     {
         case DocumentMetadataType::Text:
             // in this case the value must contain a string
-            if (!std::holds_alternative<std::string>(value))
+            if (std::holds_alternative<std::string>(value))
             {
                 throw invalid_argument_exception("The value must be a string");
             }
@@ -35,7 +35,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             return DatabaseDataTypeValue::utf8string;
         case DocumentMetadataType::Int32:
             // in this case the value must contain an integer
-            if (!std::holds_alternative<int>(value))
+            if (std::holds_alternative<int>(value))
             {
                 throw invalid_argument_exception("The value must be an integer");
             }
@@ -43,7 +43,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             return DatabaseDataTypeValue::int32;
         case DocumentMetadataType::Double:
             // in this case the value must contain a double
-            if (!std::holds_alternative<double>(value))
+            if (std::holds_alternative<double>(value))
             {
                 throw invalid_argument_exception("The value must be a double");
             }
@@ -51,22 +51,22 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             return DatabaseDataTypeValue::doublefloat;
         case DocumentMetadataType::Json:
             // in this case the value must contain a string
-            if (!std::holds_alternative<string>(value))
+            if (std::holds_alternative<string>(value))
             {
                 throw invalid_argument_exception("The value must be a string");
             }
 
             return DatabaseDataTypeValue::json;
         case DocumentMetadataType::Default:
-            if (!std::holds_alternative<std::string>(value))
+            if (std::holds_alternative<std::string>(value))
             {
                 return DatabaseDataTypeValue::utf8string;
             }
-            else if (!std::holds_alternative<int>(value))
+            else if (std::holds_alternative<int>(value))
             {
                 return DatabaseDataTypeValue::int32;
             }
-            else if (!std::holds_alternative<double>(value))
+            else if (std::holds_alternative<double>(value))
             {
                 return DatabaseDataTypeValue::doublefloat;
             }
@@ -146,20 +146,31 @@ std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath
 {
     ostringstream string_stream;
 
-    string_stream << "WITH RECURSIVE paths(id, name, level) as ( " <<
-        "SELECT Pk, Name,  1 from METADATA where AncestorId IS NULL AND Name=? " <<
-        "UNION " <<
-        "SELECT METADATA.Pk, METADATA.name,  level + 1 " <<
-        "FROM METADATA JOIN paths WHERE METADATA.AncestorId = paths.id AND " <<
-        "CASE level ";
-
-    for (size_t i = 1; i < path_parts.size(); i++)
+    if (path_parts.size() > 1)
     {
-        string_stream << "WHEN " << i << " THEN METADATA.Name=? ";
-    }
+        string_stream << "WITH RECURSIVE paths(id, name, level) as ( " <<
+            "SELECT Pk, Name,  1 from METADATA where AncestorId IS NULL AND Name=? " <<
+            "UNION " <<
+            "SELECT METADATA.Pk, METADATA.name,  level + 1 " <<
+            "FROM METADATA JOIN paths WHERE METADATA.AncestorId = paths.id AND " <<
+            "CASE level ";
 
-    string_stream << "END) " <<
-        "SELECT id, level FROM paths;";
+        for (size_t i = 1; i < path_parts.size(); i++)
+        {
+            string_stream << "WHEN " << i << " THEN METADATA.Name=? ";
+        }
+
+        string_stream << "END) " <<
+            "SELECT id FROM paths;";
+    }
+    else if (path_parts.size() == 1)
+    {
+        string_stream << "SELECT Pk FROM METADATA WHERE AncestorId IS NULL AND Name=?;";
+    }
+    else
+    {
+        throw invalid_argument_exception("The path must contain at least one part");
+    }
 
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     return statement;
