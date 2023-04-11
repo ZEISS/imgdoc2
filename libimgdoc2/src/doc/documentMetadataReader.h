@@ -29,5 +29,5 @@ public:
 
 private:
     std::shared_ptr<IDbStatement> CreateStatementForRetrievingItem(imgdoc2::DocumentMetadataItemFlags flags);
-    std::shared_ptr<IDbStatement> CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(std::optional<imgdoc2::dbIndex> parent);
+    std::shared_ptr<IDbStatement> CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(bool recursive, std::optional<imgdoc2::dbIndex> parent);
 };

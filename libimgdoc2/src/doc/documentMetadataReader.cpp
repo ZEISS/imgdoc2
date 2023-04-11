@@ -73,7 +73,7 @@ void DocumentMetadataReader::EnumerateItems(
   DocumentMetadataItemFlags flags,
   std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback)
 {
-    auto statement = this->CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(parent);
+    const auto statement = this->CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(recursive, parent);
 
     while (this->document_->GetDatabase_connection()->StepStatement(statement.get()))
     {
@@ -105,32 +105,49 @@ std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForRetrievi
     return statement;
 }
 
-std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(std::optional<imgdoc2::dbIndex> parent)
+std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(bool recursive, std::optional<imgdoc2::dbIndex> parent)
 {
     const bool parent_has_value = parent.has_value();
     ostringstream string_stream;
 
-    string_stream <<
-        "WITH RECURSIVE cte AS(" <<
-        "SELECT Pk, Name, AncestorId " <<
-        "FROM METADATA ";
-
-    if (parent_has_value)
+    if (recursive)
     {
-        string_stream << "WHERE AncestorId = ?1 ";
+        string_stream <<
+            "WITH RECURSIVE cte AS(" <<
+            "SELECT Pk, Name, AncestorId " <<
+            "FROM METADATA ";
+
+        if (parent_has_value)
+        {
+            string_stream << "WHERE AncestorId = ?1 ";
+        }
+        else
+        {
+            string_stream << "WHERE AncestorId IS NULL ";
+        }
+
+        string_stream <<
+            "UNION ALL " <<
+            "SELECT c.Pk, c.Name, c.AncestorId " <<
+            "FROM METADATA c " <<
+            "JOIN cte ON c.AncestorId = cte.Pk " <<
+            ") " <<
+            "SELECT Pk, Name FROM cte;";
     }
     else
     {
-        string_stream << "WHERE AncestorId IS NULL ";
-    }
+        string_stream <<
+            "SELECT Pk, Name FROM METADATA ";
 
-    string_stream <<
-        "UNION ALL " <<
-        "SELECT c.Pk, c.Name, c.AncestorId " <<
-        "FROM METADATA c " <<
-        "JOIN cte ON c.AncestorId = cte.Pk " <<
-        ") " <<
-        "SELECT Pk, Name FROM cte;";
+        if (parent_has_value)
+        {
+            string_stream << "WHERE AncestorId = ?1 ";
+        }
+        else
+        {
+            string_stream << "WHERE AncestorId IS NULL ";
+        }
+    }
 
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     if (parent_has_value)

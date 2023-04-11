@@ -169,15 +169,25 @@ TEST(Metadata, AddMetadataItemsWithPathAndCheckIfTheyAreAdded_Scenario1)
 
 TEST(Metadata, EnumerateItems_Scenario1)
 {
+    // Arrange
     const auto create_options = ClassFactory::CreateCreateOptionsUp();
     create_options->SetFilename(":memory:");
     create_options->AddDimension('M');
     const auto doc = ClassFactory::CreateNew(create_options.get());
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
+    // we construct the following tree:
+    // 
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+
     const auto id1 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
     const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
 
+    // Act
     vector<dbIndex> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItems(
@@ -186,7 +196,45 @@ TEST(Metadata, EnumerateItems_Scenario1)
         DocumentMetadataItemFlags::All,
         [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
 
-    EXPECT_EQ(items.size(), 4);
+    // Assert
+    EXPECT_EQ(items.size(), 4); // so, we expect 4 items, the root node and the 3 leaf nodes
     EXPECT_THAT(items, Contains(id1));
     EXPECT_THAT(items, Contains(id2));
+    EXPECT_EQ(std::unique(items.begin(), items.end()), items.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
+}
+
+TEST(Metadata, EnumerateItems_Scenario2)
+{
+    // Arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+
+    // we construct the following tree:
+    // 
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+
+    const auto id_item_b = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B", DocumentMetadataType::Null, std::monostate());
+    const auto id1 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+
+    // Act
+    vector<dbIndex> items;
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+    metadata_reader->EnumerateItems(
+        id_item_b,
+        false,
+        DocumentMetadataItemFlags::All,
+        [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
+
+    // Assert
+    EXPECT_EQ(items.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
+    EXPECT_THAT(items, UnorderedElementsAre(id1, id2));
+    EXPECT_EQ(std::unique(items.begin(), items.end()), items.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
 }
