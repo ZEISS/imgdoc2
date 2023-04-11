@@ -28,7 +28,7 @@ namespace imgdoc2
     enum class DocumentMetadataItemFlags : std::uint8_t
     {
         None = 0,
-        NAmeValid = 1,
+        NameValid = 1,
         DocumentMetadataTypeValid = 2,
         ValueValid = 4,
     };
