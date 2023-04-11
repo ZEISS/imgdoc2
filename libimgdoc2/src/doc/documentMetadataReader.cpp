@@ -162,6 +162,7 @@ std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerat
 imgdoc2::DocumentMetadataItem DocumentMetadataReader::RetrieveDocumentMetadataItemFromStatement(const std::shared_ptr<IDbStatement>& statement, imgdoc2::DocumentMetadataItemFlags flags)
 {
     DocumentMetadataItem item;
+    item.flags = flags;
     if ((flags & DocumentMetadataItemFlags::PrimaryKeyValid) == DocumentMetadataItemFlags::PrimaryKeyValid)
     {
         item.primary_key = statement->GetResultInt64(0);
