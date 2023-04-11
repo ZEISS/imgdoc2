@@ -128,11 +128,11 @@ int DocumentMetadataBase::BindTypeDiscriminatorAndData(
     return binding_index;
 }
 
-static std::vector<std::string_view> tokenize(std::string_view str, char delim)
+static std::vector<std::string_view> tokenize(std::string_view str, char deliminator)
 {
     std::vector<std::string_view> tokens;
     std::size_t start = 0, end = 0;
-    while ((end = str.find(delim, start)) != std::string_view::npos)
+    while ((end = str.find(deliminator, start)) != std::string_view::npos)
     {
         tokens.push_back(str.substr(start, end - start));
         start = end + 1;

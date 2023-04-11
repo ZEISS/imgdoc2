@@ -47,7 +47,7 @@ namespace imgdoc2
 
     struct DocumentMetadataItem
     {
-        DocumentMetadataItemFlags flags;
+        DocumentMetadataItemFlags flags{ DocumentMetadataItemFlags::None };
         std::string name;
         DocumentMetadataType type;
         IDocumentMetadata::metadata_item_variant value;
@@ -98,7 +98,7 @@ namespace imgdoc2
                     const IDocumentMetadata::metadata_item_variant& value) = 0;
 
         virtual bool DeleteItem(
-                    std::optional<imgdoc2::dbIndex> parent, 
+                    std::optional<imgdoc2::dbIndex> parent,
                     bool recursively) = 0;
         virtual bool DeleteItemForPath(
                    const std::string& path,
