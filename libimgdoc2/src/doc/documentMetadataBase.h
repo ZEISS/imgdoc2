@@ -49,7 +49,11 @@ protected:
     /// \returns    The primary keys of the nodes which could be mapped.
     std::vector<imgdoc2::dbIndex> GetNodeIdsForPath(const std::string& path, size_t* count_of_parts_in_path);
 
+    std::vector<imgdoc2::dbIndex> GetNodeIdsForPathParts(const std::vector<std::string_view>& parts);
+
     bool TryMapPathAndGetTerminalNode(const std::string& path,imgdoc2::dbIndex* terminal_node_id);
+
+    std::vector<std::string_view> SplitPath(const std::string_view& path);
 private:
     std::shared_ptr<IDbStatement> CreateQueryForNodeIdsForPath(const std::vector<std::string_view>& path_parts);
 };

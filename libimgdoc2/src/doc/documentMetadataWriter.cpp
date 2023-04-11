@@ -36,11 +36,7 @@ imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItem(
 {
     this->CheckNodeNameAndThrowIfInvalid(name);
     const DatabaseDataTypeValue item_type = DocumentMetadataBase::DetermineDatabaseDataTypeValueOrThrow(type, value);
-    auto statement = this->CreateStatementForUpdateOrCreateItem(create_node_if_not_exists, parent, name, item_type, value);
-    /* int binding_index = 1;
-     statement->BindString(binding_index++, name);
-     this->BindAncestorId(statement, binding_index++, parent);
-     this->BindTypeDiscriminatorAndData(statement, binding_index, item_type, value);*/
+    auto statement = this->CreateStatementForUpdateOrCreateItemAndBindData(create_node_if_not_exists, parent, name, item_type, value);
     this->document_->GetDatabase_connection()->Execute(statement.get());
     statement.reset();
 
@@ -60,6 +56,37 @@ imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItem(
     return pk_of_updated_or_created_item;
 }
 
+imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItemForPath(
+            bool create_path_if_not_exists,
+            bool create_node_if_not_exists,
+            const std::string& path,
+            imgdoc2::DocumentMetadataType type,
+            const IDocumentMetadata::metadata_item_variant& value)
+{
+    const auto path_parts = this->SplitPath(path);
+    auto pk_of_nodes_on_path = this->GetNodeIdsForPathParts(path_parts);
+
+    // If the size of the "pks of nodes on path" is smaller than the size of the path parts, then we 
+    // need to create the missing nodes. Or - only if the caller requested it - we need to create the missing nodes.
+    if (pk_of_nodes_on_path.size() < path_parts.size()-1)
+    {
+       if (!create_path_if_not_exists)
+       {
+           // TODO(JBl): find a better exception type
+           throw std::invalid_argument("The path does not exist and the caller did not request to create it.");
+       }
+
+       this->CreateMissingNodesOnPath(path_parts, pk_of_nodes_on_path);
+    }
+
+    return this->UpdateOrCreateItem(
+        pk_of_nodes_on_path.back(), 
+        create_node_if_not_exists, 
+        string{ path_parts.back() },
+        type, 
+        value);
+}
+
 bool DocumentMetadataWriter::DeleteItem(
             std::optional<imgdoc2::dbIndex> parent,
             bool recursively)
@@ -72,17 +99,8 @@ bool DocumentMetadataWriter::DeleteItemForPath(
 {
     throw std::logic_error("The method or operation is not implemented.");
 }
-imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItemForPath(
-            bool create_path_if_not_exists,
-            bool create_node_if_not_exists,
-            const std::string& path,
-            DocumentMetadataType type,
-            const IDocumentMetadata::metadata_item_variant& value)
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
 
-std::shared_ptr<IDbStatement> DocumentMetadataWriter::CreateStatementForUpdateOrCreateItem(bool create_node_if_not_exists, std::optional<imgdoc2::dbIndex> parent, const std::string& name,
+std::shared_ptr<IDbStatement> DocumentMetadataWriter::CreateStatementForUpdateOrCreateItemAndBindData(bool create_node_if_not_exists, std::optional<imgdoc2::dbIndex> parent, const std::string& name,
                 DatabaseDataTypeValue database_data_type_value,
                 const IDocumentMetadata::metadata_item_variant& value)
 {
@@ -318,7 +336,20 @@ imgdoc2::dbIndex DocumentMetadataWriter::AddItem(std::optional<imgdoc2::dbIndex>
 select id, path, level from paths
  */
 
-
+void DocumentMetadataWriter::CreateMissingNodesOnPath(const std::vector<std::string_view>& path_parts, std::vector<imgdoc2::dbIndex>& pks_existing)
+{
+    const size_t count_existing_pks = pks_existing.size();
+    for (size_t i = count_existing_pks; i < path_parts.size()-1; ++i)
+    {
+        const auto new_node = this->UpdateOrCreateItem(
+            i > 0 ? std::optional<imgdoc2::dbIndex>(pks_existing[i - 1]) : std::optional<imgdoc2::dbIndex>(),
+            true,
+            string{path_parts[i]},
+            DocumentMetadataType::Null,
+            std::monostate());
+        pks_existing.push_back(new_node);
+    }
+}
 
 void DocumentMetadataWriter::CheckNodeNameAndThrowIfInvalid(const std::string& name)
 {

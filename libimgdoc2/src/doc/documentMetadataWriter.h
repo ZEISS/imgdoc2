@@ -24,9 +24,6 @@ public:
     DocumentMetadataWriter(std::shared_ptr<Document> document) : DocumentMetadataBase(std::move(document)) {}
     ~DocumentMetadataWriter() override = default;
 
-    /*imgdoc2::dbIndex AddItem(std::optional<imgdoc2::dbIndex> parent, std::string name, imgdoc2::DocumentMetadataType type, const imgdoc2::IDocumentMetadata::metadata_item_variant& value) override;
-
-    void GetNodeFromPath(std::string path);*/
     imgdoc2::dbIndex UpdateOrCreateItem(
                    std::optional<imgdoc2::dbIndex> parent,
                    bool create_node_if_not_exists,
@@ -47,8 +44,10 @@ public:
                 const IDocumentMetadata::metadata_item_variant& value) override;
 private:
     void CheckNodeNameAndThrowIfInvalid(const std::string& name);
-    std::shared_ptr<IDbStatement> CreateStatementForUpdateOrCreateItem(bool create_node_if_not_exists, std::optional<imgdoc2::dbIndex> parent, const std::string& name,
+    std::shared_ptr<IDbStatement> CreateStatementForUpdateOrCreateItemAndBindData(bool create_node_if_not_exists, std::optional<imgdoc2::dbIndex> parent, const std::string& name,
                 DatabaseDataTypeValue database_data_type_value,
                 const IDocumentMetadata::metadata_item_variant& value);
     std::shared_ptr<IDbStatement> CreateQueryForNameAndAncestorIdStatement(const std::string& name, std::optional<imgdoc2::dbIndex> parent);
+
+    void CreateMissingNodesOnPath(const std::vector<std::string_view>& path_parts, std::vector<imgdoc2::dbIndex>& pks_existing );
 };

@@ -27,7 +27,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
     {
         case DocumentMetadataType::Text:
             // in this case the value must contain a string
-            if (std::holds_alternative<std::string>(value))
+            if (!std::holds_alternative<std::string>(value))
             {
                 throw invalid_argument_exception("The value must be a string");
             }
@@ -35,7 +35,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             return DatabaseDataTypeValue::utf8string;
         case DocumentMetadataType::Int32:
             // in this case the value must contain an integer
-            if (std::holds_alternative<int>(value))
+            if (!std::holds_alternative<int>(value))
             {
                 throw invalid_argument_exception("The value must be an integer");
             }
@@ -43,7 +43,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             return DatabaseDataTypeValue::int32;
         case DocumentMetadataType::Double:
             // in this case the value must contain a double
-            if (std::holds_alternative<double>(value))
+            if (!std::holds_alternative<double>(value))
             {
                 throw invalid_argument_exception("The value must be a double");
             }
@@ -51,7 +51,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             return DatabaseDataTypeValue::doublefloat;
         case DocumentMetadataType::Json:
             // in this case the value must contain a string
-            if (std::holds_alternative<string>(value))
+            if (!std::holds_alternative<string>(value))
             {
                 throw invalid_argument_exception("The value must be a string");
             }
@@ -142,6 +142,20 @@ static std::vector<std::string_view> tokenize(std::string_view str, char delimin
     return tokens;
 }
 
+std::vector<std::string_view> DocumentMetadataBase::SplitPath(const std::string_view& path)
+{
+    std::vector<std::string_view> tokens;
+    std::size_t start = 0, end = 0;
+    while ((end = path.find('/', start)) != std::string_view::npos)
+    {
+        tokens.push_back(path.substr(start, end - start));
+        start = end + 1;
+    }
+
+    tokens.push_back(path.substr(start));
+    return tokens;
+}
+
 std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath(const std::vector<std::string_view>& path_parts)
 {
     ostringstream string_stream;
@@ -184,7 +198,8 @@ std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std:
         *count_of_parts_in_path = tokens.size();
     }
 
-    const auto statement = this->CreateQueryForNodeIdsForPath(tokens);
+    return this->GetNodeIdsForPathParts(tokens);
+    /*const auto statement = this->CreateQueryForNodeIdsForPath(tokens);
 
     // TODO(JBl) : The binding currently is making a copy of the string. This is not necessary, we could use a "STATIC" binding
     //              if we ensure that the string is not deleted before the statement is executed.
@@ -195,6 +210,28 @@ std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std:
 
     std::vector<imgdoc2::dbIndex> result;
     result.reserve(tokens.size());
+    while (this->document_->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        const imgdoc2::dbIndex index = statement->GetResultInt64(0);
+        result.push_back(index);
+    }
+
+    return result;*/
+}
+
+std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPathParts(const std::vector<std::string_view>& parts)
+{
+    const auto statement = this->CreateQueryForNodeIdsForPath(parts);
+
+    // TODO(JBl) : The binding currently is making a copy of the string. This is not necessary, we could use a "STATIC" binding
+    //              if we ensure that the string is not deleted before the statement is executed.
+    for (size_t i = 0; i < parts.size(); i++)
+    {
+        statement->BindStringView(gsl::narrow<int>(i + 1), parts[i]);
+    }
+
+    std::vector<imgdoc2::dbIndex> result;
+    result.reserve(parts.size());
     while (this->document_->GetDatabase_connection()->StepStatement(statement.get()))
     {
         const imgdoc2::dbIndex index = statement->GetResultInt64(0);
