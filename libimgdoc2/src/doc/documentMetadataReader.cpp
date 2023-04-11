@@ -68,15 +68,26 @@ using namespace imgdoc2;
 }
 
 void DocumentMetadataReader::EnumerateItems(
-  imgdoc2::dbIndex parent,
+  std::optional<imgdoc2::dbIndex> parent,
   bool recursive,
   DocumentMetadataItemFlags flags,
   std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback)
 {
-    throw runtime_error("DocumentMetadataReader::EnumerateItems");
+    auto statement = this->CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(parent);
+
+    while (this->document_->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        const imgdoc2::dbIndex index = statement->GetResultInt64(0);
+        DocumentMetadataItem document_metadata_item;
+        const bool continue_operation = callback(index, document_metadata_item);
+        if (!continue_operation)
+        {
+            break;
+        }
+    }
 }
 
-void DocumentMetadataReader::EnumerateItems(
+void DocumentMetadataReader::EnumerateItemsForPath(
   const std::string& path,
   bool recursive,
   DocumentMetadataItemFlags flags,
@@ -91,5 +102,41 @@ std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForRetrievi
     string_stream << "SELECT Name,TypeDiscriminator,ValueDouble,ValueInteger,ValueString FROM [" << "METADATA" << "] WHERE " <<
         "[" << "Pk" << "] = ?1;";
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    return statement;
+}
+
+std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(std::optional<imgdoc2::dbIndex> parent)
+{
+    const bool parent_has_value = parent.has_value();
+    ostringstream string_stream;
+
+    string_stream <<
+        "WITH RECURSIVE cte AS(" <<
+        "SELECT Pk, Name, AncestorId " <<
+        "FROM METADATA ";
+
+    if (parent_has_value)
+    {
+        string_stream << "WHERE AncestorId = ?1 ";
+    }
+    else
+    {
+        string_stream << "WHERE AncestorId IS NULL ";
+    }
+
+    string_stream <<
+        "UNION ALL " <<
+        "SELECT c.Pk, c.Name, c.AncestorId " <<
+        "FROM METADATA c " <<
+        "JOIN cte ON c.AncestorId = cte.Pk " <<
+        ") " <<
+        "SELECT Pk, Name FROM cte;";
+
+    auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    if (parent_has_value)
+    {
+        statement->BindInt64(1, parent.value());
+    }
+
     return statement;
 }

@@ -3,30 +3,6 @@
 using namespace std;
 using namespace imgdoc2;
 
-//static int DetermineDiscriminator(const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
-//{
-//    if (std::holds_alternative<std::string>(value))
-//    {
-//        return 1;
-//    }
-//    else if (std::holds_alternative<int>(value))
-//    {
-//        return 2;
-//    }
-//    else if (std::holds_alternative<double>(value))
-//    {
-//        return 3;
-//    }
-//    //else if (std::holds_alternative<json>(value))
-//    //{
-//    //    return 4;
-//    //}
-//    else
-//    {
-//        throw std::invalid_argument("Unknown metadata item type");
-//    }
-//}
-
 imgdoc2::dbIndex DocumentMetadataWriter::UpdateOrCreateItem(
                   std::optional<imgdoc2::dbIndex> parent,
                   bool create_node_if_not_exists,
@@ -93,6 +69,7 @@ bool DocumentMetadataWriter::DeleteItem(
 {
     throw std::logic_error("The method or operation is not implemented.");
 }
+
 bool DocumentMetadataWriter::DeleteItemForPath(
            const std::string& path,
            bool recursively)

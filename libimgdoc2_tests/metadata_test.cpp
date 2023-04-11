@@ -166,3 +166,27 @@ TEST(Metadata, AddMetadataItemsWithPathAndCheckIfTheyAreAdded_Scenario1)
     EXPECT_EQ(item.type, DocumentMetadataType::Text);
     EXPECT_STREQ(get<string>(item.value).c_str(), "Testtext3");
 }
+
+TEST(Metadata, EnumerateItems_Scenario1)
+{
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+
+    const auto id1 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+
+    vector<dbIndex> items;
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+    metadata_reader->EnumerateItems(
+        nullopt,
+        true,
+        DocumentMetadataItemFlags::All,
+        [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
+
+    EXPECT_EQ(items.size(), 4);
+    EXPECT_THAT(items, Contains(id1));
+    EXPECT_THAT(items, Contains(id2));
+}

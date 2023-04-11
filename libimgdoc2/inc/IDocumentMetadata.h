@@ -69,11 +69,11 @@ namespace imgdoc2
         virtual imgdoc2::DocumentMetadataItem GetItem(imgdoc2::dbIndex idx, DocumentMetadataItemFlags flags) = 0;
         virtual imgdoc2::DocumentMetadataItem GetItemForPath(const std::string& path, imgdoc2::DocumentMetadataItemFlags flags) = 0;
         virtual void EnumerateItems(
-            imgdoc2::dbIndex parent,
+            std::optional<imgdoc2::dbIndex> parent,
             bool recursive,
             DocumentMetadataItemFlags flags,
             std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)> callback) = 0;
-        virtual void EnumerateItems(
+        virtual void EnumerateItemsForPath(
             const std::string& path,
             bool recursive,
             DocumentMetadataItemFlags flags,

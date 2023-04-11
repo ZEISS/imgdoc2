@@ -17,11 +17,11 @@ public:
     imgdoc2::DocumentMetadataItem GetItem(imgdoc2::dbIndex idx, imgdoc2::DocumentMetadataItemFlags flags) override;
     imgdoc2::DocumentMetadataItem GetItemForPath(const std::string& path, imgdoc2::DocumentMetadataItemFlags flags) override;
     void EnumerateItems(
-      imgdoc2::dbIndex parent,
+      std::optional<imgdoc2::dbIndex> parent,
       bool recursive,
       imgdoc2::DocumentMetadataItemFlags flags,
       std::function<bool(imgdoc2::dbIndex, const imgdoc2::DocumentMetadataItem& item)> callback) override;
-    void EnumerateItems(
+    void EnumerateItemsForPath(
       const std::string& path,
       bool recursive,
       imgdoc2::DocumentMetadataItemFlags flags,
@@ -29,4 +29,5 @@ public:
 
 private:
     std::shared_ptr<IDbStatement> CreateStatementForRetrievingItem(imgdoc2::DocumentMetadataItemFlags flags);
+    std::shared_ptr<IDbStatement> CreateStatementForEnumerateAllItemsWithAncestorAndDataBind(std::optional<imgdoc2::dbIndex> parent);
 };
