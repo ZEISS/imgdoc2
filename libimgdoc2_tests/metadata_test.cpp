@@ -225,16 +225,38 @@ TEST(Metadata, EnumerateItems_Scenario2)
     const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
 
     // Act
-    vector<dbIndex> items;
+    vector<dbIndex> primary_keys;
+    vector<DocumentMetadataItem> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItems(
         id_item_b,
         false,
         DocumentMetadataItemFlags::All,
-        [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
+        [&primary_keys, &items](const auto pk, const auto item) ->bool
+        {
+            primary_keys.push_back(pk);
+            items.push_back(item);
+            return true;
+        });
 
     // Assert
-    EXPECT_EQ(items.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
-    EXPECT_THAT(items, UnorderedElementsAre(id1, id2));
-    EXPECT_EQ(std::unique(items.begin(), items.end()), items.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
+    EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
+    EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
+    EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
+
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    ASSERT_NE(result_item_iterator, primary_keys.end());
+    size_t index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_STREQ(items[index].name.c_str(), "C");
+    ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
+    EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
+    EXPECT_EQ(items[index].primary_key, id1);
+
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
+    ASSERT_NE(result_item_iterator, primary_keys.end());
+    index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_STREQ(items[index].name.c_str(), "D");
+    ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
+    EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext2");
+    EXPECT_EQ(items[index].primary_key, id2);
 }

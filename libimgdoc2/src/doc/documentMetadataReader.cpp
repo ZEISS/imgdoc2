@@ -16,7 +16,8 @@ using namespace imgdoc2;
         throw non_existing_tile_exception(ss.str(), idx);
     }
 
-    DocumentMetadataItem item;
+    DocumentMetadataItem item = this->RetrieveDocumentMetadataItemFromStatement(statement, flags);
+    /*DocumentMetadataItem item;
     if ((flags & DocumentMetadataItemFlags::NameValid) == DocumentMetadataItemFlags::NameValid)
     {
         item.name = statement->GetResultString(0);
@@ -50,7 +51,7 @@ using namespace imgdoc2;
             default:
                 throw runtime_error("DocumentMetadataReader::GetItem: Unknown data type");
         }
-    }
+    }*/
 
     return item;
 }
@@ -78,7 +79,7 @@ void DocumentMetadataReader::EnumerateItems(
     while (this->document_->GetDatabase_connection()->StepStatement(statement.get()))
     {
         const imgdoc2::dbIndex index = statement->GetResultInt64(0);
-        DocumentMetadataItem document_metadata_item;
+        DocumentMetadataItem document_metadata_item = this->RetrieveDocumentMetadataItemFromStatement(statement, flags);
         const bool continue_operation = callback(index, document_metadata_item);
         if (!continue_operation)
         {
@@ -99,7 +100,7 @@ void DocumentMetadataReader::EnumerateItemsForPath(
 std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForRetrievingItem(imgdoc2::DocumentMetadataItemFlags flags)
 {
     ostringstream string_stream;
-    string_stream << "SELECT Name,TypeDiscriminator,ValueDouble,ValueInteger,ValueString FROM [" << "METADATA" << "] WHERE " <<
+    string_stream << "SELECT Pk, Name,TypeDiscriminator,ValueDouble,ValueInteger,ValueString FROM [" << "METADATA" << "] WHERE " <<
         "[" << "Pk" << "] = ?1;";
     auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
     return statement;
@@ -114,7 +115,7 @@ std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerat
     {
         string_stream <<
             "WITH RECURSIVE cte AS(" <<
-            "SELECT Pk, Name, AncestorId " <<
+            "SELECT Pk, Name, AncestorId, TypeDiscriminator, ValueDouble, ValueInteger, ValueString  " <<
             "FROM METADATA ";
 
         if (parent_has_value)
@@ -128,16 +129,16 @@ std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerat
 
         string_stream <<
             "UNION ALL " <<
-            "SELECT c.Pk, c.Name, c.AncestorId " <<
+            "SELECT c.Pk, c.Name, c.AncestorId,c.TypeDiscriminator, c.ValueDouble, c.ValueInteger, c.ValueString " <<
             "FROM METADATA c " <<
             "JOIN cte ON c.AncestorId = cte.Pk " <<
             ") " <<
-            "SELECT Pk, Name FROM cte;";
+            "SELECT Pk, Name,TypeDiscriminator, ValueDouble, ValueInteger, ValueString FROM cte;";
     }
     else
     {
         string_stream <<
-            "SELECT Pk, Name FROM METADATA ";
+            "SELECT Pk, Name, TypeDiscriminator, ValueDouble, ValueInteger, ValueString FROM METADATA ";
 
         if (parent_has_value)
         {
@@ -156,4 +157,49 @@ std::shared_ptr<IDbStatement> DocumentMetadataReader::CreateStatementForEnumerat
     }
 
     return statement;
+}
+
+imgdoc2::DocumentMetadataItem DocumentMetadataReader::RetrieveDocumentMetadataItemFromStatement(const std::shared_ptr<IDbStatement>& statement, imgdoc2::DocumentMetadataItemFlags flags)
+{
+    DocumentMetadataItem item;
+    if ((flags & DocumentMetadataItemFlags::PrimaryKeyValid) == DocumentMetadataItemFlags::PrimaryKeyValid)
+    {
+        item.primary_key = statement->GetResultInt64(0);
+    }
+
+    if ((flags & DocumentMetadataItemFlags::NameValid) == DocumentMetadataItemFlags::NameValid)
+    {
+        item.name = statement->GetResultString(1);
+    }
+
+    if ((flags & DocumentMetadataItemFlags::DocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::DocumentMetadataTypeAndValueValid)
+    {
+        const auto database_item_type_value = statement->GetResultInt32(2);
+        switch (database_item_type_value)
+        {
+            case DatabaseDataTypeValue::null:
+                item.value = std::monostate();
+                item.type = DocumentMetadataType::Null;
+                break;
+            case DatabaseDataTypeValue::int32:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultInt32(4));
+                item.type = DocumentMetadataType::Int32;
+                break;
+            case DatabaseDataTypeValue::doublefloat:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultDouble(3));
+                item.type = DocumentMetadataType::Double;
+                break;
+            case DatabaseDataTypeValue::utf8string:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultString(5));
+                item.type = DocumentMetadataType::Text;
+                break;
+            case DatabaseDataTypeValue::json:
+                item.value = IDocumentMetadataWrite::metadata_item_variant(statement->GetResultString(5));
+                item.type = DocumentMetadataType::Json;
+                break;
+            default:
+                throw runtime_error("DocumentMetadataReader::GetItem: Unknown data type");
+        }
+    }
+    return item;
 }

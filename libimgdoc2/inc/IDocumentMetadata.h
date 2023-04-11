@@ -13,12 +13,14 @@ namespace imgdoc2
 
     enum class DocumentMetadataType : std::uint8_t
     {
+        Invalid = 0,
         Default,
         Null,
         Text,
         Int32,
         Json,
         Double
+
     };
 
     class IDocumentMetadata
@@ -30,10 +32,11 @@ namespace imgdoc2
     enum class DocumentMetadataItemFlags : std::uint8_t
     {
         None = 0,
-        NameValid = 1,
-        DocumentMetadataTypeAndValueValid = 2,
+        PrimaryKeyValid = 1,
+        NameValid = 2,
+        DocumentMetadataTypeAndValueValid = 4,
 
-        All = NameValid | DocumentMetadataTypeAndValueValid
+        All = PrimaryKeyValid | NameValid | DocumentMetadataTypeAndValueValid
     };
 
     // -> https://stackoverflow.com/a/34220050/522591
@@ -56,8 +59,9 @@ namespace imgdoc2
     struct DocumentMetadataItem
     {
         DocumentMetadataItemFlags flags{ DocumentMetadataItemFlags::None };
+        imgdoc2::dbIndex primary_key{ 0 };
         std::string name;
-        DocumentMetadataType type;
+        DocumentMetadataType type{ DocumentMetadataType::Invalid };
         IDocumentMetadata::metadata_item_variant value;
     };
 
