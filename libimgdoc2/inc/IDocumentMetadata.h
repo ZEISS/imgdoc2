@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <cstdint>
@@ -10,7 +14,6 @@
 
 namespace imgdoc2
 {
-
     enum class DocumentMetadataType : std::uint8_t
     {
         Invalid = 0,

@@ -365,10 +365,28 @@ std::shared_ptr<IDbStatement> DocumentMetadataWriter::CreateStatementForDeleteIt
                 "DELETE FROM [" << "METADATA" << "] WHERE " << "[" << "Pk" << "] IN (SELECT id FROM children) OR " << "[" << "Pk" << "]=?1;";
         }
 
-
         auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
         statement->BindInt64(1, parent.value());
         return statement;
+    }
+    else
+    {
+        // this means that we want to delete the root node
+
+        if (recursively)
+        {
+            string_stream << "WITH RECURSIVE children(id) AS (" <<
+                          "SELECT [" << "Pk" << "] FROM [" << "METADATA" << "] WHERE " << "[" << "AncestorId" << "] IS NULL " <<
+                          "UNION ALL " <<
+                          "SELECT [" << "METADATA" << "].[" << "Pk" << "] FROM [" << "METADATA"
+                          << "] JOIN children ON [" << "METADATA" << "].[" << "AncestorId" << "]=children.id" <<
+                          ") " <<
+                          "DELETE FROM [" << "METADATA" << "] WHERE " << "[" << "Pk"
+                          << "] IN (SELECT id FROM children) OR " << "[" << "AncestorId" << "] IS NULL;";
+
+            auto statement = this->document_->GetDatabase_connection()->PrepareStatement(string_stream.str());
+            return statement;
+        }
     }
 }
 
