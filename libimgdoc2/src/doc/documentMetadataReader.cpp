@@ -58,11 +58,12 @@ using namespace imgdoc2;
 
 /*virtual*/imgdoc2::DocumentMetadataItem DocumentMetadataReader::GetItemForPath(const std::string& path, imgdoc2::DocumentMetadataItemFlags flags)
 {
-    imgdoc2::dbIndex idx;
+    optional<imgdoc2::dbIndex> idx;
     const bool success = this->TryMapPathAndGetTerminalNode(path, &idx);
-    if (success)
+    if (success && idx.has_value())
     {
-        return this->GetItem(idx, flags);
+        // note: we require to have a valid node-id here, an "empty" optional (which would mean "empty path") is not valid in this method
+        return this->GetItem(idx.value(), flags);
     }
 
     throw runtime_error("Error in DocumentMetadataReader::GetItemForPath");
@@ -94,6 +95,13 @@ void DocumentMetadataReader::EnumerateItemsForPath(
   DocumentMetadataItemFlags flags,
   const std::function<bool(imgdoc2::dbIndex, const DocumentMetadataItem& item)>& func)
 {
+    optional<imgdoc2::dbIndex> idx;
+    const bool success = this->TryMapPathAndGetTerminalNode(path, &idx);
+    if (success)
+    {
+        return this->EnumerateItems(idx, recursive, flags, func);
+    }
+
     throw runtime_error("DocumentMetadataReader::EnumerateItems");
 }
 

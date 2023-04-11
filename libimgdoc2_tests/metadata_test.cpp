@@ -408,3 +408,163 @@ TEST(Metadata, EnumerateItems_Scenario4)
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext4");
     EXPECT_EQ(items[index].primary_key, id4);
 }
+
+TEST(Metadata, EnumerateItemsForPath_Scenario1)
+{
+    // Arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+
+    // we construct the following tree:
+    // 
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+
+    const auto id1 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+
+    // Act
+    vector<dbIndex> items;
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+    metadata_reader->EnumerateItemsForPath(
+        "",
+        true,
+        DocumentMetadataItemFlags::All,
+        [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
+
+    // Assert
+    EXPECT_EQ(items.size(), 4); // so, we expect 4 items, the root node and the 3 leaf nodes
+    EXPECT_THAT(items, Contains(id1));
+    EXPECT_THAT(items, Contains(id2));
+    EXPECT_EQ(std::unique(items.begin(), items.end()), items.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
+}
+
+TEST(Metadata, EnumerateItemsForPath_Scenario2)
+{
+    // Arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+
+    // we construct the following tree:
+    // 
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+
+    metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B", DocumentMetadataType::Null, std::monostate());
+    const auto id1 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+
+    // Act
+    vector<dbIndex> primary_keys;
+    vector<DocumentMetadataItem> items;
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+    metadata_reader->EnumerateItemsForPath(
+        "A/B",
+        false,
+        DocumentMetadataItemFlags::All,
+        [&primary_keys, &items](const auto pk, const auto item) ->bool
+        {
+            primary_keys.push_back(pk);
+            items.push_back(item);
+            return true;
+        });
+
+    // Assert
+    EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
+    EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
+    EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
+
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    ASSERT_NE(result_item_iterator, primary_keys.end());
+    size_t index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::All) == DocumentMetadataItemFlags::All);
+    EXPECT_STREQ(items[index].name.c_str(), "C");
+    ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
+    EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
+    EXPECT_EQ(items[index].primary_key, id1);
+
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
+    ASSERT_NE(result_item_iterator, primary_keys.end());
+    index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::All) == DocumentMetadataItemFlags::All);
+    EXPECT_STREQ(items[index].name.c_str(), "D");
+    ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
+    EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext2");
+    EXPECT_EQ(items[index].primary_key, id2);
+}
+
+TEST(Metadata, EnumerateItemsForPath_Scenario3)
+{
+    // Arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+
+    // we construct the following tree:
+    // 
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+    //              / \
+    //             E   F
+
+    const auto id_item_b = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B", DocumentMetadataType::Null, std::monostate());
+    const auto id1 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    const auto id2 = metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/D", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+    metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C/E", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3"));
+    metadata_writer->UpdateOrCreateItemForPath(true, true, "A/B/C/F", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext4"));
+
+    // Act
+    vector<dbIndex> primary_keys;
+    vector<DocumentMetadataItem> items;
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+    metadata_reader->EnumerateItemsForPath(
+        "A/B",
+        false,                                      // Note: we instruct "recursive=false", so we expect only the the two direct leaf nodes of 'B' - 'C' and 'D'
+        DocumentMetadataItemFlags::All,
+        [&primary_keys, &items](const auto pk, const auto item) ->bool
+        {
+            primary_keys.push_back(pk);
+            items.push_back(item);
+            return true;
+        });
+
+    // Assert
+    EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
+    EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
+    EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
+
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    ASSERT_NE(result_item_iterator, primary_keys.end());
+    size_t index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::All) == DocumentMetadataItemFlags::All);
+    EXPECT_STREQ(items[index].name.c_str(), "C");
+    ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
+    EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
+    EXPECT_EQ(items[index].primary_key, id1);
+
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
+    ASSERT_NE(result_item_iterator, primary_keys.end());
+    index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::All) == DocumentMetadataItemFlags::All);
+    EXPECT_STREQ(items[index].name.c_str(), "D");
+    ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
+    EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext2");
+    EXPECT_EQ(items[index].primary_key, id2);
+}

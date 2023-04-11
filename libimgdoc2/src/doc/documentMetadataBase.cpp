@@ -192,6 +192,24 @@ std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath
 
 std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std::string& path, size_t* count_of_parts_in_path)
 {
+    // an empty string is legal (and means "the root"), ie. we return an empty vector
+    if (path.empty())
+    {
+        if (count_of_parts_in_path != nullptr)
+        {
+            *count_of_parts_in_path = 0;
+        }
+
+        return {};
+    }
+
+    // the path must NOT start with a slash
+    if (path[0] == '/')
+    {
+        // TODO(Jbl): find more appropriate exception
+        throw invalid_argument_exception("The path must not start with a slash");
+    }
+
     const std::vector<std::string_view> tokens = tokenize(path, '/');
     if (count_of_parts_in_path != nullptr)
     {
@@ -241,13 +259,28 @@ std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPathParts(const
     return result;
 }
 
-bool DocumentMetadataBase::TryMapPathAndGetTerminalNode(const std::string& path, imgdoc2::dbIndex* terminal_node_id)
+bool DocumentMetadataBase::TryMapPathAndGetTerminalNode(const std::string& path, std::optional<imgdoc2::dbIndex>* terminal_node_id)
 {
-    size_t count_of_parts_in_path = 0;
+    size_t count_of_parts_in_path;
     const auto node_ids = this->GetNodeIdsForPath(path, &count_of_parts_in_path);
+    if (count_of_parts_in_path == 0)
+    {
+        // this is a "special case", the path is empty, which means the "root"
+        if (terminal_node_id != nullptr)
+        {
+            *terminal_node_id = std::nullopt;
+        }
+
+        return true;
+    }
+
     if (node_ids.size() == count_of_parts_in_path)
     {
-        *terminal_node_id = node_ids.back();
+        if (terminal_node_id != nullptr)
+        {
+            *terminal_node_id = node_ids.back();
+        }
+
         return true;
     }
 

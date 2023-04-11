@@ -51,7 +51,7 @@ protected:
 
     std::vector<imgdoc2::dbIndex> GetNodeIdsForPathParts(const std::vector<std::string_view>& parts);
 
-    bool TryMapPathAndGetTerminalNode(const std::string& path,imgdoc2::dbIndex* terminal_node_id);
+    bool TryMapPathAndGetTerminalNode(const std::string& path, std::optional<imgdoc2::dbIndex>* terminal_node_id);
 
     std::vector<std::string_view> SplitPath(const std::string_view& path);
 private:
