@@ -31,7 +31,7 @@ public:
     void BindInt64(int index, std::int64_t value) override;
     void BindDouble(int index, double value) override;
     void BindString(int index, const char* value) override;
-    void BingStringView(int index, const std::string_view& value) override;
+    void BindStringView(int index, const std::string_view& value) override;
 
     void BindBlob_Static(int index, const void* data, size_t size) override;
 

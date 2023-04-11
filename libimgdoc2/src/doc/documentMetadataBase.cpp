@@ -1,5 +1,6 @@
 #include "documentMetadataBase.h"
 #include "exceptions.h"
+#include "gsl/narrow"
 
 using namespace std;
 using namespace imgdoc2;
@@ -146,7 +147,7 @@ std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath
     ostringstream string_stream;
 
     string_stream << "WITH RECURSIVE paths(id, name, level) as ( " <<
-        "SELECT Pk, Name,  1 from METADATA where AncestorId IS NULL AND Name='" << path_parts[0] << "' " <<
+        "SELECT Pk, Name,  1 from METADATA where AncestorId IS NULL AND Name=? " <<
         "UNION " <<
         "SELECT METADATA.Pk, METADATA.name,  level + 1 " <<
         "FROM METADATA JOIN paths WHERE METADATA.AncestorId = paths.id AND " <<
@@ -154,7 +155,7 @@ std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath
 
     for (size_t i = 1; i < path_parts.size(); i++)
     {
-        string_stream << "WHEN " << i << " THEN METADATA.Name=\"" << path_parts[i] << "\" ";
+        string_stream << "WHEN " << i << " THEN METADATA.Name=? ";
     }
 
     string_stream << "END) " <<
@@ -164,10 +165,22 @@ std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath
     return statement;
 }
 
-std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std::string& path)
+std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std::string& path, size_t* count_of_parts_in_path)
 {
     const std::vector<std::string_view> tokens = tokenize(path, '/');
-    auto statement = this->CreateQueryForNodeIdsForPath(tokens);
+    if (count_of_parts_in_path != nullptr)
+    {
+        *count_of_parts_in_path = tokens.size();
+    }
+
+    const auto statement = this->CreateQueryForNodeIdsForPath(tokens);
+
+    // TODO(JBl) : The binding currently is making a copy of the string. This is not necessary, we could use a "STATIC" binding
+    //              if we ensure that the string is not deleted before the statement is executed.
+    for (size_t i = 0; i < tokens.size(); i++)
+    {
+        statement->BindStringView(gsl::narrow<int>(i + 1), tokens[i]);
+    }
 
     std::vector<imgdoc2::dbIndex> result;
     result.reserve(tokens.size());
@@ -178,4 +191,17 @@ std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std:
     }
 
     return result;
+}
+
+bool DocumentMetadataBase::TryMapPathAndGetTerminalNode(const std::string& path, imgdoc2::dbIndex* terminal_node_id)
+{
+    size_t count_of_parts_in_path = 0;
+    const auto node_ids = this->GetNodeIdsForPath(path, &count_of_parts_in_path);
+    if (node_ids.size() == count_of_parts_in_path)
+    {
+        *terminal_node_id = node_ids.back();
+        return true;
+    }
+
+    return false;
 }

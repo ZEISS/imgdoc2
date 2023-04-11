@@ -28,7 +28,7 @@ namespace imgdoc2
     enum class DocumentMetadataItemFlags : std::uint8_t
     {
         None = 0,
-        PathValid = 1,
+        NAmeValid = 1,
         DocumentMetadataTypeValid = 2,
         ValueValid = 4,
     };
@@ -48,7 +48,7 @@ namespace imgdoc2
     struct DocumentMetadataItem
     {
         DocumentMetadataItemFlags flags;
-        std::string path;
+        std::string name;
         DocumentMetadataType type;
         IDocumentMetadata::metadata_item_variant value;
     };

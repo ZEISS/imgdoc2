@@ -33,7 +33,7 @@ public:
    /// \param  value   The null-terminated string to be bound (in UTF8 encoding).
     virtual void BindString(int index, const char* value) = 0;
 
-    virtual void BingStringView(int index, const std::string_view& value) = 0;
+    virtual void BindStringView(int index, const std::string_view& value) = 0;
 
     /// Bind a "static" BLOB. Static means that the pointer MUST remain valid valid until either the prepared statement is 
     /// finalized or the same SQL parameter is bound to something else. 
