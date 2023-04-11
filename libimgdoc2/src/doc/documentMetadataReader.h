@@ -13,7 +13,6 @@ public:
     DocumentMetadataReader(std::shared_ptr<Document> document) : DocumentMetadataBase(std::move(document)) {}
     ~DocumentMetadataReader() override = default;
 
-    //imgdoc2::IDocumentMetadata::metadata_item_variant GetItem(imgdoc2::dbIndex idx) override;
     imgdoc2::DocumentMetadataItem GetItem(imgdoc2::dbIndex idx, imgdoc2::DocumentMetadataItemFlags flags) override;
     imgdoc2::DocumentMetadataItem GetItemForPath(const std::string& path, imgdoc2::DocumentMetadataItemFlags flags) override;
     void EnumerateItems(

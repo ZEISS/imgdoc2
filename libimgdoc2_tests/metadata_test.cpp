@@ -247,6 +247,7 @@ TEST(Metadata, EnumerateItems_Scenario2)
     auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     size_t index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::All) == DocumentMetadataItemFlags::All);
     EXPECT_STREQ(items[index].name.c_str(), "C");
     ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
@@ -255,6 +256,7 @@ TEST(Metadata, EnumerateItems_Scenario2)
     result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     index = distance(primary_keys.begin(), result_item_iterator);
+    EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::All) == DocumentMetadataItemFlags::All);
     EXPECT_STREQ(items[index].name.c_str(), "D");
     ASSERT_EQ(items[index].type, DocumentMetadataType::Text);
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext2");
