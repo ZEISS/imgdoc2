@@ -47,11 +47,27 @@ public:
     /// \returns The read-object (for 3D-document).
     std::shared_ptr<imgdoc2::IDocRead3d> GetReader3d() override;
 
+    std::shared_ptr<imgdoc2::IDocumentMetadataWrite> GetDocumentMetadataWriter() override;
+    std::shared_ptr<imgdoc2::IDocumentMetadataRead> GetDocumentMetadataReader() override;
+
     ~Document() override = default;
 public:
     [[nodiscard]] const std::shared_ptr<IDbConnection>& GetDatabase_connection() const { return this->database_connection_; }
     [[nodiscard]] const std::shared_ptr<DatabaseConfiguration2D>& GetDataBaseConfiguration2d() const { return this->database_configuration_2d_; }
     [[nodiscard]] const std::shared_ptr<DatabaseConfiguration3D>& GetDataBaseConfiguration3d() const { return this->database_configuration_3d_; }
+    [[nodiscard]] const DatabaseConfigurationCommon* GetDataBaseConfigurationCommon() const
+    {
+        if (this->IsDocument2d())
+        {
+            return this->GetDataBaseConfiguration2d().get();
+        }
+        else if (this->IsDocument3d())
+        {
+            return this->GetDataBaseConfiguration3d().get();
+        }
+
+        return nullptr;
+    }
 
     [[nodiscard]] const std::shared_ptr<imgdoc2::IHostingEnvironment>& GetHostingEnvironment() const { return this->database_connection_->GetHostingEnvironment(); }
     [[nodiscard]] bool IsDocument2d() const { return this->database_configuration_2d_.operator bool(); }

@@ -34,7 +34,7 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel
 
       - name: Configure CMake for 'Clang-Tidy' build
-        run: cmake -B ${{github.workspace}}/clangtidybuild -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DIMGDOC2_BUILD_CLANGTIDY=ON -DIMGDOC2_BUILD_CONVCZI=OFF
+        run: cmake -B ${{github.workspace}}/clangtidybuild -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DIMGDOC2_BUILD_CLANGTIDY=ON -DIMGDOC2_BUILD_CONVCZI=OFF -DIMGDOC2_BUILD_NATIVEIMGDOC2CMD=OFF
 
       - name: Build 'Clang-Tidy'
         # Build your program with the given configuration

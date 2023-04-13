@@ -87,7 +87,7 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
     }
 }
 
-/*virtual*/void SqliteDbConnection::Execute(IDbStatement* statement)
+/*virtual*/void SqliteDbConnection::Execute(IDbStatement* statement, std::int64_t* number_of_rows_modified/*=nullptr*/)
 {
     if (statement == nullptr)
     {
@@ -109,6 +109,11 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
     if (return_value != SQLITE_DONE)
     {
         throw database_exception("Error from 'sqlite3_step'", return_value);
+    }
+
+    if (number_of_rows_modified != nullptr)
+    {
+        *number_of_rows_modified = sqlite3_changes64(this->database_);
     }
 }
 

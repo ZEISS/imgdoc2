@@ -12,10 +12,11 @@ enum class GeneralTableItems
     kTilesInfoTable,    ///< An enum constant representing "Name of the 'TILESINFO'-table".
     kDocType,           ///< An enum constant representing the document type.
     kBlobTable,         ///< An enum constant representing "Name of the 'BLOB'-table".
-    kSpatialIndexTable  ///< An enum constant representing the "Name of the 'Spatial-Index'-table".
+    kSpatialIndexTable, ///< An enum constant representing the "Name of the 'Spatial-Index'-table".
+    kMetadataTable      ///< An enum constant representing the "Name of the 'Metadata'-table".
 };
 
-/// Here we gather constants for the imgdoc2-database desgin. "Constant" means that this should be the
+/// Here we gather constants for the imgdoc2-database design. "Constant" means that this should be the
 /// only place where those value appear, and this should be the only place that needs to be changed.
 class DbConstants
 {
@@ -33,6 +34,7 @@ public:
     static const char* const kTilesDataTable_DefaultName;         // = "TILESDATA"
     static const char* const kTilesSpatialIndexTable_DefaultName; // = "TILESSPATIALINDEX"
     static const char* const kBlobTable_DefaultName;              // = "BLOBS"
+    static const char* const kMetadataTable_DefaultName;          // = "METADATA"
 
     static const char* const kTilesDataTable_Column_Pk_DefaultName;
     static const char* const kTilesDataTable_Column_PixelWidth_DefaultName;
@@ -66,10 +68,20 @@ public:
     static const char* const kSqliteSpatialIndexTable_Column_minZ_DefaultName;
     static const char* const kSqliteSpatialIndexTable_Column_maxZ_DefaultName;
 
+    static const char* const kMetadataTable_Column_Pk_DefaultName;
+    static const char* const kMetadataTable_Column_Name_DefaultName;
+    static const char* const kMetadataTable_Column_AncestorId_DefaultName;
+    static const char* const kMetadataTable_Column_TypeDiscriminator_DefaultName;
+    static const char* const kMetadataTable_Column_ValueDouble_DefaultName;
+    static const char* const kMetadataTable_Column_ValueInteger_DefaultName;
+    static const char* const kMetadataTable_Column_ValueString_DefaultName;
+
     static const char* const kDimensionColumnPrefix_Default;  // = "Dim_"
     static const char* const kIndexForDimensionColumnPrefix_Default; // = "IndexForDim_"
 
-
+    /// Gets the "key" for the given item in the 'GENERAL'-table.
+    /// \param  item    The item to query the name for.
+    /// \returns    The name for the general table item key.
     static const char* GetGeneralTable_ItemKey(GeneralTableItems item);
 };
 

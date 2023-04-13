@@ -24,7 +24,7 @@ public:
 
         /// Type of the column. Currently, this is a string, an no effort so far has been done to
         /// 'canonicalize" this information.
-        std::string column_type;    
+        std::string column_type;
     };
 
     /// Information about an index. Currently, we just report the name, if would be desirable to query
@@ -38,7 +38,14 @@ public:
     /// \param  sql_statement The SQL statement (in UTF8).
     virtual void Execute(const char* sql_statement) = 0;
 
-    virtual void Execute(IDbStatement* statement) = 0;
+    /// Executes the specified statement and does *not* read any data returned from the database.
+    /// Optionally, the number of rows modified by the statement is returned. This works for
+    /// INSERT, UPDATE, and DELETE statements.
+    /// C.f. https://sqlite.org/c3ref/total_changes.html .
+    ///
+    /// \param [in,out] statement                 The statement to be executed.
+    /// \param [in,out] number_of_rows_modified   (Optional) If non-null and if successful, the number of rows modified is given here.
+    virtual void Execute(IDbStatement* statement, std::int64_t* number_of_rows_modified = nullptr) = 0;
     virtual std::int64_t ExecuteAndGetLastRowId(IDbStatement* statement) = 0;
 
     /// Prepare a SQL statement - the statement is compiled into an internal representation, and a

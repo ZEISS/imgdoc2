@@ -54,14 +54,14 @@ bool DatabaseConfigurationCommon::TryGetColumnNameOfGeneralInfoTable(int columnI
     const char* requested_column_name = nullptr;
     switch (columnIdentifier)
     {
-    case kGeneralInfoTable_Column_Key:
-        requested_column_name = "Key";
-        break;
-    case kGeneralInfoTable_Column_ValueString:
-        requested_column_name = "ValueString";
-        break;
-    default:
-        break;
+        case kGeneralInfoTable_Column_Key:
+            requested_column_name = "Key";
+            break;
+        case kGeneralInfoTable_Column_ValueString:
+            requested_column_name = "ValueString";
+            break;
+        default:
+            break;
     }
 
     if (requested_column_name == nullptr)
@@ -85,6 +85,16 @@ void DatabaseConfigurationCommon::SetColumnNameForBlobTable(int column_identifie
 bool DatabaseConfigurationCommon::TryGetColumnNameOfBlobTable(int column_identifier, std::string* column_name) const
 {
     return GetColumnName(this->map_blobtable_columnids_to_columnname_, column_identifier, column_name);
+}
+
+void DatabaseConfigurationCommon::SetColumnNameForMetadataTable(int column_identifier, const char* column_name)
+{
+    SetColumnName(this->map_metadatatable_columnids_to_columnname_, column_identifier, column_name);
+}
+
+bool DatabaseConfigurationCommon::TryGetColumnNameOfMetadataTable(int column_identifier, std::string* column_name) const
+{
+    return GetColumnName(this->map_metadatatable_columnids_to_columnname_, column_identifier, column_name);
 }
 
 std::string DatabaseConfigurationCommon::GetTableNameForTilesDataOrThrow() const
@@ -112,6 +122,11 @@ std::string DatabaseConfigurationCommon::GetTableNameForBlobTableOrThrow() const
     return this->GetTableNameOrThrow(TableTypeCommon::Blobs);
 }
 
+std::string DatabaseConfigurationCommon::GetTableNameForMetadataTableOrThrow() const
+{
+    return this->GetTableNameOrThrow(TableTypeCommon::Metadata);
+}
+
 std::string DatabaseConfigurationCommon::GetColumnNameOfGeneralInfoTableOrThrow(int column_identifier) const
 {
     string general_table_name;
@@ -135,6 +150,12 @@ bool DatabaseConfigurationCommon::GetHasBlobsTable() const
     return iterator != this->map_tabletype_to_tablename_.cend();
 }
 
+bool DatabaseConfigurationCommon::GetHasMetadataTable() const
+{
+    const auto iterator = this->map_tabletype_to_tablename_.find(TableTypeCommon::Metadata);
+    return iterator != this->map_tabletype_to_tablename_.cend();
+}
+
 bool DatabaseConfigurationCommon::IsDimensionIndexed(imgdoc2::Dimension dimension) const
 {
     return this->indexed_dimensions_.find(dimension) != this->indexed_dimensions_.cend();
@@ -149,6 +170,17 @@ std::string DatabaseConfigurationCommon::GetColumnNameOfBlobTableOrThrow(int col
 {
     std::string column_name;;
     if (!this->TryGetColumnNameOfBlobTable(column_identifier, &column_name))
+    {
+        throw std::runtime_error("column-name not present");
+    }
+
+    return column_name;
+}
+
+std::string DatabaseConfigurationCommon::GetColumnNameOfMetadataTableOrThrow(int column_identifier) const
+{
+    std::string column_name;;
+    if (!this->TryGetColumnNameOfMetadataTable(column_identifier, &column_name))
     {
         throw std::runtime_error("column-name not present");
     }
@@ -184,11 +216,22 @@ std::string DatabaseConfigurationCommon::GetColumnNameOfBlobTableOrThrow(int col
     return true;
 }
 
+void DatabaseConfigurationCommon::SetDefaultColumnNamesForMetadataTable()
+{
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_Pk, DbConstants::kMetadataTable_Column_Pk_DefaultName);
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_Name, DbConstants::kMetadataTable_Column_Name_DefaultName);
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId, DbConstants::kMetadataTable_Column_AncestorId_DefaultName);
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_TypeDiscriminator, DbConstants::kMetadataTable_Column_TypeDiscriminator_DefaultName);
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_ValueDouble, DbConstants::kMetadataTable_Column_ValueDouble_DefaultName);
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_ValueInteger, DbConstants::kMetadataTable_Column_ValueInteger_DefaultName);
+    this->SetColumnNameForMetadataTable(DatabaseConfigurationCommon::kMetadataTable_Column_ValueString, DbConstants::kMetadataTable_Column_ValueString_DefaultName);
+}
+
 // ----------------------------------------------------------------------------
 
-/*virtual*/[[nodiscard]] imgdoc2::DocumentType DatabaseConfiguration2D::GetDocumentType() const
+/*virtual*/ [[nodiscard]] imgdoc2::DocumentType DatabaseConfiguration2D::GetDocumentType() const
 {
-    return imgdoc2::DocumentType::kImage2d;    
+    return imgdoc2::DocumentType::kImage2d;
 }
 
 void DatabaseConfiguration2D::SetColumnNameForTilesInfoTable(int columnIdentifier, const char* column_name)
@@ -257,13 +300,13 @@ std::string DatabaseConfiguration2D::GetColumnNameOfTilesSpatialIndexTableOrThro
 
 void DatabaseConfiguration2D::SetDefaultColumnNamesForTilesInfoTable()
 {
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_Pk, DbConstants::kTilesInfoTable_Column_Pk_DefaultName/*"Pk"*/);
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX, DbConstants::kTilesInfoTable_Column_TileX_DefaultName/*"TileX"*/);
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY, DbConstants::kTilesInfoTable_Column_TileY_DefaultName/*"TileY"*/);
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW, DbConstants::kTilesInfoTable_Column_TileW_DefaultName /*"TileW"*/);
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH, DbConstants::kTilesInfoTable_Column_TileH_DefaultName/*"TileH"*/);
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel, DbConstants::kTilesInfoTable_Column_PyramidLevel_DefaultName/*"PyramidLevel"*/);
-   this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileDataId, DbConstants::kTilesInfoTable_Column_TileDataId_DefaultName/*"TileDataId"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_Pk, DbConstants::kTilesInfoTable_Column_Pk_DefaultName/*"Pk"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileX, DbConstants::kTilesInfoTable_Column_TileX_DefaultName/*"TileX"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileY, DbConstants::kTilesInfoTable_Column_TileY_DefaultName/*"TileY"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileW, DbConstants::kTilesInfoTable_Column_TileW_DefaultName /*"TileW"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileH, DbConstants::kTilesInfoTable_Column_TileH_DefaultName/*"TileH"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel, DbConstants::kTilesInfoTable_Column_PyramidLevel_DefaultName/*"PyramidLevel"*/);
+    this->SetColumnNameForTilesInfoTable(DatabaseConfiguration2D::kTilesInfoTable_Column_TileDataId, DbConstants::kTilesInfoTable_Column_TileDataId_DefaultName/*"TileDataId"*/);
 }
 
 void DatabaseConfiguration2D::SetDefaultColumnNamesForTilesDataTable()

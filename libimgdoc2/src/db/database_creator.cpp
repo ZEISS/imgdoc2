@@ -38,11 +38,14 @@ std::shared_ptr<DatabaseConfiguration2D> DbCreator::CreateTables2d(const imgdoc2
     sql_statement = this->GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(database_configuration.get());
     this->db_connection_->Execute(sql_statement);
 
+    sql_statement = this->GenerateSqlStatementForCreatingMetadataTable_Sqlite(database_configuration.get());
+    this->db_connection_->Execute(sql_statement);
+
     if (create_options->GetUseSpatialIndex())
     {
         sql_statement = this->GenerateSqlStatementForCreatingSpatialTilesIndex_Sqlite(database_configuration.get());
         this->db_connection_->Execute(sql_statement);
-        
+
         // and, add its name to the "General" table
         this->SetGeneralTableInfoForSpatialIndex(database_configuration.get());
     }
@@ -76,6 +79,9 @@ std::shared_ptr<DatabaseConfiguration3D> DbCreator::CreateTables3d(const imgdoc2
     this->db_connection_->Execute(sql_statement);
 
     sql_statement = this->GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(database_configuration.get());
+    this->db_connection_->Execute(sql_statement);
+
+    sql_statement = this->GenerateSqlStatementForCreatingMetadataTable_Sqlite(database_configuration.get());
     this->db_connection_->Execute(sql_statement);
 
     if (create_options->GetUseSpatialIndex())
@@ -234,6 +240,7 @@ std::string DbCreator::GenerateSqlStatementForFillingGeneralTable_Sqlite(const D
         " VALUES('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kVersion) << "','" << "0.0.1-alpha" << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kTilesDataTable) << "','" << database_configuration_common->GetTableNameForTilesDataOrThrow() << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kTilesInfoTable) << "','" << database_configuration_common->GetTableNameForTilesInfoOrThrow() << "')," <<
+        "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kMetadataTable) << "','" << database_configuration_common->GetTableNameForMetadataTableOrThrow() << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kDocType) << "','" << DbUtilities::GetDocTypeValueForDocumentType(database_configuration_common->GetDocumentType()) << "');";
 
     return string_stream.str();
@@ -246,9 +253,9 @@ void DbCreator::Initialize2dConfigurationFromCreateOptions(DatabaseConfiguration
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::GeneralInfo, DbConstants::kGeneralTable_Name/*"GENERAL"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesData, DbConstants::kTilesDataTable_DefaultName/*"TILESDATA"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesInfo, DbConstants::kTilesInfoTable_DefaultName/*"TILESINFO"*/);
-
+    database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::Metadata, DbConstants::kMetadataTable_DefaultName);
+    database_configuration->SetDefaultColumnNamesForMetadataTable();// TODO(JBl): should we make the metadata-table optional?
     database_configuration->SetDefaultColumnNamesForTilesDataTable();
-
     database_configuration->SetDefaultColumnNamesForTilesInfoTable();
     database_configuration->SetTileDimensions(create_options->GetDimensions().cbegin(), create_options->GetDimensions().cend());
     database_configuration->SetIndexedTileDimensions(create_options->GetIndexedDimensions().cbegin(), create_options->GetIndexedDimensions().cend());
@@ -278,7 +285,8 @@ void DbCreator::Initialize3dConfigurationFromCreateOptions(DatabaseConfiguration
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::GeneralInfo, DbConstants::kGeneralTable_Name/*"GENERAL"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesData, DbConstants::kTilesDataTable_DefaultName/*"TILESDATA"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesInfo, DbConstants::kTilesInfoTable_DefaultName/*"TILESINFO"*/);
-
+    database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::Metadata, DbConstants::kMetadataTable_DefaultName);
+    database_configuration->SetDefaultColumnNamesForMetadataTable();// TODO(JBl): should we make the metadata-table optional?
     database_configuration->SetDefaultColumnNamesForTilesDataTable();
 
     database_configuration->SetDefaultColumnNamesForTilesInfoTable();
@@ -377,26 +385,22 @@ void DbCreator::SetBlobTableNameInGeneralTable(const DatabaseConfigurationCommon
     }
 }
 
-// ----------------------------------------------------------------------------
-
-#if 0
-/*static*/std::shared_ptr<imgdoc2::IDoc> imgdoc2::ClassFactory::OpenExisting(imgdoc2::IOpenExistingOptions* open_existing_options)
+std::string DbCreator::GenerateSqlStatementForCreatingMetadataTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common)
 {
-    // TODO(JBL): here would be the place where we'd allow for "other databases than Sqlite", for the time being,
-    //            we just deal with Sqlite here
-    auto db_connection = DbFactory::SqliteCreateNewDatabase(open_existing_options->GetFilename().c_str());
+    ostringstream string_stream;
+    string_stream << "CREATE TABLE [" << database_configuration_common->GetTableNameForMetadataTableOrThrow() << "] (" <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk) << "] INTEGER PRIMARY KEY," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Name) << "] TEXT NOT NULL," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId) << "] INTEGER," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_TypeDiscriminator) << "] INTEGER," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueDouble) << "] REAL," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueInteger) << "] INTEGER," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueString) << "] TEXT," <<
+        "FOREIGN KEY(" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId) << ") REFERENCES " <<
+        database_configuration_common->GetTableNameForMetadataTableOrThrow() << "(" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk) << "),"
+        "UNIQUE(" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Name) << "," << 
+        database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId) << ") )" << ";";
+    // the combination of Name and AncestorId must be unique, in other words, the names of items with the same ancestor must be unique
 
-    DbDiscovery database_discovery{ db_connection };
-    database_discovery.DoDiscovery();
-
-    const auto database_configuration_2d = std::dynamic_pointer_cast<DatabaseConfiguration2D>(database_discovery.GetDatabaseConfiguration());
-    if (database_configuration_2d)
-    {
-        return make_shared<Document>(db_connection, database_configuration_2d);
-    }
-
-    // TODO(JBL): 3d version should follow here
-
-    return {};
+    return string_stream.str();
 }
-#endif

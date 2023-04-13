@@ -26,7 +26,7 @@ public:
     static std::shared_ptr<IDbConnection> SqliteOpenExistingDatabase(const char* filename, bool readonly, std::shared_ptr<imgdoc2::IHostingEnvironment> environment);
 
     void Execute(const char* sql_statement) override;
-    void Execute(IDbStatement* statement) override;
+    void Execute(IDbStatement* statement, std::int64_t* number_of_rows_modified = nullptr) override;
     std::int64_t ExecuteAndGetLastRowId(IDbStatement* statement) override;
     std::shared_ptr<IDbStatement> PrepareStatement(const std::string& sql_statement) override;
 
