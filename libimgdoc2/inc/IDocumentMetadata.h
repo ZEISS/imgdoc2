@@ -141,7 +141,7 @@ namespace imgdoc2
         /// Enumerate items for which the specified node 'parent' is the ancestor. If recursive is false, then only the direct children of the specified parent are enumerated.
         /// If recursive is true, then all descendants of the specified parent are enumerated.
         /// If the specified parent is not valid (nullopt), then all items are enumerated.
-        /// IF the specified parent is valid, but does not exist, an exception of type imgdoc2::non_existing_item_exception is thrown.
+        /// If the specified parent is valid, but does not exist, an exception of type imgdoc2::non_existing_item_exception is thrown.
         ///
         /// \param  parent      The parent node for which the children are to be enumerated. If nullopt, then all items are enumerated.
         /// \param  recursive   False to enumerate only the direct children of the specified parent, true to enumerate all descendants of the specified parent.
