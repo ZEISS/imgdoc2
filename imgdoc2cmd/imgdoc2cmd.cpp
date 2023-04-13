@@ -143,17 +143,17 @@ static void Test4()
     auto meta_writer = doc->GetDocumentMetadataWriter();
     auto meta_reader = doc->GetDocumentMetadataReader();
 
-    auto id = meta_writer->UpdateOrCreateItemForPath(true,true,"A/B/C", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    auto id = meta_writer->UpdateOrCreateItemForPath(true,true,"A/B/C", DocumentMetadataType::kText, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
     
-    auto id1 = meta_writer->UpdateOrCreateItem(nullopt, true, "Node1", DocumentMetadataType::Double, IDocumentMetadataWrite::metadata_item_variant(33.443));
-    auto id1_1 = meta_writer->UpdateOrCreateItem(id1, true, "Node1_1", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
-    auto id1_2 = meta_writer->UpdateOrCreateItem(id1, true, "Node1_2", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
-    auto id1_1_1 = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_1", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3"));
-    auto id1_1_2 = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_2", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3 b"));
+    auto id1 = meta_writer->UpdateOrCreateItem(nullopt, true, "Node1", DocumentMetadataType::kDouble, IDocumentMetadataWrite::metadata_item_variant(33.443));
+    auto id1_1 = meta_writer->UpdateOrCreateItem(id1, true, "Node1_1", DocumentMetadataType::kText, IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+    auto id1_2 = meta_writer->UpdateOrCreateItem(id1, true, "Node1_2", DocumentMetadataType::kText, IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+    auto id1_1_1 = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_1", DocumentMetadataType::kText, IDocumentMetadataWrite::metadata_item_variant("Testtext3"));
+    auto id1_1_2 = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_2", DocumentMetadataType::kText, IDocumentMetadataWrite::metadata_item_variant("Testtext3 b"));
 
-    auto r = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_1", DocumentMetadataType::Text, IDocumentMetadataWrite::metadata_item_variant("Testtext3 modified"));
+    auto r = meta_writer->UpdateOrCreateItem(id1_1, true, "Node1_1_1", DocumentMetadataType::kText, IDocumentMetadataWrite::metadata_item_variant("Testtext3 modified"));
 
-    auto item = meta_reader->GetItemForPath("Node1/Node1_1", DocumentMetadataItemFlags::All);
+    auto item = meta_reader->GetItemForPath("Node1/Node1_1", DocumentMetadataItemFlags::kAll);
     
 
     return;

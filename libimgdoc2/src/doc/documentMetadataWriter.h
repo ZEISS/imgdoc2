@@ -1,27 +1,22 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <memory>
+#include <utility>
+#include <string>
+#include <vector>
 #include "IDocumentMetadata.h"
 #include "documentMetadataBase.h"
 #include "document.h"
 
 class DocumentMetadataWriter : public DocumentMetadataBase, public imgdoc2::IDocumentMetadataWrite
 {
-private:
-    //std::shared_ptr<Document> document_;
-
-    /*enum class DataType
-    {
-        null = 0,
-        int32 = 1,
-        uint32 = 2,
-        doublefloat = 3,
-        singlefloat = 4,
-        utf8string = 5,
-        json = 6,
-    };*/
 public:
-    DocumentMetadataWriter(std::shared_ptr<Document> document) : DocumentMetadataBase(std::move(document)) {}
+    DocumentMetadataWriter() = delete;
+    explicit DocumentMetadataWriter(std::shared_ptr<Document> document) : DocumentMetadataBase(std::move(document)) {}
     ~DocumentMetadataWriter() override = default;
 
     imgdoc2::dbIndex UpdateOrCreateItem(

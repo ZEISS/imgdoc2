@@ -81,6 +81,9 @@ std::shared_ptr<DatabaseConfiguration3D> DbCreator::CreateTables3d(const imgdoc2
     sql_statement = this->GenerateSqlStatementForCreatingTilesInfoTable_Sqlite(database_configuration.get());
     this->db_connection_->Execute(sql_statement);
 
+    sql_statement = this->GenerateSqlStatementForCreatingMetadataTable_Sqlite(database_configuration.get());
+    this->db_connection_->Execute(sql_statement);
+
     if (create_options->GetUseSpatialIndex())
     {
         sql_statement = this->GenerateSqlStatementForCreatingSpatialTilesIndex_Sqlite(database_configuration.get());
@@ -237,6 +240,7 @@ std::string DbCreator::GenerateSqlStatementForFillingGeneralTable_Sqlite(const D
         " VALUES('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kVersion) << "','" << "0.0.1-alpha" << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kTilesDataTable) << "','" << database_configuration_common->GetTableNameForTilesDataOrThrow() << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kTilesInfoTable) << "','" << database_configuration_common->GetTableNameForTilesInfoOrThrow() << "')," <<
+        "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kMetadataTable) << "','" << database_configuration_common->GetTableNameForMetadataTableOrThrow() << "')," <<
         "('" << DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kDocType) << "','" << DbUtilities::GetDocTypeValueForDocumentType(database_configuration_common->GetDocumentType()) << "');";
 
     return string_stream.str();
@@ -249,9 +253,9 @@ void DbCreator::Initialize2dConfigurationFromCreateOptions(DatabaseConfiguration
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::GeneralInfo, DbConstants::kGeneralTable_Name/*"GENERAL"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesData, DbConstants::kTilesDataTable_DefaultName/*"TILESDATA"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesInfo, DbConstants::kTilesInfoTable_DefaultName/*"TILESINFO"*/);
-
+    database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::Metadata, DbConstants::kMetadataTable_DefaultName);
+    database_configuration->SetDefaultColumnNamesForMetadataTable();// TODO(JBl): should we make the metadata-table optional?
     database_configuration->SetDefaultColumnNamesForTilesDataTable();
-
     database_configuration->SetDefaultColumnNamesForTilesInfoTable();
     database_configuration->SetTileDimensions(create_options->GetDimensions().cbegin(), create_options->GetDimensions().cend());
     database_configuration->SetIndexedTileDimensions(create_options->GetIndexedDimensions().cbegin(), create_options->GetIndexedDimensions().cend());
@@ -281,7 +285,8 @@ void DbCreator::Initialize3dConfigurationFromCreateOptions(DatabaseConfiguration
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::GeneralInfo, DbConstants::kGeneralTable_Name/*"GENERAL"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesData, DbConstants::kTilesDataTable_DefaultName/*"TILESDATA"*/);
     database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::TilesInfo, DbConstants::kTilesInfoTable_DefaultName/*"TILESINFO"*/);
-
+    database_configuration->SetTableName(DatabaseConfigurationCommon::TableTypeCommon::Metadata, DbConstants::kMetadataTable_DefaultName);
+    database_configuration->SetDefaultColumnNamesForMetadataTable();// TODO(JBl): should we make the metadata-table optional?
     database_configuration->SetDefaultColumnNamesForTilesDataTable();
 
     database_configuration->SetDefaultColumnNamesForTilesInfoTable();
@@ -383,16 +388,19 @@ void DbCreator::SetBlobTableNameInGeneralTable(const DatabaseConfigurationCommon
 std::string DbCreator::GenerateSqlStatementForCreatingMetadataTable_Sqlite(const DatabaseConfigurationCommon* database_configuration_common)
 {
     ostringstream string_stream;
-    string_stream << "CREATE TABLE [" << "METADATA"/*database_configuration_common->GetTableNameForMetadataTableOrThrow()*/ << "] (" <<
-        "[" << "Pk"/*database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk)*/ << "] INTEGER PRIMARY KEY," <<
-        "[" << "Name"/*database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Key)*/ << "] TEXT NOT NULL," <<
-        "[" << "AncestorId"/*database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueString)*/ << "] INTEGER," <<
-        "[" << "TypeDiscriminator" << "] INTEGER," <<
-        "[" << "ValueDouble" << "] REAL," <<
-        "[" << "ValueInteger" << "] INTEGER," <<
-        "[" << "ValueString" << "] TEXT," <<
-        "FOREIGN KEY(AncestorId) REFERENCES METADATA(Pk),"
-        "UNIQUE(Name,AncestorId) )" << ";"; // the combination of Name and AncestorId must be unique, in other words, the names of items with the same ancestor must be unique
+    string_stream << "CREATE TABLE [" << database_configuration_common->GetTableNameForMetadataTableOrThrow() << "] (" <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk) << "] INTEGER PRIMARY KEY," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Name) << "] TEXT NOT NULL," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId) << "] INTEGER," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_TypeDiscriminator) << "] INTEGER," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueDouble) << "] REAL," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueInteger) << "] INTEGER," <<
+        "[" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_ValueString) << "] TEXT," <<
+        "FOREIGN KEY(" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId) << ") REFERENCES " <<
+        database_configuration_common->GetTableNameForMetadataTableOrThrow() << "(" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk) << "),"
+        "UNIQUE(" << database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Name) << "," << 
+        database_configuration_common->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId) << ") )" << ";";
+    // the combination of Name and AncestorId must be unique, in other words, the names of items with the same ancestor must be unique
 
     return string_stream.str();
 }

@@ -235,11 +235,23 @@ DbDiscovery::GeneralDataDiscoveryResult DbDiscovery::DiscoverGeneralTable()
         general_discovery_result.spatial_index_table_name = str;
     }
 
+    if (Utilities::TryReadStringFromPropertyBag(
+        this->db_connection_.get(),
+        DbConstants::kGeneralTable_Name,
+        DbConstants::kGeneralTable_KeyColumnName,
+        DbConstants::kGeneralTable_ValueStringColumnName,
+        DbConstants::GetGeneralTable_ItemKey(GeneralTableItems::kMetadataTable), //"MetadataTable",
+        &str))
+    {
+        general_discovery_result.metadatatable_name = str;
+    }
+
     return general_discovery_result;
 }
 
 void DbDiscovery::Check_Tables_And_Determine_Dimensions(GeneralDataDiscoveryResult& general_table_discovery_result)
 {
+    // check the tiles-data table for the expected columns
     vector<ExpectedColumnsInfo> expected_columns_for_table
     {
         ExpectedColumnsInfo(DbConstants::kTilesDataTable_Column_Pk_DefaultName),
@@ -267,6 +279,35 @@ void DbDiscovery::Check_Tables_And_Determine_Dimensions(GeneralDataDiscoveryResu
         }
     }
 
+    // check the metadata table for the expected columns
+    expected_columns_for_table = vector<ExpectedColumnsInfo>
+    {
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_Pk_DefaultName),
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_Name_DefaultName),
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_AncestorId_DefaultName),
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_TypeDiscriminator_DefaultName),
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_ValueDouble_DefaultName),
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_ValueInteger_DefaultName),
+        ExpectedColumnsInfo(DbConstants::kMetadataTable_Column_ValueString_DefaultName),
+    };
+
+    columns_of_table = this->db_connection_->GetTableInfo(general_table_discovery_result.metadatatable_name.c_str());
+
+    for (const auto& expected_column_info : expected_columns_for_table)
+    {
+        if (!any_of(
+            columns_of_table.cbegin(),
+            columns_of_table.cend(),
+            [&](const IDbConnection::ColumnInfo& column_info)->bool
+            {
+                return column_info.column_name == expected_column_info.column_name;
+            }))
+        {
+            throw discovery_exception("Column not found or column is inappropriate.");
+        }
+    }
+
+    // check the tiles-info table for the expected columns, and determine the dimensions
     expected_columns_for_table = vector<ExpectedColumnsInfo>
     {
         ExpectedColumnsInfo(DbConstants::kTilesInfoTable_Column_Pk_DefaultName),

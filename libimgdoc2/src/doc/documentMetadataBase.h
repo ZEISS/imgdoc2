@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <limits>
@@ -5,15 +9,21 @@
 #include <optional>
 #include <memory>
 #include <type_traits>
+#include <utility>
+#include <string>
 #include "IDocumentMetadata.h"
 #include "../db/IDbStatement.h"
 #include "document.h"
 
 class DocumentMetadataBase
 {
-protected:
+private:
     std::shared_ptr<Document> document_;
-
+protected:
+    constexpr static char kPathDelimiter_ = '/';
+public:
+    DocumentMetadataBase() = delete;
+protected:
     explicit DocumentMetadataBase(std::shared_ptr<Document> document) : document_(std::move(document))
     {}
 
@@ -53,7 +63,17 @@ protected:
 
     bool TryMapPathAndGetTerminalNode(const std::string& path, std::optional<imgdoc2::dbIndex>* terminal_node_id);
 
-    std::vector<std::string_view> SplitPath(const std::string_view& path);
+    [[nodiscard]] const std::shared_ptr<Document>& GetDocument() const { return this->document_; }
+
+    /// Splits a the specified path (at the delimiter kPathDelimiter_) into its parts.
+    /// If there is zero-length part, then an imgdoc2::invalid_path_exception is thrown.
+    ///
+    /// \param  path    The path to be split.
+    ///
+    /// \returns    A vector containing the parts;
+    static std::vector<std::string_view> SplitPath(const std::string_view& path);
+
+    bool CheckIfItemExists(imgdoc2::dbIndex primary_key);
 private:
     std::shared_ptr<IDbStatement> CreateQueryForNodeIdsForPath(const std::vector<std::string_view>& path_parts);
 };

@@ -84,8 +84,6 @@ set(LibImgDoc2_Srcfiles
          "src/doc/documentMetadataWriter.cpp"
          "src/doc/documentMetadataReader.h"
          "src/doc/documentMetadataReader.cpp" 
-         "src/db/metadatautilities.h" 
-         "src/db/metadatautilities.cpp" 
          "src/doc/documentMetadataBase.cpp")
 
 add_library(libimgdoc2 STATIC

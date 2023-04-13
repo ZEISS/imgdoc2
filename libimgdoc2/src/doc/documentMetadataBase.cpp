@@ -1,6 +1,11 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
 #include "documentMetadataBase.h"
+#include <string>
 #include "exceptions.h"
-#include "gsl/narrow"
+#include <gsl/narrow>
 
 using namespace std;
 using namespace imgdoc2;
@@ -25,7 +30,10 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
 
     switch (type)
     {
-        case DocumentMetadataType::Text:
+        case DocumentMetadataType::kNull:
+            // in this the value does not matter
+            return DatabaseDataTypeValue::null;
+        case DocumentMetadataType::kText:
             // in this case the value must contain a string
             if (!std::holds_alternative<std::string>(value))
             {
@@ -33,7 +41,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             }
 
             return DatabaseDataTypeValue::utf8string;
-        case DocumentMetadataType::Int32:
+        case DocumentMetadataType::kInt32:
             // in this case the value must contain an integer
             if (!std::holds_alternative<int>(value))
             {
@@ -41,7 +49,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             }
 
             return DatabaseDataTypeValue::int32;
-        case DocumentMetadataType::Double:
+        case DocumentMetadataType::kDouble:
             // in this case the value must contain a double
             if (!std::holds_alternative<double>(value))
             {
@@ -49,7 +57,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             }
 
             return DatabaseDataTypeValue::doublefloat;
-        case DocumentMetadataType::Json:
+        case DocumentMetadataType::kJson:
             // in this case the value must contain a string
             if (!std::holds_alternative<string>(value))
             {
@@ -57,7 +65,7 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             }
 
             return DatabaseDataTypeValue::json;
-        case DocumentMetadataType::Default:
+        case DocumentMetadataType::kDefault:
             if (std::holds_alternative<std::string>(value))
             {
                 return DatabaseDataTypeValue::utf8string;
@@ -74,22 +82,12 @@ DocumentMetadataBase::DatabaseDataTypeValue DocumentMetadataBase::DetermineDatab
             {
                 throw invalid_argument_exception("Unknown metadata item type");
             }
+        case DocumentMetadataType::kInvalid:
+            throw invalid_argument_exception("The metadata type is invalid");
     }
 
     return DatabaseDataTypeValue::invalid;
 }
-
-//void DocumentMetadataBase::BindAncestorId(const std::shared_ptr<IDbStatement>& database_statement, int binding_index, const std::optional<imgdoc2::dbIndex>& parent)
-//{
-//    if (parent.has_value())
-//    {
-//        database_statement->BindInt64(binding_index, parent.value());
-//    }
-//    else
-//    {
-//        database_statement->BindNull(binding_index);
-//    }
-//}
 
 int DocumentMetadataBase::BindTypeDiscriminatorAndData(
     const std::shared_ptr<IDbStatement>& database_statement,
@@ -97,7 +95,7 @@ int DocumentMetadataBase::BindTypeDiscriminatorAndData(
     DatabaseDataTypeValue type,
     const imgdoc2::IDocumentMetadata::metadata_item_variant& value)
 {
-    database_statement->BindInt32(binding_index++, (int)type);
+    database_statement->BindInt32(binding_index++, gsl::narrow_cast<int>(type));
     if (std::holds_alternative<double>(value))
     {
         database_statement->BindDouble(binding_index++, std::get<double>(value));
@@ -128,28 +126,24 @@ int DocumentMetadataBase::BindTypeDiscriminatorAndData(
     return binding_index;
 }
 
-static std::vector<std::string_view> tokenize(std::string_view str, char deliminator)
+/*static*/std::vector<std::string_view> DocumentMetadataBase::SplitPath(const std::string_view& path)
 {
     std::vector<std::string_view> tokens;
-    std::size_t start = 0, end = 0;
-    while ((end = str.find(deliminator, start)) != std::string_view::npos)
+    std::size_t start = 0, end;
+    while ((end = path.find(DocumentMetadataBase::kPathDelimiter_, start)) != std::string_view::npos)
     {
-        tokens.push_back(str.substr(start, end - start));
+        if (end == start)
+        {
+            throw invalid_path_exception("path must not contain zero-length fragments");
+        }
+
+        tokens.push_back(path.substr(start, end - start));
         start = end + 1;
     }
 
-    tokens.push_back(str.substr(start));
-    return tokens;
-}
-
-std::vector<std::string_view> DocumentMetadataBase::SplitPath(const std::string_view& path)
-{
-    std::vector<std::string_view> tokens;
-    std::size_t start = 0, end = 0;
-    while ((end = path.find('/', start)) != std::string_view::npos)
+    if (start == path.size())
     {
-        tokens.push_back(path.substr(start, end - start));
-        start = end + 1;
+        throw invalid_path_exception("path must not end with a delimiter");
     }
 
     tokens.push_back(path.substr(start));
@@ -159,19 +153,23 @@ std::vector<std::string_view> DocumentMetadataBase::SplitPath(const std::string_
 std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath(const std::vector<std::string_view>& path_parts)
 {
     ostringstream string_stream;
+    const auto metadata_table_name = this->GetDocument()->GetDataBaseConfigurationCommon()->GetTableNameForMetadataTableOrThrow();
+    const auto column_name_pk = this->GetDocument()->GetDataBaseConfigurationCommon()->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk);
+    const auto column_name_name = this->GetDocument()->GetDataBaseConfigurationCommon()->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Name);
+    const auto column_name_ancestor_id = this->GetDocument()->GetDataBaseConfigurationCommon()->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_AncestorId);
 
     if (path_parts.size() > 1)
     {
-        string_stream << "WITH RECURSIVE paths(id, name, level) as ( " <<
-            "SELECT Pk, Name,  1 from METADATA where AncestorId IS NULL AND Name=? " <<
+        string_stream << "WITH RECURSIVE paths(id, name, level) AS( " <<
+            "SELECT " << column_name_pk << "," << column_name_name << ",1 FROM [" << metadata_table_name << "] WHERE " << column_name_ancestor_id << " IS NULL AND " << column_name_name << "=? " <<
             "UNION " <<
-            "SELECT METADATA.Pk, METADATA.name,  level + 1 " <<
-            "FROM METADATA JOIN paths WHERE METADATA.AncestorId = paths.id AND " <<
+            "SELECT " << metadata_table_name << "." << column_name_pk << ", " << metadata_table_name << "." << column_name_name << ",  level + 1 " <<
+            "FROM [" << metadata_table_name << "] JOIN paths WHERE " << metadata_table_name << "." << column_name_ancestor_id << "=paths.id AND " <<
             "CASE level ";
 
         for (size_t i = 1; i < path_parts.size(); i++)
         {
-            string_stream << "WHEN " << i << " THEN METADATA.Name=? ";
+            string_stream << "WHEN " << i << " THEN " << metadata_table_name << "." << column_name_name << "=? ";
         }
 
         string_stream << "END) " <<
@@ -179,7 +177,7 @@ std::shared_ptr<IDbStatement> DocumentMetadataBase::CreateQueryForNodeIdsForPath
     }
     else if (path_parts.size() == 1)
     {
-        string_stream << "SELECT Pk FROM METADATA WHERE AncestorId IS NULL AND Name=?;";
+        string_stream << "SELECT " << column_name_pk << " FROM " << metadata_table_name << " WHERE " << column_name_ancestor_id << " IS NULL AND " << column_name_name << "=?;";
     }
     else
     {
@@ -204,37 +202,18 @@ std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPath(const std:
     }
 
     // the path must NOT start with a slash
-    if (path[0] == '/')
+    if (path[0] == DocumentMetadataBase::kPathDelimiter_)
     {
-        // TODO(Jbl): find more appropriate exception
-        throw invalid_argument_exception("The path must not start with a slash");
+        throw invalid_path_exception("The path must not start with a slash");
     }
 
-    const std::vector<std::string_view> tokens = tokenize(path, '/');
+    const std::vector<std::string_view> tokens = DocumentMetadataBase::SplitPath(path);
     if (count_of_parts_in_path != nullptr)
     {
         *count_of_parts_in_path = tokens.size();
     }
 
     return this->GetNodeIdsForPathParts(tokens);
-    /*const auto statement = this->CreateQueryForNodeIdsForPath(tokens);
-
-    // TODO(JBl) : The binding currently is making a copy of the string. This is not necessary, we could use a "STATIC" binding
-    //              if we ensure that the string is not deleted before the statement is executed.
-    for (size_t i = 0; i < tokens.size(); i++)
-    {
-        statement->BindStringView(gsl::narrow<int>(i + 1), tokens[i]);
-    }
-
-    std::vector<imgdoc2::dbIndex> result;
-    result.reserve(tokens.size());
-    while (this->document_->GetDatabase_connection()->StepStatement(statement.get()))
-    {
-        const imgdoc2::dbIndex index = statement->GetResultInt64(0);
-        result.push_back(index);
-    }
-
-    return result;*/
 }
 
 std::vector<imgdoc2::dbIndex> DocumentMetadataBase::GetNodeIdsForPathParts(const std::vector<std::string_view>& parts)
@@ -285,4 +264,22 @@ bool DocumentMetadataBase::TryMapPathAndGetTerminalNode(const std::string& path,
     }
 
     return false;
+}
+
+bool DocumentMetadataBase::CheckIfItemExists(imgdoc2::dbIndex primary_key)
+{
+    ostringstream string_stream;
+    string_stream << "SELECT EXISTS(SELECT 1 FROM [" << this->GetDocument()->GetDataBaseConfigurationCommon()->GetTableNameForMetadataTableOrThrow() << "] " << 
+        "WHERE [" << this->GetDocument()->GetDataBaseConfigurationCommon()->GetColumnNameOfMetadataTableOrThrow(DatabaseConfigurationCommon::kMetadataTable_Column_Pk) << "]=?1)";
+
+    const auto statement = this->GetDocument()->GetDatabase_connection()->PrepareStatement(string_stream.str());
+    statement->BindInt64(1, primary_key);
+
+    if (!this->GetDocument()->GetDatabase_connection()->StepStatement(statement.get()))
+    {
+        throw internal_error_exception("DocumentMetadataReader::CheckIfItemExists: Could not execute statement.");
+    }
+
+    const int64_t result = statement->GetResultInt64(0);
+    return result == 1;
 }
