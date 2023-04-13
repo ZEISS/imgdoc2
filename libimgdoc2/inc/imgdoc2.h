@@ -10,7 +10,6 @@ objects, functions and definitions.
 So - this is the only file which is to be included by a client application.
 */
 
-#include "exceptions.h"
 #include "loglevel.h"
 #include "types.h"
 #include "IEnvironment.h"
