@@ -95,3 +95,16 @@ two (or more) consecutive slashes (and an empty string is not allowed as the nam
 
 `EnumerateItems` is used to enumerate all items that are children of a given parent node. The argument `parent` specifies the parent node. If `parent` is `std::nullopt`,
 then the root node is used. The argument `recursive` specifies whether the enumeration should be recursive (i.e. also include all children of the direct children).
+The argument `flags` specifies which information should be retrieved for each item. The argument `func` is a function that is called for each item. The function
+is called with the primary key of the item and the item itself. If the function returns `false`, the enumeration is stopped. If the function returns `true`, the enumeration
+continues. The enumeration is performed in a depth-first manner.
+
+`EnumerateItemsForPath` is similar to `EnumerateItems`, but it takes a path as argument instead of a primary key. The path is a string that describes the path to the item (identifying the
+parent node for the enumeration). An empty string is used to specify the root node.
+
+### write access
+
+Write access is provided by the `IDocumentMetadataWrite` interface.
+
+
+        
