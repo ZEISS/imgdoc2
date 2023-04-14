@@ -1,7 +1,15 @@
 # Approach and Philosophy: Multi-Level Organization of Microscopy Image Data           {#approach_and_philosophy}
 
-In the following sections, we will describe the approach and philosophy underlying the design
-and implementation of imgdoc2.
+The design and implementation of imgdoc2 is based on the following principles:
+-   **Modularity and Extensibility:** imgdoc2 is designed to be modular and extensible, allowing for easy integration of new features and new data formats.
+-   **Flexibility:** imgdoc2 is designed to be flexible and adaptable to the needs of the user, allowing for customization of the functionalilty, capabilities and the data model.
+-   **Data Agnostic:** imgdoc2 is designed to be data-agnostic, meaning that it is not limited to any specific type of microscopy data, and it is not tied to any specific file format.
+-   **Standardization:** imgdoc2 is designed to facilitate standardization of the terminology and organization of microscopy image data, allowing for clear communication and understanding of image data.
+-   **Interoperability:** imgdoc2 is designed to be interoperable with other software packages, allowing for easy integration with existing software tools and workflows.
+-   **Open Source:** imgdoc2 is designed to be open source and freely available, allowing for easy access, modification, and extension by the scientific community.
+
+In the following sections, we will describe the approach, principles and philosophy underlying the data model
+implemented by imgdoc2.
 
 ## Multi-Level Organization of Microscopy Image Data: Emphasizing Context, Relationships, and Standardized Terminology
 
@@ -42,3 +50,8 @@ An example of such a "standardized ordering scheme" is the concept of a spatial 
 assigned to the images have a defined semantic and a meaning. Concepts like "tiled-image" or "image-pyramid" are introduced at this level.
 
 ### microscopic image
+
+This level means that the images are organized as a set of images that are taken with the same microscope. 
+The microscope is defined e.g. by its modality (e.g. fluorescence), its settings (e.g. wavelength, exposure time), 
+its techniques (e.g. deconvolution, stitching), its experimental conditions (e.g. temperature, pH), and its 
+post-processing (e.g. contrast enhancement, segmentation).
