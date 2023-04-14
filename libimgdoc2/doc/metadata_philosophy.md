@@ -30,3 +30,15 @@ solution for managing microscopy image data that caters to the diverse needs of 
 applications. With a clearly defined system for organizing and describing image data, users can effectively 
 store, navigate, and analyze their images while maintaining the context and details necessary for 
 accurate interpretation and reproducibility.
+
+### set of images
+
+This level means that the is no standardized, coherent organization of the images. The ordering scheme is arbitrary or taylored for the specific application.
+
+### ordered set of images
+
+This level means that the images are ordered in a standardized way. The ordering scheme is standardized and can be used to navigate or compose the images.
+An example of such a "standardized ordering scheme" is the concept of a spatial position - images are positioned in a coordinate system. The coordinates
+assigned to the images have a defined semantic and a meaning. Concepts like "tiled-image" or "image-pyramid" are introduced at this level.
+
+### microscopic image
