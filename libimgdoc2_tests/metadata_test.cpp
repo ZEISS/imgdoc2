@@ -6,6 +6,8 @@
 #include <gmock/gmock.h>
 #include <random>
 #include <algorithm>
+#include <array>
+#include <string>
 #include "../libimgdoc2/inc/imgdoc2.h"
 
 using namespace std;
@@ -21,21 +23,21 @@ TEST(Metadata, CheckNodeNamesWithInvalidNamesAndExpectException)
 
     auto metadata_writer = doc->GetDocumentMetadataWriter();
     EXPECT_THROW(
-        metadata_writer->UpdateOrCreateItem(
+            metadata_writer->UpdateOrCreateItem(
         nullopt,
         true,
         "ABC/DEF",
         DocumentMetadataType::kDefault,
         IDocumentMetadataWrite::metadata_item_variant(std::monostate())),
-        invalid_argument_exception);
+            invalid_argument_exception);
     EXPECT_THROW(
-        metadata_writer->UpdateOrCreateItem(
+            metadata_writer->UpdateOrCreateItem(
         nullopt,
         true,
         "",
         DocumentMetadataType::kDefault,
         IDocumentMetadataWrite::metadata_item_variant(std::monostate())),
-        invalid_argument_exception);
+            invalid_argument_exception);
 }
 
 TEST(Metadata, UpdateOrCreateItemWithInvalidParentKeyAndExpectException)
@@ -46,13 +48,13 @@ TEST(Metadata, UpdateOrCreateItemWithInvalidParentKeyAndExpectException)
     const auto doc = ClassFactory::CreateNew(create_options.get());
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
     EXPECT_THROW(
-        metadata_writer->UpdateOrCreateItem(
+            metadata_writer->UpdateOrCreateItem(
         123,
         true,
         "ABC",
         DocumentMetadataType::kDefault,
         IDocumentMetadataWrite::metadata_item_variant(std::monostate())),
-        non_existing_item_exception);
+            non_existing_item_exception);
 }
 
 TEST(Metadata, AddMetadataItemsAndCheckIfTheyAreAdded_Scenario1)
@@ -63,29 +65,29 @@ TEST(Metadata, AddMetadataItemsAndCheckIfTheyAreAdded_Scenario1)
     const auto doc = ClassFactory::CreateNew(create_options.get());
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
     auto pk_node1 = metadata_writer->UpdateOrCreateItem(
-        nullopt,
-        true,
-        "Node1",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant(std::monostate()));
+            nullopt,
+            true,
+            "Node1",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant(std::monostate()));
     auto pk_node1_1 = metadata_writer->UpdateOrCreateItem(
-        pk_node1,
-        true,
-        "Node1_1",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant(1.234));
+            pk_node1,
+            true,
+            "Node1_1",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant(1.234));
     auto pk_node1_2 = metadata_writer->UpdateOrCreateItem(
-        pk_node1,
-        true,
-        "Node1_2",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant(1234));
+            pk_node1,
+            true,
+            "Node1_2",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant(1234));
     auto pk_node1_3 = metadata_writer->UpdateOrCreateItem(
-        pk_node1,
-        true,
-        "Node1_3",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            pk_node1,
+            true,
+            "Node1_3",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     auto item = metadata_reader->GetItem(pk_node1, DocumentMetadataItemFlags::kAll);
@@ -113,29 +115,29 @@ TEST(Metadata, AddMetadataItemsAndCheckIfTheyAreAdded_Scenario2)
     const auto doc = ClassFactory::CreateNew(create_options.get());
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
     auto pk_node1 = metadata_writer->UpdateOrCreateItem(
-        nullopt,
-        true,
-        "A",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant(std::monostate()));
+            nullopt,
+            true,
+            "A",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant(std::monostate()));
     auto pk_node1_1 = metadata_writer->UpdateOrCreateItem(
-        pk_node1,
-        true,
-        "B",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant(1.234));
+            pk_node1,
+            true,
+            "B",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant(1.234));
     auto pk_node1_1_1 = metadata_writer->UpdateOrCreateItem(
-        pk_node1_1,
-        true,
-        "C",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant(1234));
+            pk_node1_1,
+            true,
+            "C",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant(1234));
     metadata_writer->UpdateOrCreateItem(
-        pk_node1_1_1,
-        true,
-        "D",
-        DocumentMetadataType::kDefault,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            pk_node1_1_1,
+            true,
+            "D",
+            DocumentMetadataType::kDefault,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     auto item = metadata_reader->GetItemForPath("A", DocumentMetadataItemFlags::kAll);
@@ -209,10 +211,14 @@ TEST(Metadata, EnumerateItems_Scenario1)
     vector<dbIndex> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItems(
-        nullopt,
-        true,
-        DocumentMetadataItemFlags::kAll,
-        [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
+            nullopt,
+            true,
+            DocumentMetadataItemFlags::kAll,
+            [&items](const auto pk, const auto item)
+            {
+                items.push_back(pk);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(items.size(), 4); // so, we expect 4 items, the root node and the 3 leaf nodes
@@ -247,22 +253,23 @@ TEST(Metadata, EnumerateItems_Scenario2)
     vector<DocumentMetadataItem> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItems(
-        id_item_b,
-        false,
-        DocumentMetadataItemFlags::kAll,
-        [&primary_keys, &items](const auto pk, const auto item) ->bool
-        {
-            primary_keys.push_back(pk);
-            items.push_back(item);
-            return true;
-        });
+            id_item_b,
+            false,
+            DocumentMetadataItemFlags::kAll,
+            [&primary_keys, &items](const auto pk, const auto item) -> bool
+            {
+                primary_keys.push_back(pk);
+                items.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
     EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
     EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
 
-    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id1; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     size_t index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -271,7 +278,8 @@ TEST(Metadata, EnumerateItems_Scenario2)
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
     EXPECT_EQ(items[index].primary_key, id1);
 
-    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id2; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -311,22 +319,23 @@ TEST(Metadata, EnumerateItems_Scenario3)
     vector<DocumentMetadataItem> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItems(
-        id_item_b,
-        false,                                      // Note: we instruct "recursive=false", so we expect only the the two direct leaf nodes of 'B' - 'C' and 'D'
-        DocumentMetadataItemFlags::kAll,
-        [&primary_keys, &items](const auto pk, const auto item) ->bool
-        {
-            primary_keys.push_back(pk);
-            items.push_back(item);
-            return true;
-        });
+            id_item_b,
+            false,                                      // Note: we instruct "recursive=false", so we expect only the the two direct leaf nodes of 'B' - 'C' and 'D'
+            DocumentMetadataItemFlags::kAll,
+            [&primary_keys, &items](const auto pk, const auto item) -> bool
+            {
+                primary_keys.push_back(pk);
+                items.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
     EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
     EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
 
-    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id1; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     size_t index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -335,7 +344,8 @@ TEST(Metadata, EnumerateItems_Scenario3)
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
     EXPECT_EQ(items[index].primary_key, id1);
 
-    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id2; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -375,22 +385,23 @@ TEST(Metadata, EnumerateItems_Scenario4)
     vector<DocumentMetadataItem> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItems(
-        id_item_b,
-        true,                                      // Note: we instruct "recursive=true", so we expect to have all 4 leaf nodes of 'B' : 'C', 'D', 'E' and 'F'
-        DocumentMetadataItemFlags::kAll,
-        [&primary_keys, &items](const auto pk, const auto item) ->bool
-        {
-            primary_keys.push_back(pk);
-            items.push_back(item);
-            return true;
-        });
+            id_item_b,
+            true,                                      // Note: we instruct "recursive=true", so we expect to have all 4 leaf nodes of 'B' : 'C', 'D', 'E' and 'F'
+            DocumentMetadataItemFlags::kAll,
+            [&primary_keys, &items](const auto pk, const auto item) -> bool
+            {
+                primary_keys.push_back(pk);
+                items.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(primary_keys.size(), 4); // so, we expect 4 items, the root node and the 3 leaf nodes
     EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2, id3, id4));
     EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
 
-    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id1; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     size_t index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -399,7 +410,8 @@ TEST(Metadata, EnumerateItems_Scenario4)
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext");
     EXPECT_EQ(items[index].primary_key, id1);
 
-    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id2; });
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id2; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -408,7 +420,8 @@ TEST(Metadata, EnumerateItems_Scenario4)
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext2");
     EXPECT_EQ(items[index].primary_key, id2);
 
-    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id3; });
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id3; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -417,7 +430,8 @@ TEST(Metadata, EnumerateItems_Scenario4)
     EXPECT_STREQ(get<string>(items[index].value).c_str(), "Testtext3");
     EXPECT_EQ(items[index].primary_key, id3);
 
-    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id4; });
+    result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id4; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -451,10 +465,14 @@ TEST(Metadata, EnumerateItemsForPath_Scenario1)
     vector<dbIndex> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItemsForPath(
-        "",
-        true,
-        DocumentMetadataItemFlags::kAll,
-        [&items](const auto pk, const auto item) { items.push_back(pk); return true; });
+            "",
+            true,
+            DocumentMetadataItemFlags::kAll,
+            [&items](const auto pk, const auto item)
+            {
+                items.push_back(pk);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(items.size(), 4); // so, we expect 4 items, the root node and the 3 leaf nodes
@@ -489,22 +507,23 @@ TEST(Metadata, EnumerateItemsForPath_Scenario2)
     vector<DocumentMetadataItem> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItemsForPath(
-        "A/B",
-        false,
-        DocumentMetadataItemFlags::kAll,
-        [&primary_keys, &items](const auto pk, const auto item) ->bool
-        {
-            primary_keys.push_back(pk);
-            items.push_back(item);
-            return true;
-        });
+            "A/B",
+            false,
+            DocumentMetadataItemFlags::kAll,
+            [&primary_keys, &items](const auto pk, const auto item) -> bool
+            {
+                primary_keys.push_back(pk);
+                items.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
     EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
     EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
 
-    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id1; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     size_t index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -553,22 +572,23 @@ TEST(Metadata, EnumerateItemsForPath_Scenario3)
     vector<DocumentMetadataItem> items;
     const auto metadata_reader = doc->GetDocumentMetadataReader();
     metadata_reader->EnumerateItemsForPath(
-        "A/B",
-        false,                                      // Note: we instruct "recursive=false", so we expect only the the two direct leaf nodes of 'B' - 'C' and 'D'
-        DocumentMetadataItemFlags::kAll,
-        [&primary_keys, &items](const auto pk, const auto item) ->bool
-        {
-            primary_keys.push_back(pk);
-            items.push_back(item);
-            return true;
-        });
+            "A/B",
+            false,                                      // Note: we instruct "recursive=false", so we expect only the the two direct leaf nodes of 'B' - 'C' and 'D'
+            DocumentMetadataItemFlags::kAll,
+            [&primary_keys, &items](const auto pk, const auto item) -> bool
+            {
+                primary_keys.push_back(pk);
+                items.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(primary_keys.size(), 2); // so, we expect 4 items, the root node and the 3 leaf nodes
     EXPECT_THAT(primary_keys, UnorderedElementsAre(id1, id2));
     EXPECT_EQ(std::unique(primary_keys.begin(), primary_keys.end()), primary_keys.end());    // check that there are no duplicates, a condition which obviously must be fulfilled
 
-    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk) { return pk == id1; });
+    auto result_item_iterator = find_if(primary_keys.begin(), primary_keys.end(), [=](const auto& pk)
+    { return pk == id1; });
     ASSERT_NE(result_item_iterator, primary_keys.end());
     size_t index = distance(primary_keys.begin(), result_item_iterator);
     EXPECT_TRUE((items[index].flags & DocumentMetadataItemFlags::kAll) == DocumentMetadataItemFlags::kAll);
@@ -767,11 +787,11 @@ TEST(Metadata, ConstructDeepMetadataHierarchyAndDeleteAllItems)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     // Act
     const auto number_of_nodes_deleted = metadata_writer->DeleteItemForPath("", true);
@@ -809,11 +829,11 @@ TEST(Metadata, CallGetItemForNonExistingItemAndExpectError)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     const auto key = metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "AAAABBBB",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "AAAABBBB",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     const auto invalid_key = key + 1;
 
@@ -831,11 +851,11 @@ TEST(Metadata, CallGetItemForPathForNonExistingItemAndExpectError)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "AAAABBBB",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "AAAABBBB",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     // Act & Assert
     EXPECT_THROW(metadata_reader->GetItemForPath("AAAABBBB/QQQ", DocumentMetadataItemFlags::kAll), invalid_path_exception);
@@ -854,14 +874,15 @@ TEST(Metadata, CallEnumerateItemsForPathForNonExistingItemAndExpectError)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "AAAABBBB",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "AAAABBBB",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     // Act & Assert
-    EXPECT_THROW(metadata_reader->EnumerateItemsForPath("Testtext2", true, DocumentMetadataItemFlags::kAll, [](auto x, auto y) {return true; }), invalid_path_exception);
+    EXPECT_THROW(metadata_reader->EnumerateItemsForPath("Testtext2", true, DocumentMetadataItemFlags::kAll, [](auto x, auto y)
+        { return true; }), invalid_path_exception);
 }
 
 TEST(Metadata, GetItemWithFullPathCheckResult_Scenario1)
@@ -875,11 +896,11 @@ TEST(Metadata, GetItemWithFullPathCheckResult_Scenario1)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     const auto pk = metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     auto item = metadata_reader->GetItem(pk, DocumentMetadataItemFlags::kAllWithCompletePath);
     EXPECT_TRUE((item.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::kCompletePath);
@@ -901,18 +922,18 @@ TEST(Metadata, GetItemWithFullPathCheckResult_Scenario2)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     const auto pk1 = metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     const auto pk2 = metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/YY/ZZ",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
+            true,
+            true,
+            "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/YY/ZZ",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext2"));
 
     auto item = metadata_reader->GetItem(pk1, DocumentMetadataItemFlags::kCompletePath);
     EXPECT_TRUE((item.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::kCompletePath);
@@ -934,11 +955,11 @@ TEST(Metadata, GetItemForNonExistingItemTestAllFlags)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     const auto key = metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "AAAABBBB",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "AAAABBBB",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     const auto invalid_key = key + 1;
 
@@ -964,19 +985,19 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario1)
     const auto metadata_writer = doc->GetDocumentMetadataWriter();
 
     metadata_writer->UpdateOrCreateItemForPath(
-        true,
-        true,
-        "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
-        DocumentMetadataType::kText,
-        IDocumentMetadataWrite::metadata_item_variant("Testtext"));
+            true,
+            true,
+            "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z",
+            DocumentMetadataType::kText,
+            IDocumentMetadataWrite::metadata_item_variant("Testtext"));
 
     vector<DocumentMetadataItem> results;
     metadata_reader->EnumerateItems(nullopt, false, DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+                                    [&results](const auto pk, const auto item)
+                                    {
+                                        results.push_back(item);
+                                        return true;
+                                    });
 
     EXPECT_EQ(results.size(), 1);
     EXPECT_EQ(results.at(0).flags & DocumentMetadataItemFlags::kCompletePath, DocumentMetadataItemFlags::kCompletePath);
@@ -984,134 +1005,134 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario1)
 
     results.clear();
     metadata_reader->EnumerateItems(nullopt, true, DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+                                    [&results](const auto pk, const auto item)
+                                    {
+                                        results.push_back(item);
+                                        return true;
+                                    });
 
     EXPECT_EQ(results.size(), 26);
     bool all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            return (i.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::kCompletePath;
-        });
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
+            {
+                return (i.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::kCompletePath;
+            });
     EXPECT_TRUE(all_true);
 
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            if (i.name == "A")
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
             {
-                return i.complete_path == "A";
-            }
-            else if (i.name == "B")
-            {
-                return i.complete_path == "A/B";
-            }
-            else if (i.name == "C")
-            {
-                return i.complete_path == "A/B/C";
-            }
-            else if (i.name == "D")
-            {
-                return i.complete_path == "A/B/C/D";
-            }
-            else if (i.name == "E")
-            {
-                return i.complete_path == "A/B/C/D/E";
-            }
-            else if (i.name == "F")
-            {
-                return i.complete_path == "A/B/C/D/E/F";
-            }
-            else if (i.name == "G")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G";
-            }
-            else if (i.name == "H")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H";
-            }
-            else if (i.name == "I")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I";
-            }
-            else if (i.name == "J")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J";
-            }
-            else if (i.name == "K")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K";
-            }
-            else if (i.name == "L")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L";
-            }
-            else if (i.name == "M")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M";
-            }
-            else if (i.name == "N")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N";
-            }
-            else if (i.name == "O")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O";
-            }
-            else if (i.name == "P")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P";
-            }
-            else if (i.name == "Q")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q";
-            }
-            else if (i.name == "R")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R";
-            }
-            else if (i.name == "S")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S";
-            }
-            else if (i.name == "T")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T";
-            }
-            else if (i.name == "U")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U";
-            }
-            else if (i.name == "V")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V";
-            }
-            else if (i.name == "W")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W";
-            }
-            else if (i.name == "X")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X";
-            }
-            else if (i.name == "Y")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y";
-            }
-            else if (i.name == "Z")
-            {
-                return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z";
-            }
+                if (i.name == "A")
+                {
+                    return i.complete_path == "A";
+                }
+                else if (i.name == "B")
+                {
+                    return i.complete_path == "A/B";
+                }
+                else if (i.name == "C")
+                {
+                    return i.complete_path == "A/B/C";
+                }
+                else if (i.name == "D")
+                {
+                    return i.complete_path == "A/B/C/D";
+                }
+                else if (i.name == "E")
+                {
+                    return i.complete_path == "A/B/C/D/E";
+                }
+                else if (i.name == "F")
+                {
+                    return i.complete_path == "A/B/C/D/E/F";
+                }
+                else if (i.name == "G")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G";
+                }
+                else if (i.name == "H")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H";
+                }
+                else if (i.name == "I")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I";
+                }
+                else if (i.name == "J")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J";
+                }
+                else if (i.name == "K")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K";
+                }
+                else if (i.name == "L")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L";
+                }
+                else if (i.name == "M")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M";
+                }
+                else if (i.name == "N")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N";
+                }
+                else if (i.name == "O")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O";
+                }
+                else if (i.name == "P")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P";
+                }
+                else if (i.name == "Q")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q";
+                }
+                else if (i.name == "R")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R";
+                }
+                else if (i.name == "S")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S";
+                }
+                else if (i.name == "T")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T";
+                }
+                else if (i.name == "U")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U";
+                }
+                else if (i.name == "V")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V";
+                }
+                else if (i.name == "W")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W";
+                }
+                else if (i.name == "X")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X";
+                }
+                else if (i.name == "Y")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y";
+                }
+                else if (i.name == "Z")
+                {
+                    return i.complete_path == "A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z";
+                }
 
-            return false;
-        });
+                return false;
+            });
     EXPECT_TRUE(all_true);
 }
 
@@ -1147,57 +1168,57 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario2)
 
     // query for all items with complete path
     metadata_reader->EnumerateItems(
-        nullopt,
-        true,
-        DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+            nullopt,
+            true,
+            DocumentMetadataItemFlags::kAllWithCompletePath,
+            [&results](const auto pk, const auto item)
+            {
+                results.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(results.size(), 6);
     bool all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
-        });
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
+            {
+                return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
+            });
     EXPECT_TRUE(all_true);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            if (i.name == "A")
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
             {
-                return i.complete_path == "A";
-            }
-            else if (i.name == "B")
-            {
-                return i.complete_path == "A/B";
-            }
-            else if (i.name == "C")
-            {
-                return i.complete_path == "A/B/C";
-            }
-            else if (i.name == "D")
-            {
-                return i.complete_path == "A/B/D";
-            }
-            else if (i.name == "E")
-            {
-                return i.complete_path == "A/B/C/E";
-            }
-            else if (i.name == "F")
-            {
-                return i.complete_path == "A/B/C/F";
-            }
+                if (i.name == "A")
+                {
+                    return i.complete_path == "A";
+                }
+                else if (i.name == "B")
+                {
+                    return i.complete_path == "A/B";
+                }
+                else if (i.name == "C")
+                {
+                    return i.complete_path == "A/B/C";
+                }
+                else if (i.name == "D")
+                {
+                    return i.complete_path == "A/B/D";
+                }
+                else if (i.name == "E")
+                {
+                    return i.complete_path == "A/B/C/E";
+                }
+                else if (i.name == "F")
+                {
+                    return i.complete_path == "A/B/C/F";
+                }
 
-            return false;
-        });
+                return false;
+            });
     EXPECT_TRUE(all_true);
 
     // Act
@@ -1205,41 +1226,41 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario2)
     // query for direct and indirect children of C
     results.clear();
     metadata_reader->EnumerateItems(
-        id_item_c,
-        true,
-        DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+            id_item_c,
+            true,
+            DocumentMetadataItemFlags::kAllWithCompletePath,
+            [&results](const auto pk, const auto item)
+            {
+                results.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(results.size(), 2);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
-        });
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
+            {
+                return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
+            });
     EXPECT_TRUE(all_true);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            if (i.name == "E")
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
             {
-                return i.complete_path == "A/B/C/E";
-            }
-            else if (i.name == "F")
-            {
-                return i.complete_path == "A/B/C/F";
-            }
+                if (i.name == "E")
+                {
+                    return i.complete_path == "A/B/C/E";
+                }
+                else if (i.name == "F")
+                {
+                    return i.complete_path == "A/B/C/F";
+                }
 
-            return false;
-        });
+                return false;
+            });
     EXPECT_TRUE(all_true);
 
     // Act
@@ -1247,41 +1268,41 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario2)
     // query for direct children of B
     results.clear();
     metadata_reader->EnumerateItems(
-        id_item_b,
-        false,
-        DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+            id_item_b,
+            false,
+            DocumentMetadataItemFlags::kAllWithCompletePath,
+            [&results](const auto pk, const auto item)
+            {
+                results.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(results.size(), 2);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
-        });
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
+            {
+                return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
+            });
     EXPECT_TRUE(all_true);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            if (i.name == "C")
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
             {
-                return i.complete_path == "A/B/C";
-            }
-            else if (i.name == "D")
-            {
-                return i.complete_path == "A/B/D";
-            }
+                if (i.name == "C")
+                {
+                    return i.complete_path == "A/B/C";
+                }
+                else if (i.name == "D")
+                {
+                    return i.complete_path == "A/B/D";
+                }
 
-            return false;
-        });
+                return false;
+            });
     EXPECT_TRUE(all_true);
 
     // Act
@@ -1289,49 +1310,49 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario2)
     // query for direct and indirect children of B
     results.clear();
     metadata_reader->EnumerateItems(
-        id_item_b,
-        true,
-        DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+            id_item_b,
+            true,
+            DocumentMetadataItemFlags::kAllWithCompletePath,
+            [&results](const auto pk, const auto item)
+            {
+                results.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(results.size(), 4);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
-        });
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
+            {
+                return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
+            });
     EXPECT_TRUE(all_true);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            if (i.name == "C")
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
             {
-                return i.complete_path == "A/B/C";
-            }
-            else if (i.name == "D")
-            {
-                return i.complete_path == "A/B/D";
-            }
-            else if (i.name == "E")
-            {
-                return i.complete_path == "A/B/C/E";
-            }
-            else if (i.name == "F")
-            {
-                return i.complete_path == "A/B/C/F";
-            }
+                if (i.name == "C")
+                {
+                    return i.complete_path == "A/B/C";
+                }
+                else if (i.name == "D")
+                {
+                    return i.complete_path == "A/B/D";
+                }
+                else if (i.name == "E")
+                {
+                    return i.complete_path == "A/B/C/E";
+                }
+                else if (i.name == "F")
+                {
+                    return i.complete_path == "A/B/C/F";
+                }
 
-            return false;
-        });
+                return false;
+            });
     EXPECT_TRUE(all_true);
 
     // Act
@@ -1339,52 +1360,135 @@ TEST(Metadata, EnumerateItemsFullPathCheckResult_Scenario2)
     // query for direct and indirect children of A
     results.clear();
     metadata_reader->EnumerateItems(
-        id_item_a,
-        true,
-        DocumentMetadataItemFlags::kAllWithCompletePath,
-        [&results](const auto pk, const auto item)
-        {
-            results.push_back(item);
-            return true;
-        });
+            id_item_a,
+            true,
+            DocumentMetadataItemFlags::kAllWithCompletePath,
+            [&results](const auto pk, const auto item)
+            {
+                results.push_back(item);
+                return true;
+            });
 
     // Assert
     EXPECT_EQ(results.size(), 5);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
-        });
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
+            {
+                return (i.flags & (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid)) == (DocumentMetadataItemFlags::kCompletePath | DocumentMetadataItemFlags::kNameValid);
+            });
     EXPECT_TRUE(all_true);
     all_true = all_of(
-        results.begin(),
-        results.end(),
-        [](const DocumentMetadataItem& i)
-        {
-            if (i.name == "B")
+            results.begin(),
+            results.end(),
+            [](const DocumentMetadataItem& i)
             {
-                return i.complete_path == "A/B";
-            }
-            else if (i.name == "C")
-            {
-                return i.complete_path == "A/B/C";
-            }
-            else if (i.name == "D")
-            {
-                return i.complete_path == "A/B/D";
-            }
-            else if (i.name == "E")
-            {
-                return i.complete_path == "A/B/C/E";
-            }
-            else if (i.name == "F")
-            {
-                return i.complete_path == "A/B/C/F";
-            }
+                if (i.name == "B")
+                {
+                    return i.complete_path == "A/B";
+                }
+                else if (i.name == "C")
+                {
+                    return i.complete_path == "A/B/C";
+                }
+                else if (i.name == "D")
+                {
+                    return i.complete_path == "A/B/D";
+                }
+                else if (i.name == "E")
+                {
+                    return i.complete_path == "A/B/C/E";
+                }
+                else if (i.name == "F")
+                {
+                    return i.complete_path == "A/B/C/F";
+                }
 
-            return false;
-        });
+                return false;
+            });
     EXPECT_TRUE(all_true);
 }
+
+struct WithDifferentDocumentMetadataItemFlagsFixture : public testing::TestWithParam<DocumentMetadataItemFlags>
+{
+};
+
+TEST_P(WithDifferentDocumentMetadataItemFlagsFixture, GetItemCheckFlagsOnResultInVariousCases)
+{
+    DocumentMetadataItemFlags flags_to_query = GetParam();
+
+    // Arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+
+    // we construct the following tree:
+    //
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+    //              / \
+    //             E   F
+
+    const auto id_item_a = metadata_writer->UpdateOrCreateItem(nullopt, true, "A", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_b = metadata_writer->UpdateOrCreateItem(id_item_a, true, "B", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_c = metadata_writer->UpdateOrCreateItem(id_item_b, true, "C", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_d = metadata_writer->UpdateOrCreateItem(id_item_b, true, "D", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_e = metadata_writer->UpdateOrCreateItem(id_item_c, true, "E", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_f = metadata_writer->UpdateOrCreateItem(id_item_c, true, "F", DocumentMetadataType::kNull, std::monostate());
+
+    // find an invalid primary key
+    const array<dbIndex, 6> valid_primary_keys = { id_item_a, id_item_b, id_item_c, id_item_d, id_item_e, id_item_f };
+    dbIndex invalid_primary_key = 0;
+    for (;; ++invalid_primary_key)
+    {
+        if (find(valid_primary_keys.begin(), valid_primary_keys.end(), invalid_primary_key) == valid_primary_keys.end())
+        {
+            // we found an invalid primary key
+            break;
+        }
+    }
+
+    // Act & Assert
+    EXPECT_THROW(metadata_reader->GetItem(invalid_primary_key, flags_to_query), non_existing_item_exception);
+
+    auto metadata_item = metadata_reader->GetItem(id_item_a, flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & flags_to_query) == flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kPrimaryKeyValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.primary_key == id_item_a);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kNameValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.name == "A");
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kDocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.type == DocumentMetadataType::kNull);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::None ||
+                metadata_item.complete_path == "A");
+
+    metadata_item = metadata_reader->GetItem(id_item_f, flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & flags_to_query) == flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kPrimaryKeyValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.primary_key == id_item_f);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kNameValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.name == "F");
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kDocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.type == DocumentMetadataType::kNull);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::None ||
+                metadata_item.complete_path == "A/B/C/F");
+}
+
+INSTANTIATE_TEST_SUITE_P(
+        Metadata,
+        WithDifferentDocumentMetadataItemFlagsFixture,
+        testing::Values(
+    DocumentMetadataItemFlags::None,
+    DocumentMetadataItemFlags::kPrimaryKeyValid,
+    DocumentMetadataItemFlags::kNameValid,
+    DocumentMetadataItemFlags::kDocumentMetadataTypeAndValueValid,
+    DocumentMetadataItemFlags::kCompletePath,
+    DocumentMetadataItemFlags::kAll,
+    DocumentMetadataItemFlags::kAllWithCompletePath));
