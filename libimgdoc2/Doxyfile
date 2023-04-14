@@ -915,6 +915,7 @@ INPUT                  = ./inc                              \
                          ./doc/document_concepts.md         \
                          ./doc/database_structure.md        \
                          ./doc/encoding_of_pixeldata.md     \
+                         ./doc/metadata_technical.md        \
                          ./doc/glossary.md                  \
                          ./doc/coding_style.md
 

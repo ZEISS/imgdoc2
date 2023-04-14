@@ -1,4 +1,4 @@
-# Metatadata: technical implementation           {#pixel_data_encoding}
+# Metatadata: technical implementation           {#metadata_technical_implementation}
 
 ## data base table layout
 
