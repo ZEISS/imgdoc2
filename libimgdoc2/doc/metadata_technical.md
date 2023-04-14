@@ -106,5 +106,43 @@ parent node for the enumeration). An empty string is used to specify the root no
 
 Write access is provided by the `IDocumentMetadataWrite` interface.
 
+```cpp
+class IDocumentMetadataWrite
+{
+     virtual imgdoc2::dbIndex UpdateOrCreateItem(
+            std::optional<imgdoc2::dbIndex> parent,
+            bool create_node_if_not_exists,
+            const std::string& name,
+            DocumentMetadataType type,
+            const IDocumentMetadata::metadata_item_variant& value) = 0;
+    virtual imgdoc2::dbIndex UpdateOrCreateItemForPath(
+            bool create_path_if_not_exists,
+            bool create_node_if_not_exists,
+            const std::string& path,
+            DocumentMetadataType type,
+            const IDocumentMetadata::metadata_item_variant& value) = 0;
+    virtual std::uint64_t DeleteItem(
+            std::optional<imgdoc2::dbIndex> primary_key,
+            bool recursively) = 0;  
+    virtual std::uint64_t DeleteItemForPath(
+            const std::string& path,
+            bool recursively) = 0;
+};
+```
 
-        
+`UpdateOrCreateItem` allows to update or create a single item. The argument `parent` specifies the parent node. If 
+`parent` is `std::nullopt`, then the root node is used. The node to be inserted or updated is specified by the argument
+'name' - it is the name of a node which is a direct child of the node specified by `parent`.
+The argument `create_node_if_not_exists` controls whether the node should be created if it does not exist. If the node does not exist, and
+`create_node_if_not_exists` is `false`, then an exception is thrown. If the node does not exist, and `create_node_if_not_exists` is `true`, 
+then the node is created.
+
+`UpdateOrCreateItemForPath` is similar to `UpdateOrCreateItem`, but it takes a path as argument instead of a primary key. 
+It has an additional argument `create_path_if_not_exists` which controls whether the path (or parts of the path) should be created if they do not exist.
+In this case nodes with a type  `DocumentMetadataType::kNull` are created.
+
+`DeleteItem` is used to delete one or more items. If the boolean argument `recursively` is `false`, then only the item specified by `primary_key` is deleted,
+and it is only deleted if it has no children (otherwise an exception is thrown). If the boolean argument `recursively` is `true`, then the item specified by `primary_key`
+are deleted and all children (direct and indirect) are deleted as well.
+
+`DeleteItemForPath` is similar to `DeleteItem`, but it takes a path as argument instead of a primary key.
