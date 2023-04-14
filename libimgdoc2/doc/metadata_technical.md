@@ -37,10 +37,10 @@ The name of the node is stored in the `Name` column. The `AncestorId` column is 
 The top-level nodes have `AncestorId` set to `NULL` (and can be thought of "child nodes of root", where this 
 conceptual "root node" does not exist in the table).
 
-As an example, consider the following tree:
+As an example, consider the following tree:  
 ![architecture_overview](images/metadata_example.png "example tree")
 
-This would be stored in the following table:
+This would be stored in the following table:  
 ![architecture_overview](images/metadata_example_table.png "example table")
 
 Main motivation for this design is to allow for a hierarchical structure, which allows for a natural way to structure the metadata. 
