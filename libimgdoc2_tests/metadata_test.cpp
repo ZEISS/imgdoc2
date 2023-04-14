@@ -1481,6 +1481,63 @@ TEST_P(WithDifferentDocumentMetadataItemFlagsFixture, GetItemCheckFlagsOnResultI
                 metadata_item.complete_path == "A/B/C/F");
 }
 
+TEST_P(WithDifferentDocumentMetadataItemFlagsFixture, GetItemCheckForPathFlagsOnResultInVariousCases)
+{
+    DocumentMetadataItemFlags flags_to_query = GetParam();
+
+    // Arrange
+    const auto create_options = ClassFactory::CreateCreateOptionsUp();
+    create_options->SetFilename(":memory:");
+    create_options->AddDimension('M');
+    const auto doc = ClassFactory::CreateNew(create_options.get());
+    const auto metadata_writer = doc->GetDocumentMetadataWriter();
+    const auto metadata_reader = doc->GetDocumentMetadataReader();
+
+    // we construct the following tree:
+    //
+    //                 A
+    //                 |
+    //                 B
+    //                / \
+    //               C   D
+    //              / \
+    //             E   F
+
+    const auto id_item_a = metadata_writer->UpdateOrCreateItem(nullopt, true, "A", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_b = metadata_writer->UpdateOrCreateItem(id_item_a, true, "B", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_c = metadata_writer->UpdateOrCreateItem(id_item_b, true, "C", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_d = metadata_writer->UpdateOrCreateItem(id_item_b, true, "D", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_e = metadata_writer->UpdateOrCreateItem(id_item_c, true, "E", DocumentMetadataType::kNull, std::monostate());
+    const auto id_item_f = metadata_writer->UpdateOrCreateItem(id_item_c, true, "F", DocumentMetadataType::kNull, std::monostate());
+
+    // Act & Assert
+    EXPECT_THROW(metadata_reader->GetItemForPath("A/C/D", flags_to_query), invalid_path_exception);
+    EXPECT_THROW(metadata_reader->GetItemForPath("", flags_to_query), invalid_path_exception);
+
+    auto metadata_item = metadata_reader->GetItemForPath("A", flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & flags_to_query) == flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kPrimaryKeyValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.primary_key == id_item_a);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kNameValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.name == "A");
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kDocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.type == DocumentMetadataType::kNull);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::None ||
+                metadata_item.complete_path == "A");
+
+    metadata_item = metadata_reader->GetItemForPath("A/B/C/F", flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & flags_to_query) == flags_to_query);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kPrimaryKeyValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.primary_key == id_item_f);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kNameValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.name == "F");
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kDocumentMetadataTypeAndValueValid) == DocumentMetadataItemFlags::None ||
+                metadata_item.type == DocumentMetadataType::kNull);
+    ASSERT_TRUE((metadata_item.flags & DocumentMetadataItemFlags::kCompletePath) == DocumentMetadataItemFlags::None ||
+                metadata_item.complete_path == "A/B/C/F");
+}
+
+
 INSTANTIATE_TEST_SUITE_P(
         Metadata,
         WithDifferentDocumentMetadataItemFlagsFixture,
