@@ -38,7 +38,7 @@ bool mapsEqual(const std::map<Tkey, Tvalue>& map1, const std::map<Tkey, Tvalue>&
     return true;
 }
 
-/// A utility function to generate a unique filename (for SQLite) for a shared in memory database.
+/// A utility function to generate a unique filename (for SQLite) for a shared in-memory database.
 /// The name should be unique for each test case, so that the database is not shared between test cases.
 /// The idea is to use the filename (per macro __FILE__) and the line number (per macro __LINE__) of 
 /// the test case in order to generate a unique name.

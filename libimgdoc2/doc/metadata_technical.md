@@ -18,7 +18,7 @@ We have the following columns:
 | TypeDiscriminator | INTEGER       | Specifies the type of the node. Currently defined values are given below.                                              |
 | ValueDouble       | REAL          | If indicated by discriminator, data of type 'double' is found here.                                                    |
 | ValueInteger      | INTEGER       | If indicated by discriminator, data of type 'integer' is found here.                                                   |
-| ValueString       | TEXT          | If indicated by discriminator, data of type 'text' is found here.                                                      |                                                                                                                       |
+| ValueString       | TEXT          | If indicated by discriminator, data of type 'text' is found here.                                                      |
 
 
 Currently defined discriminator values are:
