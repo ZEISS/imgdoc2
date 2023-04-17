@@ -2,7 +2,7 @@
 
 The design and implementation of imgdoc2 is based on the following principles:
 -   **Modularity and Extensibility:** imgdoc2 is designed to be modular and extensible, allowing for easy integration of new features and new data formats.
--   **Flexibility:** imgdoc2 is designed to be flexible and adaptable to the needs of the user, allowing for customization of the functionalilty, capabilities and the data model.
+-   **Flexibility:** imgdoc2 is designed to be flexible and adaptable to the needs of the user, allowing for customization of the functionality, capabilities and the data model.
 -   **Data Agnostic:** imgdoc2 is designed to be data-agnostic, meaning that it is not limited to any specific type of microscopy data, and it is not tied to any specific file format.
 -   **Standardization:** imgdoc2 is designed to facilitate standardization of the terminology and organization of microscopy image data, allowing for clear communication and understanding of image data.
 -   **Interoperability:** imgdoc2 is designed to be interoperable with other software packages, allowing for easy integration with existing software tools and workflows.
