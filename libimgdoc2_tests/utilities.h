@@ -10,7 +10,7 @@
 #define STRINGIFY(s) STRINGIFY_INTERNAL(s)
 #define STRINGIFY_INTERNAL(s) #s
 
-/// Simply utility for compare two maps for equality.
+/// Simple utility for comparing two maps for equality.
 ///
 /// \tparam Tkey   Type of the map's key.
 /// \tparam Tvalue Type of the map's value.
