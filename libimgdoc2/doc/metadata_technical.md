@@ -6,6 +6,7 @@ The implementation is providing a hierarchical key-value store. The mapping of h
 to table is by following the "Adjacency List" pattern (c.f. [here](https://www.databasestar.com/hierarchical-data-sql/)).
 
 The table layout is as follows:
+
 ![architecture_overview](images/metadata_table_diagram.png "metadata table layout")
 
 We have the following columns:
