@@ -6,12 +6,6 @@
 
 namespace imgdoc2
 {
-    //constexpr int LogLevel_ERROR = 1;
-    //constexpr int LogLevel_WARN = 2;
-    //constexpr int LogLevel_INFO = 3;
-    //constexpr int LogLevel_TRACE = 4;
-    //constexpr int LogLevel_DEBUG = 15;
-
     /// In this class functionality "to be provided by a hosting environment" ist gathered.
     /// The prime example is "debug logging", which is a cross cutting concern and it is allowed
     /// to route debug print to the hosting environment.
