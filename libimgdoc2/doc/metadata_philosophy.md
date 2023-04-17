@@ -56,3 +56,27 @@ This level means that the images are organized as a set of images that are taken
 The microscope is defined e.g. by its modality (e.g. fluorescence), its settings (e.g. wavelength, exposure time), 
 its techniques (e.g. deconvolution, stitching), its experimental conditions (e.g. temperature, pH), and its 
 post-processing (e.g. contrast enhancement, segmentation).
+
+## How do Image2d & Image3d fit into this picture?
+
+The two document-types "Image2d" and "Image3d" implemented in libimgdoc2 now fall evidently into "ordered set of images".
+
+Image2d and Image3d assign meaning and semantic to the following attributes:
+
+* tile/brick position
+* pyramid level
+
+## discovery
+
+Users of libimgdoc2 are, general speaking, expected to **actively** discover a document. Disovering here means to check whether the requirements and
+expectations a client has are fulfilled.  
+Examples of requirements/expectation that may need to be checked are:
+* Are tiles with same M-index at the same x-y-position and have same extent?
+* Is there the same number of tiles on all planes?
+* Is a pyramid present? Is the pyramid complete?
+* Is sufficient metadata available?
+
+The expectation is that questions like this can be answered "fast", however it is up to the client to formulate and codify its requirements, and to
+check them in a discovery phase actively.
+
+

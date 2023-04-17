@@ -917,6 +917,7 @@ INPUT                  = ./inc                              \
                          ./doc/encoding_of_pixeldata.md     \
                          ./doc/metadata_technical.md        \
                          ./doc/glossary.md                  \
+                         ./doc/metadata_philosophy.md       \
                          ./doc/coding_style.md
 
 
