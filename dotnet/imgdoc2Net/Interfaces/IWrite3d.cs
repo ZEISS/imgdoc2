@@ -9,7 +9,7 @@ namespace ImgDoc2Net.Interfaces
     /// <summary>   
     /// This interface is used to give write-access to the document-3D. 
     /// </summary>
-    public interface IWrite3d : IDisposable
+    public interface IWrite3d : ITransaction, IDisposable
     {
         /// <summary>   
         /// Adds a brick with the specified content. 

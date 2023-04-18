@@ -16,6 +16,7 @@ using namespace std;
 /*static*/const char* const DbConstants::kTilesDataTable_DefaultName = "TILESDATA";
 /*static*/const char* const DbConstants::kTilesSpatialIndexTable_DefaultName = "TILESSPATIALINDEX";
 /*static*/const char* const DbConstants::kBlobTable_DefaultName = "BLOBS";
+/*static*/const char* const DbConstants::kMetadataTable_DefaultName = "METADATA";
 
 /*static*/const char* const DbConstants::kTilesDataTable_Column_Pk_DefaultName = "Pk";
 /*static*/const char* const DbConstants::kTilesDataTable_Column_PixelWidth_DefaultName = "PixelWidth";
@@ -49,7 +50,13 @@ using namespace std;
 /*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_minZ_DefaultName = "minZ";
 /*static*/const char* const DbConstants::kSqliteSpatialIndexTable_Column_maxZ_DefaultName = "maxZ";
 
-
+/*static*/const char* const DbConstants::kMetadataTable_Column_Pk_DefaultName = "Pk";
+/*static*/const char* const DbConstants::kMetadataTable_Column_Name_DefaultName = "Name";
+/*static*/const char* const DbConstants::kMetadataTable_Column_AncestorId_DefaultName = "AncestorId";
+/*static*/const char* const DbConstants::kMetadataTable_Column_TypeDiscriminator_DefaultName = "TypeDiscriminator";
+/*static*/const char* const DbConstants::kMetadataTable_Column_ValueDouble_DefaultName = "ValueDouble";
+/*static*/const char* const DbConstants::kMetadataTable_Column_ValueInteger_DefaultName = "ValueInteger";
+/*static*/const char* const DbConstants::kMetadataTable_Column_ValueString_DefaultName = "ValueString";
 
 /*static*/const char* const DbConstants::kDimensionColumnPrefix_Default = "Dim_";
 /*static*/const char* const DbConstants::kIndexForDimensionColumnPrefix_Default = "IndexForDim_";
@@ -58,18 +65,20 @@ using namespace std;
 {
     switch (item)
     {
-    case GeneralTableItems::kVersion:
-        return "Version";
-    case GeneralTableItems::kTilesDataTable:
-        return "TilesDataTable";
-    case GeneralTableItems::kTilesInfoTable:
-        return "TilesInfoTable";
-    case GeneralTableItems::kDocType:
-        return "DocType";
-    case GeneralTableItems::kBlobTable:
-        return "BlobTable";
-    case GeneralTableItems::kSpatialIndexTable:
-        return "SpatialIndexTable";
+        case GeneralTableItems::kVersion:
+            return "Version";
+        case GeneralTableItems::kTilesDataTable:
+            return "TilesDataTable";
+        case GeneralTableItems::kTilesInfoTable:
+            return "TilesInfoTable";
+        case GeneralTableItems::kDocType:
+            return "DocType";
+        case GeneralTableItems::kBlobTable:
+            return "BlobTable";
+        case GeneralTableItems::kSpatialIndexTable:
+            return "SpatialIndexTable";
+        case GeneralTableItems::kMetadataTable:
+            return "MetadataTable";
     }
 
     throw std::invalid_argument("invalid argument for 'item' specified.");

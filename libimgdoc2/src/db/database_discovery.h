@@ -26,6 +26,7 @@ private:
         std::string tileinfotable_name;
         std::string blobtable_name;
         std::string spatial_index_table_name;
+        std::string metadatatable_name;
 
         imgdoc2::DocumentType document_type { imgdoc2::DocumentType::kInvalid };
         std::vector<imgdoc2::Dimension> dimensions;

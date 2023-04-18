@@ -81,9 +81,9 @@ void GetStatistics(ImgDoc2StatisticsInterop* statistics_interop)
 
 HandleEnvironmentObject CreateEnvironmentObject(
     std::intptr_t user_parameter,
-    void (LIBIMGDOC2_STDCALL*pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
-    bool (LIBIMGDOC2_STDCALL*pfn_is_level_active)(std::intptr_t userparam, int level),
-    void (LIBIMGDOC2_STDCALL*pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage))
+    void (LIBIMGDOC2_STDCALL* pfn_log)(std::intptr_t userparam, int level, const char* szMessage),
+    bool (LIBIMGDOC2_STDCALL* pfn_is_level_active)(std::intptr_t userparam, int level),
+    void (LIBIMGDOC2_STDCALL* pfn_report_fatal_error_and_exit)(std::intptr_t userparam, const char* szMessage))
 {
     const auto environment = ClassFactory::CreateHostingEnvironmentForFunctionPointers(
         user_parameter,
@@ -1366,4 +1366,66 @@ ImgDoc2ErrorCode IDocInfo3d_GetTileCountPerLayer(
 {
     const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileCountPerLayer(reader3d.get(), tile_count_per_layer_interop, error_information);
+}
+
+static ImgDoc2ErrorCode IDocWriter2d_TransactionCommon(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information, void(IDatabaseTransaction::* mfp)())
+{
+    const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    try
+    {
+        (writer2d.get()->*mfp)();
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocWrite2d_BeginTransaction(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information)
+{
+    return IDocWriter2d_TransactionCommon(handle, error_information, &IDatabaseTransaction::BeginTransaction);
+}
+
+ImgDoc2ErrorCode IDocWrite2d_CommitTransaction(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information)
+{
+    return IDocWriter2d_TransactionCommon(handle, error_information, &IDatabaseTransaction::CommitTransaction);
+}
+
+ImgDoc2ErrorCode IDocWrite2d_RollbackTransaction(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information)
+{
+    return IDocWriter2d_TransactionCommon(handle, error_information, &IDatabaseTransaction::RollbackTransaction);
+}
+
+static ImgDoc2ErrorCode IDocWriter3d_TransactionCommon(HandleDocWrite3D handle, ImgDoc2ErrorInformation* error_information, void(IDatabaseTransaction::* mfp)())
+{
+    const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    try
+    {
+        (writer3d.get()->*mfp)();
+    }
+    catch (exception& exception)
+    {
+        FillOutErrorInformation(exception, error_information);
+        return MapExceptionToReturnValue(exception);
+    }
+
+    return ImgDoc2_ErrorCode_OK;
+}
+
+ImgDoc2ErrorCode IDocWrite3d_BeginTransaction(HandleDocWrite3D handle, ImgDoc2ErrorInformation* error_information)
+{
+    return IDocWriter3d_TransactionCommon(handle, error_information, &IDatabaseTransaction::BeginTransaction);
+}
+
+ImgDoc2ErrorCode IDocWrite3d_CommitTransaction(HandleDocWrite3D handle, ImgDoc2ErrorInformation* error_information)
+{
+    return IDocWriter3d_TransactionCommon(handle, error_information, &IDatabaseTransaction::CommitTransaction);
+}
+
+ImgDoc2ErrorCode IDocWrite3d_RollbackTransaction(HandleDocWrite3D handle, ImgDoc2ErrorInformation* error_information)
+{
+    return IDocWriter3d_TransactionCommon(handle, error_information, &IDatabaseTransaction::RollbackTransaction);
 }

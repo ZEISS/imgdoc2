@@ -35,6 +35,8 @@ option(IMGDOC2_CODECOV_GCOVRHTML "Build with Code-Coverage (for unit-tests) as a
 
 option(IMGDOC2_BUILD_CONVCZI "Whether to build the convczi-tool" ON)
 
+option(IMGDOC2_BUILD_NATIVEIMGDOC2CMD "Whether to build the native imgdoc2cmd-tool (currently contains throw-away experiments)" ON)
+
 
 if (IMGDOC2_BUILD_CLANGTIDY)
   # How "clang-tidy" organization works (if this option is enable here):
@@ -65,7 +67,10 @@ add_subdirectory(external/sqlite3)
 
 add_subdirectory(libimgdoc2)
 add_subdirectory(imgdoc2API)
-add_subdirectory(imgdoc2cmd)
+
+if (IMGDOC2_BUILD_NATIVEIMGDOC2CMD)
+  add_subdirectory(imgdoc2cmd)
+endif()
 
 if (IMGDOC2_BUILD_CONVCZI)
   include("${CMAKE_SOURCE_DIR}/cmake/libCZI.cmake")
@@ -74,6 +79,10 @@ if (IMGDOC2_BUILD_CONVCZI)
   add_subdirectory(convczi)
 endif()
 
+include (CTest)
+set(MEMORYCHECK_COMMAND valgrind)
+#set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --track-origins=yes")
+set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=yes")
 enable_testing()
 add_subdirectory(libimgdoc2_tests)
 

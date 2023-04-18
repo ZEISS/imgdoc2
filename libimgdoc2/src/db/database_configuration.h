@@ -30,14 +30,23 @@ public:
         TilesData,
         TilesInfo,
         TilesSpatialIndex,
+        Metadata,
         Blobs
     };
 
-    static constexpr int kGeneralInfoTable_Column_Key = 1;  ///< Identifier for the "key column" in the "general" table
-    static constexpr int kGeneralInfoTable_Column_ValueString = 2;  ///< Identifier for the "value(string) column" in the "general" table
+    static constexpr int kGeneralInfoTable_Column_Key = 1;          ///< Identifier for the "key column" in the "general" table.
+    static constexpr int kGeneralInfoTable_Column_ValueString = 2;  ///< Identifier for the "value(string) column" in the "general" table.
 
-    static constexpr int kBlobTable_Column_Pk = 1;
-    static constexpr int kBlobTable_Column_Data = 2;
+    static constexpr int kBlobTable_Column_Pk = 1;                  ///< Identifier for the "primary key column" in the "blobs" table.
+    static constexpr int kBlobTable_Column_Data = 2;                ///< Identifier for the "data column" in the "blobs" table.
+
+    static constexpr int kMetadataTable_Column_Pk = 1;                ///< Identifier for the "primary key" column in the "metadata" table.
+    static constexpr int kMetadataTable_Column_Name = 2;              ///< Identifier for the "name" column in the "metadata" table.
+    static constexpr int kMetadataTable_Column_AncestorId = 3;        ///< Identifier for the "ancestor-id" column in the "metadata" table.
+    static constexpr int kMetadataTable_Column_TypeDiscriminator = 4; ///< Identifier for the "type discriminator" column in the "metadata" table.
+    static constexpr int kMetadataTable_Column_ValueDouble = 5;       ///< Identifier for the "value(double) column" in the "metadata" table.
+    static constexpr int kMetadataTable_Column_ValueInteger = 6;      ///< Identifier for the "value(integer) column" in the "metadata" table.
+    static constexpr int kMetadataTable_Column_ValueString = 7;       ///< Identifier for the "value(string) column" in the "metadata" table.
 private:
     std::unordered_set<imgdoc2::Dimension> dimensions_;
     std::unordered_set<imgdoc2::Dimension> indexed_dimensions_;
@@ -45,6 +54,7 @@ private:
     std::string dimension_column_prefix_;
     std::string index_for_dimension_prefix_;
     std::map<int, std::string> map_blobtable_columnids_to_columnname_;
+    std::map<int, std::string> map_metadatatable_columnids_to_columnname_;
 public:
     template<typename ForwardIterator>
     void SetTileDimensions(ForwardIterator begin, ForwardIterator end)
@@ -85,10 +95,12 @@ public:
 
     virtual bool TryGetTableName(TableTypeCommon table_type, std::string* name) const;
 
-    bool TryGetColumnNameOfGeneralInfoTable(int columnIdentifier, std::string* column_name) const;
-
     void SetColumnNameForBlobTable(int column_identifier, const char* column_name);
+    void SetColumnNameForMetadataTable(int column_identifier, const char* column_name);
+
+    bool TryGetColumnNameOfGeneralInfoTable(int columnIdentifier, std::string* column_name) const;
     bool TryGetColumnNameOfBlobTable(int column_identifier, std::string* column_name) const;
+    bool TryGetColumnNameOfMetadataTable(int column_identifier, std::string* column_name) const;
 
     /// Gets document type constant - which document-type is represented by this configuration.
     ///
@@ -101,19 +113,24 @@ public:
     std::string GetTableNameForTilesDataOrThrow() const;
     std::string GetTableNameForTilesInfoOrThrow() const;
     std::string GetTableNameForGeneralTableOrThrow() const;
-    std::string GetColumnNameOfGeneralInfoTableOrThrow(int column_identifier) const;
-    std::string GetColumnNameOfBlobTableOrThrow(int column_identifier) const;
     std::string GetTableNameForTilesSpatialIndexTableOrThrow() const;
     std::string GetTableNameForBlobTableOrThrow() const;
+    std::string GetTableNameForMetadataTableOrThrow() const;
+
+    std::string GetColumnNameOfGeneralInfoTableOrThrow(int column_identifier) const;
+    std::string GetColumnNameOfBlobTableOrThrow(int column_identifier) const;
+    std::string GetColumnNameOfMetadataTableOrThrow(int column_identifier) const;
+
+    void SetDefaultColumnNamesForMetadataTable();
 
     bool GetIsUsingSpatialIndex() const;
     bool GetHasBlobsTable() const;
+    bool GetHasMetadataTable() const;
 
 protected:
     static void SetColumnName(std::map<int, std::string>& map, int columnIdentifier, const char* column_name);
     static bool GetColumnName(const std::map<int, std::string>& map, int columnIdentifier, std::string* column_name);
 };
-
 
 /// This class is intended to capture the "state of the database configuration" for 2D-documents.
 class DatabaseConfiguration2D : public DatabaseConfigurationCommon

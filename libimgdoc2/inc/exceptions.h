@@ -131,6 +131,60 @@ namespace imgdoc2
         [[nodiscard]] imgdoc2::dbIndex GetIndex() const { return this->index_; }
     };
 
+    /// Exception for signalling that an invalid path was specified.
+    class invalid_path_exception : public imgdoc2_exception
+    {
+    public:
+        invalid_path_exception() = delete;
+
+        /// Constructor which specifies the primary key of the non existing tile.
+        /// \param  error_message Message describing the error.
+        explicit invalid_path_exception(const std::string& error_message)
+            : imgdoc2_exception(error_message.c_str())
+        {}
+
+        /// Constructor which specifies the primary key of the non existing tile.
+        /// \param  error_message Message describing the error.
+        explicit invalid_path_exception(const char* error_message)
+            : imgdoc2_exception(error_message)
+        {}
+    };
+
+    /// Exception for signalling that an attempt was made to access an non existing metadata item.
+    class non_existing_item_exception : public imgdoc2_exception
+    {
+    private:
+        bool index_valid_{ false };
+        imgdoc2::dbIndex index_{ 0 };
+    public:
+        non_existing_item_exception() = delete;
+
+        /// Constructor which specifies the primary key of the non existing tile.
+        /// \param  error_message Message describing the error.
+        /// \param  index         The primary key of the non existing tile.
+        explicit non_existing_item_exception(const std::string& error_message, imgdoc2::dbIndex index)
+            : non_existing_item_exception(error_message.c_str(), index)
+        {}
+
+        /// Constructor which specifies the primary key of the non existing tile.
+        /// \param  error_message Message describing the error.
+        /// \param  index         The primary key of the non existing tile.
+        explicit non_existing_item_exception(const char* error_message, imgdoc2::dbIndex index)
+            : imgdoc2_exception(error_message),
+            index_valid_(true),
+            index_(index)
+        {}
+
+        /// Gets a boolean indicating whether the primary key of the faulty item access is valid.
+        /// \returns True if the primary key is valid; false otherwise.
+        [[nodiscard]] bool IsIndexValid() const { return this->index_valid_; }
+
+        /// Gets the primary key of the non existing item which was attempted to be accessed. Check non_existing_item_exception::IsIndexValid() whether
+        /// this property is valid.
+        /// \returns The index of the non existing item which was attempted to be accessed.
+        [[nodiscard]] imgdoc2::dbIndex GetIndex() const { return this->index_; }
+    };
+
     /// Exception for signalling an unexpected internal error condition.
     class internal_error_exception : public imgdoc2_exception
     {

@@ -63,9 +63,9 @@ using namespace imgdoc2;
            this->GetDocument()->GetDataBaseConfiguration2d()->GetColumnNameOfTilesInfoTableOrThrow(DatabaseConfiguration2D::kTilesInfoTable_Column_PyramidLevel));
 }
 
-/*virtual*/void DocumentRead2d::ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coord, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info)
+/*virtual*/void DocumentRead2d::ReadTileInfo(imgdoc2::dbIndex idx, imgdoc2::ITileCoordinateMutate* coordinate, imgdoc2::LogicalPositionInfo* info, imgdoc2::TileBlobInfo* tile_blob_info)
 {
-    const auto query_statement = this->GetReadTileInfo_Statement(coord != nullptr, info != nullptr, tile_blob_info != nullptr);
+    const auto query_statement = this->GetReadTileInfo_Statement(coordinate != nullptr, info != nullptr, tile_blob_info != nullptr);
     query_statement->BindInt64(1, idx);
 
     // we are expecting exactly one result, or zero in case of "not found"
@@ -78,12 +78,12 @@ using namespace imgdoc2;
     }
 
     int result_index = 0;
-    if (coord != nullptr)
+    if (coordinate != nullptr)
     {
-        coord->Clear();
+        coordinate->Clear();
         for (const auto dimension : this->GetDocument()->GetDataBaseConfiguration2d()->GetTileDimensions())
         {
-            coord->Set(dimension, query_statement->GetResultInt32(result_index++));
+            coordinate->Set(dimension, query_statement->GetResultInt32(result_index++));
         }
     }
 

@@ -516,7 +516,7 @@ TEST_P(VariousNumberOfTilesFixture, GetTilePerLayerCountForSimpleDocumentAndChec
     EXPECT_EQ(number_of_tiles, num_tiles + num_tiles / 2 + num_tiles / 4);
 
     // we expect the number of tiles per layer to be correct
-    map<int, std::uint64_t> expected_tile_count_per_layer = { { 0, num_tiles }, { 1, num_tiles / 2 }, { 2, num_tiles / 4 } };
+    const map<int, std::uint64_t> expected_tile_count_per_layer = { { 0, num_tiles }, { 1, num_tiles / 2 }, { 2, num_tiles / 4 } };
     ASSERT_TRUE(mapsEqual(tile_count_per_layer, expected_tile_count_per_layer));
 }
 
@@ -556,7 +556,7 @@ TEST(DocInfo2d, GetTilePerLayerCountForEmptyDocumentAndCheckResult)
     const auto reader = doc->GetReader2d();
 
     // act
-    auto tile_count_per_layer = reader->GetTileCountPerLayer();
+    const auto tile_count_per_layer = reader->GetTileCountPerLayer();
 
     // assert
     EXPECT_TRUE(tile_count_per_layer.empty());

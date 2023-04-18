@@ -183,6 +183,13 @@ namespace ImgDoc2Net.Interop
                 this.idocinfo3dGetTileCountPerLayer =
                     this.GetProcAddressThrowIfNotFound<IDocInfo_GetTileCountPerLayerDelegate>("IDocInfo3d_GetTileCountPerLayer");
 
+                this.idocwrite2dBeginTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite2d_BeginTransaction");
+                this.idocwrite2dCommitTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite2d_CommitTransaction");
+                this.idocwrite2dRollbackTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite2d_RollbackTransaction");
+                this.idocwrite3dBeginTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite3d_BeginTransaction");
+                this.idocwrite3dCommitTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite3d_CommitTransaction");
+                this.idocwrite3dRollbackTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite3d_RollbackTransaction");
+
                 this.funcPtrBlobOutputSetSizeForwarder =
                     Marshal.GetFunctionPointerForDelegate<BlobOutputSetSizeDelegate>(ImgDoc2ApiInterop.BlobOutputSetSizeDelegateObj);
                 this.funcPtrBlobOutputSetDataForwarder =
@@ -737,6 +744,21 @@ namespace ImgDoc2Net.Interop
             this.destroyWriter3d(handleWriter);
         }
 
+        public void Writer2dBeginTransaction(IntPtr handle2dWriter)
+        {
+            this.InternalWriter2d3dTransaction(handle2dWriter, this.idocwrite2dBeginTransaction);
+        }
+
+        public void Writer2dCommitTransaction(IntPtr handle2dWriter)
+        {
+            this.InternalWriter2d3dTransaction(handle2dWriter, this.idocwrite2dCommitTransaction);
+        }
+
+        public void Writer2dRollbackTransaction(IntPtr handle2dWriter)
+        {
+            this.InternalWriter2d3dTransaction(handle2dWriter, this.idocwrite2dRollbackTransaction);
+        }
+
         public long Writer2dAddTile(
             IntPtr write2dHandle,
             ITileCoordinate coordinate,
@@ -813,6 +835,21 @@ namespace ImgDoc2Net.Interop
 
             this.HandleErrorCases(returnCode, in errorInformation);
             return resultPk;
+        }
+
+        public void Writer3dBeginTransaction(IntPtr handle3dWriter)
+        {
+            this.InternalWriter2d3dTransaction(handle3dWriter, this.idocwrite3dBeginTransaction);
+        }
+
+        public void Writer3dCommitTransaction(IntPtr handle3dWriter)
+        {
+            this.InternalWriter2d3dTransaction(handle3dWriter, this.idocwrite3dCommitTransaction);
+        }
+
+        public void Writer3dRollbackTransaction(IntPtr handle3dWriter)
+        {
+            this.InternalWriter2d3dTransaction(handle3dWriter, this.idocwrite3dRollbackTransaction);
         }
 
         public QueryResult Reader2dQuery(IntPtr read2dHandle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)
@@ -1822,6 +1859,13 @@ namespace ImgDoc2Net.Interop
         private readonly IDocInfo_GetTileCountPerLayerDelegate idocinfo2dGetTileCountPerLayer;
         private readonly IDocInfo_GetTileCountPerLayerDelegate idocinfo3dGetTileCountPerLayer;
 
+        private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite2dBeginTransaction;
+        private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite2dCommitTransaction;
+        private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite2dRollbackTransaction;
+        private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite3dBeginTransaction;
+        private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite3dCommitTransaction;
+        private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite3dRollbackTransaction;
+
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate void GetStatisticsDelegate(ImgDoc2StatisticsInterop* statisticsInterop);
 
@@ -2044,6 +2088,18 @@ namespace ImgDoc2Net.Interop
         private unsafe delegate int IDocInfo_GetTileCountPerLayerDelegate(
             IntPtr read2dHandle,
             TileCountPerLayerInterop* tileCountPerLayerInterop,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        /// <summary> 
+        /// This delegate is corresponding the the APIs IDocWrite2d_BeginTransaction/IDocWrite2d_CommitTransaction/IDocWrite2d_RollbackTransaction
+        /// and IDocWrite3d_BeginTransaction/IDocWrite3d_CommitTransaction/IDocWrite3d_RollbackTransaction.
+        /// </summary>
+        /// <param name="write2d3dHandle">  Handle of a writer2D or writer3D object.</param>
+        /// <param name="errorInformation"> [in,out] If non-null and in case of an error, information describing the error is put here.</param>
+        /// <returns> An error code.</returns>
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int IDocWrite2d3d_BeginCommitRollbackTransactionDelegate(
+            IntPtr write2d3dHandle,
             ImgDoc2ErrorInformation* errorInformation);
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -2696,6 +2752,19 @@ namespace ImgDoc2Net.Interop
 
                 return result;
             }
+        }
+
+        private void InternalWriter2d3dTransaction(IntPtr handle2d3dWriter, IDocWrite2d3d_BeginCommitRollbackTransactionDelegate operation)
+        {
+            this.ThrowIfNotInitialized();
+            int returnCode;
+            ImgDoc2ErrorInformation errorInformation;
+            unsafe
+            {
+                returnCode = operation(handle2d3dWriter, &errorInformation);
+            }
+
+            this.HandleErrorCases(returnCode, in errorInformation);
         }
     }
 }

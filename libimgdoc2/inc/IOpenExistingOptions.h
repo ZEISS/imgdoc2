@@ -31,6 +31,14 @@ namespace imgdoc2
 
         virtual ~IOpenExistingOptions() = default;
 
+        /// Sets the filename of the file to be opened.
+        /// \param  filename The null-terminated string specifying the file to be opened. The string
+        ///                   is expected to be in UTF8-encoding.
+        void SetFilename(const std::string& filename)
+        {
+            this->SetFilename(filename.c_str());
+        }
+
         // no copy and no move (-> https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all )
         IOpenExistingOptions() = default;
         IOpenExistingOptions(const IOpenExistingOptions&) = delete;             // copy constructor
