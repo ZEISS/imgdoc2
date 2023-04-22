@@ -21,12 +21,77 @@ using namespace std;
 
 static ImgDoc2ApiStatistics g_imgdoc2_api_statistics;  ///< Define a static object, which is used to count active instances of objects, which are created by the imgdoc2API.
 
-template <typename t>
-struct SharedPtrWrapper
+//template <typename t>
+//struct SharedPtrWrapper
+//{
+//    explicit SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : shared_ptr_(std::move(shared_ptr)) {}
+//    std::shared_ptr<t> shared_ptr_;
+//};
+
+template <typename ClassT, std::uint32_t MagicValueN>
+struct SharedPtrWrapperBase
 {
-    explicit SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : shared_ptr_(std::move(shared_ptr)) {}
-    std::shared_ptr<t> shared_ptr_;
+    explicit SharedPtrWrapperBase(std::shared_ptr<ClassT> shared_ptr) : magic_(MagicValueN), shared_ptr_(std::move(shared_ptr)) {}
+    [[nodiscard]] bool IsValid() const { return this->magic_ == MagicValueN; }
+    void Invalidate() { this->magic_ = 0; }
+    std::uint32_t magic_;
+    std::shared_ptr<ClassT> shared_ptr_;
 };
+
+template <typename t>
+struct SharedPtrWrapper :public SharedPtrWrapperBase<t, 0>
+{
+    SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : SharedPtrWrapperBase<t, 0>(std::move(shared_ptr)) {}
+};
+
+
+//template <>
+//struct SharedPtrWrapper <imgdoc2::IDoc> : SharedPtrWrapper <imgdoc2::IDoc, 0xBCFB6C34>
+//{};
+
+
+template <>
+struct SharedPtrWrapper<imgdoc2::IHostingEnvironment> : SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, 0xBCFB6C34>
+{
+    SharedPtrWrapper(std::shared_ptr<imgdoc2::IHostingEnvironment> shared_ptr) :
+        SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, 0xBCFB6C34>(std::move(shared_ptr)) {}
+};
+
+template <>
+struct SharedPtrWrapper<imgdoc2::IDoc> : SharedPtrWrapperBase<imgdoc2::IDoc, 0x5F3D69B2>
+{
+    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDoc> shared_ptr) :
+        SharedPtrWrapperBase<imgdoc2::IDoc, 0x5F3D69B2>(std::move(shared_ptr)) {}
+};
+
+template <>
+struct SharedPtrWrapper<imgdoc2::IDocRead2d> : SharedPtrWrapperBase<imgdoc2::IDocRead2d, 0xA31445DC>
+{
+    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead2d> shared_ptr) :
+        SharedPtrWrapperBase<imgdoc2::IDocRead2d, 0xA31445DC>(std::move(shared_ptr)) {}
+};
+
+template <>
+struct SharedPtrWrapper<imgdoc2::IDocRead3d> : SharedPtrWrapperBase<imgdoc2::IDocRead3d, 0x2762E513>
+{
+    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead3d> shared_ptr) :
+        SharedPtrWrapperBase<imgdoc2::IDocRead3d, 0x2762E513>(std::move(shared_ptr)) {}
+};
+
+template <>
+struct SharedPtrWrapper<imgdoc2::IDocWrite2d> : SharedPtrWrapperBase<imgdoc2::IDocWrite2d, 0xABFF9A83>
+{
+    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite2d> shared_ptr) :
+        SharedPtrWrapperBase<imgdoc2::IDocWrite2d, 0xABFF9A83>(std::move(shared_ptr)) {}
+};
+
+template <>
+struct SharedPtrWrapper<imgdoc2::IDocWrite3d> : SharedPtrWrapperBase<imgdoc2::IDocWrite3d, 0x1714CBB3>
+{
+    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite3d> shared_ptr) :
+        SharedPtrWrapperBase<imgdoc2::IDocWrite3d, 0x1714CBB3>(std::move(shared_ptr)) {}
+};
+
 
 static void FillOutErrorInformation(const exception& exception, ImgDoc2ErrorInformation* error_information)
 {
@@ -193,6 +258,11 @@ ImgDoc2ErrorCode OpenExistingDocument(
 void DestroyDocument(HandleDoc handle)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        return;// object->shared_ptr_->Close();
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_document_objects_active;
 }
