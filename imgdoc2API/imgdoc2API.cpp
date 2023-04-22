@@ -28,6 +28,15 @@ static ImgDoc2ApiStatistics g_imgdoc2_api_statistics;  ///< Define a static obje
 //    std::shared_ptr<t> shared_ptr_;
 //};
 
+/// This class is used to represent a shared pointer, or this is what the handles we are providing is pointing to. This class
+/// contains a magic value, which is used to check if the handle is still valid. When the handle is created, the magic value
+/// is set to a specific value. When the handle is destroyed, the magic value is set to 0. If the magic value is not the
+/// expected value, the handle is invalid.
+/// We use template specialization to set the magic value for each type of object, and we need to use some template magic
+/// to make this work. We use partial template specialization to set the magic value for each type of object. 
+///
+/// \typeparam  ClassT      The type of the object to be stored here.
+/// \typeparam  MagicValueN The magic value to be used for this type of object.
 template <typename ClassT, std::uint32_t MagicValueN>
 struct SharedPtrWrapperBase
 {
@@ -38,58 +47,64 @@ struct SharedPtrWrapperBase
     std::shared_ptr<ClassT> shared_ptr_;
 };
 
+/// SharedPtrWrapper is a generic template class that inherits from SharedPtrWrapperBase.
+/// This uses an invalid magic value of 0 for all types, and we use partial template specialization to set the magic value
+/// for each type of object we want to support.
+///
+/// \typeparam  t   Generic type parameter.
 template <typename t>
 struct SharedPtrWrapper :public SharedPtrWrapperBase<t, 0>
 {
     SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : SharedPtrWrapperBase<t, 0>(std::move(shared_ptr)) {}
 };
 
-
-//template <>
-//struct SharedPtrWrapper <imgdoc2::IDoc> : SharedPtrWrapper <imgdoc2::IDoc, 0xBCFB6C34>
-//{};
-
+constexpr uint32_t kMagicIHostingEnvironment = 0xBCFB6C34;
+constexpr uint32_t kMagicIDoc = 0x5F3D69B2;
+constexpr uint32_t kMagicIDocRead2d = 0xA31445DC;
+constexpr uint32_t kMagicIDocRead3d = 0x2762E513;
+constexpr uint32_t kMagicIDocWrite2d = 0xABFF9A83;
+constexpr uint32_t kMagicIDocWrite3d = 0x1714CBB3;
 
 template <>
-struct SharedPtrWrapper<imgdoc2::IHostingEnvironment> : SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, 0xBCFB6C34>
+struct SharedPtrWrapper<imgdoc2::IHostingEnvironment> : SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, kMagicIHostingEnvironment>
 {
     SharedPtrWrapper(std::shared_ptr<imgdoc2::IHostingEnvironment> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, 0xBCFB6C34>(std::move(shared_ptr)) {}
+        SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, kMagicIHostingEnvironment>(std::move(shared_ptr)) {}
 };
 
 template <>
-struct SharedPtrWrapper<imgdoc2::IDoc> : SharedPtrWrapperBase<imgdoc2::IDoc, 0x5F3D69B2>
+struct SharedPtrWrapper<imgdoc2::IDoc> : SharedPtrWrapperBase<imgdoc2::IDoc, kMagicIDoc>
 {
     SharedPtrWrapper(std::shared_ptr<imgdoc2::IDoc> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDoc, 0x5F3D69B2>(std::move(shared_ptr)) {}
+        SharedPtrWrapperBase<imgdoc2::IDoc, kMagicIDoc>(std::move(shared_ptr)) {}
 };
 
 template <>
-struct SharedPtrWrapper<imgdoc2::IDocRead2d> : SharedPtrWrapperBase<imgdoc2::IDocRead2d, 0xA31445DC>
+struct SharedPtrWrapper<imgdoc2::IDocRead2d> : SharedPtrWrapperBase<imgdoc2::IDocRead2d, kMagicIDocRead2d>
 {
     SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead2d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocRead2d, 0xA31445DC>(std::move(shared_ptr)) {}
+        SharedPtrWrapperBase<imgdoc2::IDocRead2d, kMagicIDocRead2d>(std::move(shared_ptr)) {}
 };
 
 template <>
-struct SharedPtrWrapper<imgdoc2::IDocRead3d> : SharedPtrWrapperBase<imgdoc2::IDocRead3d, 0x2762E513>
+struct SharedPtrWrapper<imgdoc2::IDocRead3d> : SharedPtrWrapperBase<imgdoc2::IDocRead3d, kMagicIDocRead3d>
 {
     SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead3d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocRead3d, 0x2762E513>(std::move(shared_ptr)) {}
+        SharedPtrWrapperBase<imgdoc2::IDocRead3d, kMagicIDocRead3d>(std::move(shared_ptr)) {}
 };
 
 template <>
-struct SharedPtrWrapper<imgdoc2::IDocWrite2d> : SharedPtrWrapperBase<imgdoc2::IDocWrite2d, 0xABFF9A83>
+struct SharedPtrWrapper<imgdoc2::IDocWrite2d> : SharedPtrWrapperBase<imgdoc2::IDocWrite2d, kMagicIDocWrite2d>
 {
     SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite2d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocWrite2d, 0xABFF9A83>(std::move(shared_ptr)) {}
+        SharedPtrWrapperBase<imgdoc2::IDocWrite2d, kMagicIDocWrite2d>(std::move(shared_ptr)) {}
 };
 
 template <>
-struct SharedPtrWrapper<imgdoc2::IDocWrite3d> : SharedPtrWrapperBase<imgdoc2::IDocWrite3d, 0x1714CBB3>
+struct SharedPtrWrapper<imgdoc2::IDocWrite3d> : SharedPtrWrapperBase<imgdoc2::IDocWrite3d, kMagicIDocWrite3d>
 {
     SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite3d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocWrite3d, 0x1714CBB3>(std::move(shared_ptr)) {}
+        SharedPtrWrapperBase<imgdoc2::IDocWrite3d, kMagicIDocWrite3d>(std::move(shared_ptr)) {}
 };
 
 
