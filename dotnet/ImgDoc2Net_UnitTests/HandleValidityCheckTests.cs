@@ -14,6 +14,41 @@ namespace ImgDoc2Net_UnitTests
     public class HandleValidityCheckTests
     {
         [Fact]
+        public void OpenExistingOptionsHandle_WhenDestroyedTwice_ThrowsException()
+        {
+            var instance = ImgDoc2ApiInterop.Instance;
+            var handle = instance.CreateOpenExistingOptions();
+            instance.DestroyOpenExistingOptions(handle);
+
+            // expect exception on calling DestroyOpenExistingOptions() twice
+            Assert.Throws<ImgDoc2Exception>(() => instance.DestroyOpenExistingOptions(handle));
+        }
+
+        [Fact]
+        public void CreateOptionsHandle_WhenDestroyedTwice_ThrowsException()
+        {
+            var instance = ImgDoc2ApiInterop.Instance;
+            var handle = instance.CreateCreateOptions();
+            instance.DestroyCreateOptions(handle);
+
+            // expect exception on calling DestroyOpenExistingOptions() twice
+            Assert.Throws<ImgDoc2Exception>(() => instance.DestroyCreateOptions(handle));
+        }
+
+        [Fact]
+        public void UseWrongTypeOfHandle_ThrowsException()
+        {
+            var instance = ImgDoc2ApiInterop.Instance;
+            var handle = instance.CreateCreateOptions();
+
+            // when passing this "create-options"-handle to a function that expects an "open-existing-options"-handle,
+            // we expect an exception
+            Assert.Throws<ImgDoc2Exception>(() => instance.DestroyOpenExistingOptions(handle));
+
+            instance.DestroyCreateOptions(handle);
+        }
+
+        [Fact]
         public void HandleValidityCheck_WhenHandleIsInvalid_ThrowsException()
         {
             // this test is operating on "interop"-level
@@ -21,7 +56,11 @@ namespace ImgDoc2Net_UnitTests
             var createOptionsHandle = instance.CreateCreateOptions();
             instance.CreateOptionsSetFilename(createOptionsHandle, ":memory:");
             var handle = instance.CreateNewDocument(createOptionsHandle);
-            instance.DestroyDocument(handle+1);
+
+            // we add 1 to the handle, so this is then for sure an invalid handle, and we expect an exception
+            Assert.Throws<ImgDoc2Exception>(() => instance.DestroyDocument(handle + 1));
+
+            instance.DestroyDocument(handle);
             instance.DestroyCreateOptions(createOptionsHandle);
         }
     }

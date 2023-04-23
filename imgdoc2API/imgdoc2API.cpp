@@ -14,93 +14,13 @@
 #include <gsl/util>
 #include "utilities.h"
 #include "imgdoc2apistatistics.h"
+#include "sharedptrwrapper.h"
 #include <imgdoc2.h>
 
 using namespace imgdoc2;
 using namespace std;
 
 static ImgDoc2ApiStatistics g_imgdoc2_api_statistics;  ///< Define a static object, which is used to count active instances of objects, which are created by the imgdoc2API.
-
-/// This class is used to represent a shared pointer, or this is what the handles we are providing is pointing to. This class
-/// contains a magic value, which is used to check if the handle is still valid. When the handle is created, the magic value
-/// is set to a specific value. When the handle is destroyed, the magic value is set to 0. If the magic value is not the
-/// expected value, the handle is invalid.
-/// We use template specialization to set the magic value for each type of object, and we need to use some template magic
-/// to make this work. We use partial template specialization to set the magic value for each type of object. 
-///
-/// \typeparam  ClassT      The type of the object to be stored here.
-/// \typeparam  MagicValueN The magic value to be used for this type of object.
-template <typename ClassT, std::uint32_t MagicValueN>
-struct SharedPtrWrapperBase
-{
-    explicit SharedPtrWrapperBase(std::shared_ptr<ClassT> shared_ptr) : magic_(MagicValueN), shared_ptr_(std::move(shared_ptr)) {}
-    [[nodiscard]] bool IsValid() const { return this->magic_ == MagicValueN; }
-    void Invalidate() { this->magic_ = 0; }
-    std::uint32_t magic_;
-    std::shared_ptr<ClassT> shared_ptr_;
-};
-
-/// SharedPtrWrapper is a generic template class that inherits from SharedPtrWrapperBase.
-/// This uses an invalid magic value of 0 for all types, and we use partial template specialization to set the magic value
-/// for each type of object we want to support.
-/// Note that the constructor is private, so that we can only create partial specialization of this class.
-///
-/// \typeparam  t   Generic type parameter.
-template <typename t>
-struct SharedPtrWrapper :public SharedPtrWrapperBase<t, 0>
-{
-private:
-    explicit SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : SharedPtrWrapperBase<t, 0>(std::move(shared_ptr)) {}
-};
-
-constexpr uint32_t kMagicIHostingEnvironment = 0xBCFB6C34;
-constexpr uint32_t kMagicIDoc = 0x5F3D69B2;
-constexpr uint32_t kMagicIDocRead2d = 0xA31445DC;
-constexpr uint32_t kMagicIDocRead3d = 0x2762E513;
-constexpr uint32_t kMagicIDocWrite2d = 0xABFF9A83;
-constexpr uint32_t kMagicIDocWrite3d = 0x1714CBB3;
-
-template <>
-struct SharedPtrWrapper<imgdoc2::IHostingEnvironment> : SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, kMagicIHostingEnvironment>
-{
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IHostingEnvironment> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, kMagicIHostingEnvironment>(std::move(shared_ptr)) {}
-};
-
-template <>
-struct SharedPtrWrapper<imgdoc2::IDoc> : SharedPtrWrapperBase<imgdoc2::IDoc, kMagicIDoc>
-{
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDoc> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDoc, kMagicIDoc>(std::move(shared_ptr)) {}
-};
-
-template <>
-struct SharedPtrWrapper<imgdoc2::IDocRead2d> : SharedPtrWrapperBase<imgdoc2::IDocRead2d, kMagicIDocRead2d>
-{
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead2d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocRead2d, kMagicIDocRead2d>(std::move(shared_ptr)) {}
-};
-
-template <>
-struct SharedPtrWrapper<imgdoc2::IDocRead3d> : SharedPtrWrapperBase<imgdoc2::IDocRead3d, kMagicIDocRead3d>
-{
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead3d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocRead3d, kMagicIDocRead3d>(std::move(shared_ptr)) {}
-};
-
-template <>
-struct SharedPtrWrapper<imgdoc2::IDocWrite2d> : SharedPtrWrapperBase<imgdoc2::IDocWrite2d, kMagicIDocWrite2d>
-{
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite2d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocWrite2d, kMagicIDocWrite2d>(std::move(shared_ptr)) {}
-};
-
-template <>
-struct SharedPtrWrapper<imgdoc2::IDocWrite3d> : SharedPtrWrapperBase<imgdoc2::IDocWrite3d, kMagicIDocWrite3d>
-{
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite3d> shared_ptr) :
-        SharedPtrWrapperBase<imgdoc2::IDocWrite3d, kMagicIDocWrite3d>(std::move(shared_ptr)) {}
-};
 
 
 static void FillOutErrorInformation(const exception& exception, ImgDoc2ErrorInformation* error_information)
@@ -120,6 +40,21 @@ static void FillOutErrorInformationForInvalidArgument(const char* argument_name,
     {
         stringstream ss;
         ss << "Argument '" << argument_name << "'";
+        if (text != nullptr)
+        {
+            ss << ": " << text;
+        }
+
+        Utilities::copy_string_to_fixed_size(ss.str().c_str(), error_information->message, ImgDoc2ErrorInformation::kMaxMessageLength);
+    }
+}
+
+static void FillOutErrorInformationForInvalidHandle(const char* handle_name, const char* text, ImgDoc2ErrorInformation* error_information)
+{
+    if (error_information != nullptr)
+    {
+        stringstream ss;
+        ss << "Handle '" << handle_name << "'";
         if (text != nullptr)
         {
             ss << ": " << text;
@@ -169,36 +104,57 @@ HandleEnvironmentObject CreateEnvironmentObject(
     return reinterpret_cast<HandleEnvironmentObject>(shared_environment_wrapping_object);
 }
 
-void DestroyEnvironmentObject(HandleEnvironmentObject handle)
+ImgDoc2ErrorCode DestroyEnvironmentObject(HandleEnvironmentObject handle, ImgDoc2ErrorInformation* error_information)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleEnvironmentObject", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 HandleCreateOptions CreateCreateOptions()
 {
     ++g_imgdoc2_api_statistics.number_of_createoptions_objects_active;
-    return reinterpret_cast<HandleCreateOptions>(ClassFactory::CreateCreateOptionsPtr());
+    return reinterpret_cast<HandleCreateOptions>(new PtrWrapper(ClassFactory::CreateCreateOptionsPtr()));
 }
 
-void DestroyCreateOptions(HandleCreateOptions handle)
+ImgDoc2ErrorCode DestroyCreateOptions(HandleCreateOptions handle, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_createoptions_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 HandleOpenExistingOptions CreateOpenExistingOptions()
 {
     ++g_imgdoc2_api_statistics.number_of_openexistingoptions_objects_active;
-    return reinterpret_cast<HandleOpenExistingOptions>(ClassFactory::CreateOpenExistingOptions());
+    return reinterpret_cast<HandleOpenExistingOptions>(new PtrWrapper(ClassFactory::CreateOpenExistingOptions()));
 }
 
-void DestroyOpenExistingOptions(HandleOpenExistingOptions handle)
+ImgDoc2ErrorCode DestroyOpenExistingOptions(HandleOpenExistingOptions handle, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto object = reinterpret_cast<PtrWrapper<IOpenExistingOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleOpenExistingOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_openexistingoptions_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode CreateNewDocument(HandleCreateOptions create_options, HandleEnvironmentObject handle_environment_object, HandleDoc* document, ImgDoc2ErrorInformation* error_information)
@@ -212,12 +168,26 @@ ImgDoc2ErrorCode CreateNewDocument(HandleCreateOptions create_options, HandleEnv
     shared_ptr<imgdoc2::IHostingEnvironment> hosting_environment;
     if (handle_environment_object != kInvalidObjectHandle)
     {
-        hosting_environment = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle_environment_object)->shared_ptr_;
+        const auto hosting_environment_object = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle_environment_object);  // NOLINT(performance-no-int-to-ptr)
+        if (!hosting_environment_object->IsValid())
+        {
+            FillOutErrorInformationForInvalidHandle("HandleEnvironmentObject", "The handle is invalid.", error_information);
+            return ImgDoc2_ErrorCode_InvalidHandle;
+        }
+
+        hosting_environment = hosting_environment_object->shared_ptr_;
     }
 
     try
     {
-        imgdoc2 = ClassFactory::CreateNew(reinterpret_cast<ICreateOptions*>(create_options), hosting_environment);  // NOLINT(performance-no-int-to-ptr)
+        const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(create_options);  // NOLINT(performance-no-int-to-ptr)
+        if (!create_options_object->IsValid())
+        {
+            FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+            return ImgDoc2_ErrorCode_InvalidHandle;
+        }
+
+        imgdoc2 = ClassFactory::CreateNew(create_options_object->ptr_, hosting_environment);  // NOLINT(performance-no-int-to-ptr)
     }
     catch (exception& exception)
     {
@@ -246,12 +216,28 @@ ImgDoc2ErrorCode OpenExistingDocument(
     shared_ptr<imgdoc2::IHostingEnvironment> hosting_environment;
     if (handle_environment_object != kInvalidObjectHandle)
     {
-        hosting_environment = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle_environment_object)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+        const auto hosting_environment_object = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle_environment_object);  // NOLINT(performance-no-int-to-ptr)
+        if (!hosting_environment_object->IsValid())
+        {
+            FillOutErrorInformationForInvalidHandle("HandleEnvironmentObject", "The handle is invalid.", error_information);
+            return ImgDoc2_ErrorCode_InvalidHandle;
+        }
+
+        hosting_environment = hosting_environment_object->shared_ptr_;
+        //hosting_environment = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle_environment_object)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     }
 
     try
     {
-        imgdoc2 = ClassFactory::OpenExisting(reinterpret_cast<IOpenExistingOptions*>(open_existing_options), hosting_environment);  // NOLINT(performance-no-int-to-ptr)
+        const auto open_existing_options_object = reinterpret_cast<PtrWrapper<IOpenExistingOptions>*>(open_existing_options);  // NOLINT(performance-no-int-to-ptr)
+        if (!open_existing_options_object->IsValid())
+        {
+            FillOutErrorInformationForInvalidHandle("HandleOpenExistingOptions", "The handle is invalid.", error_information);
+            return ImgDoc2_ErrorCode_InvalidHandle;
+        }
+
+        imgdoc2 = ClassFactory::OpenExisting(open_existing_options_object->ptr_, hosting_environment);  // NOLINT(performance-no-int-to-ptr)
+        //imgdoc2 = ClassFactory::OpenExisting(reinterpret_cast<IOpenExistingOptions*>(open_existing_options), hosting_environment);  // NOLINT(performance-no-int-to-ptr)
     }
     catch (exception& exception)
     {
@@ -265,16 +251,18 @@ ImgDoc2ErrorCode OpenExistingDocument(
     return ImgDoc2_ErrorCode_OK;
 }
 
-void DestroyDocument(HandleDoc handle)
+ImgDoc2ErrorCode DestroyDocument(HandleDoc handle, ImgDoc2ErrorInformation* error_information)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!object->IsValid())
     {
-        return;// object->shared_ptr_->Close();
+        FillOutErrorInformationForInvalidHandle("HandleDoc", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
     }
 
     delete object;
     --g_imgdoc2_api_statistics.number_of_document_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* document_read2d, ImgDoc2ErrorInformation* error_information)
@@ -285,7 +273,15 @@ ImgDoc2ErrorCode IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* do
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    auto spReader2d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader2d();   // NOLINT(performance-no-int-to-ptr)
+    const auto document_object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document);  // NOLINT(performance-no-int-to-ptr)
+    if (!document_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDoc", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    //auto spReader2d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader2d();   // NOLINT(performance-no-int-to-ptr)
+    auto spReader2d = document_object->shared_ptr_->GetReader2d();
     if (spReader2d)
     {
         auto shared_reader2d_wrapping_object = new SharedPtrWrapper<IDocRead2d>{ spReader2d };
@@ -300,11 +296,18 @@ ImgDoc2ErrorCode IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* do
     return ImgDoc2_ErrorCode_OK;
 }
 
-void DestroyReader2d(HandleDocRead2D handle)
+ImgDoc2ErrorCode DestroyReader2d(HandleDocRead2D handle, ImgDoc2ErrorInformation* error_information)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_reader2d_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* document_read3d, ImgDoc2ErrorInformation* error_information)
@@ -315,7 +318,15 @@ ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* do
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    auto spReader3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader3d();   // NOLINT(performance-no-int-to-ptr)
+    const auto document_object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document);  // NOLINT(performance-no-int-to-ptr)
+    if (!document_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDoc", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    auto spReader3d = document_object->shared_ptr_->GetReader3d();
+    //auto spReader3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader3d();   // NOLINT(performance-no-int-to-ptr)
     if (spReader3d)
     {
         auto shared_reader3d_wrapping_object = new SharedPtrWrapper<IDocRead3d>{ spReader3d };
@@ -330,11 +341,18 @@ ImgDoc2ErrorCode IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead3D* do
     return ImgDoc2_ErrorCode_OK;
 }
 
-void DestroyReader3d(HandleDocRead3D handle)
+ImgDoc2ErrorCode DestroyReader3d(HandleDocRead3D handle, ImgDoc2ErrorInformation* error_information)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_reader3d_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* document_writer2d, ImgDoc2ErrorInformation* error_information)
@@ -345,7 +363,15 @@ ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* d
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    auto spWriter2d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetWriter2d();   // NOLINT(performance-no-int-to-ptr)
+    const auto document_object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document);  // NOLINT(performance-no-int-to-ptr)
+    if (!document_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDoc", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    auto spWriter2d = document_object->shared_ptr_->GetWriter2d();
+    //auto spWriter2d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetWriter2d();   // NOLINT(performance-no-int-to-ptr)
     if (spWriter2d)
     {
         auto shared_writer2d_wrapping_object = new SharedPtrWrapper<IDocWrite2d>{ spWriter2d };
@@ -360,11 +386,18 @@ ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* d
     return ImgDoc2_ErrorCode_OK;
 }
 
-void DestroyWriter2d(HandleDocWrite2D handle)
+ImgDoc2ErrorCode DestroyWriter2d(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocWrite2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_writer2d_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite3D* document_writer3d, ImgDoc2ErrorInformation* error_information)
@@ -375,7 +408,15 @@ ImgDoc2ErrorCode IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite3D* d
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    auto spWriter3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetWriter3d();   // NOLINT(performance-no-int-to-ptr)
+    const auto document_object = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document);  // NOLINT(performance-no-int-to-ptr)
+    if (!document_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDoc", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    auto spWriter3d = document_object->shared_ptr_->GetWriter3d();
+    //auto spWriter3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetWriter3d();   // NOLINT(performance-no-int-to-ptr)
     if (spWriter3d)
     {
         auto shared_writer3d_wrapping_object = new SharedPtrWrapper<IDocWrite3d>{ spWriter3d };
@@ -390,34 +431,62 @@ ImgDoc2ErrorCode IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite3D* d
     return ImgDoc2_ErrorCode_OK;
 }
 
-void DestroyWriter3d(HandleDocWrite2D handle)
+ImgDoc2ErrorCode DestroyWriter3d(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information)
 {
     const auto object = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocWrite2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     delete object;
     --g_imgdoc2_api_statistics.number_of_writer3d_objects_active;
+    return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode CreateOptions_SetFilename(HandleCreateOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    object->SetFilename(filename_utf8);
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    create_options_object->ptr_->SetFilename(filename_utf8);
     return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode OpenExistingOptions_SetFilename(HandleOpenExistingOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    object->SetFilename(filename_utf8);
+    //const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto open_existing_options_object = reinterpret_cast<PtrWrapper<IOpenExistingOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!open_existing_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleOpenExistingOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    open_existing_options_object->ptr_->SetFilename(filename_utf8);
     return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode CreateOptions_SetDocumentType(HandleCreateOptions handle, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     const auto document_type = Utilities::ConvertDocumentTypeFromInterop(document_type_interop);
     try
     {
-        object->SetDocumentType(document_type);
+        create_options_object->ptr_->SetDocumentType(document_type);
     }
     catch (const std::exception& exception)
     {
@@ -430,22 +499,43 @@ ImgDoc2ErrorCode CreateOptions_SetDocumentType(HandleCreateOptions handle, std::
 
 ImgDoc2ErrorCode CreateOptions_SetUseSpatialIndex(HandleCreateOptions handle, bool use_spatial_index, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    object->SetUseSpatialIndex(use_spatial_index);
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    create_options_object->ptr_->SetUseSpatialIndex(use_spatial_index);
     return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode CreateOptions_SetUseBlobTable(HandleCreateOptions handle, bool use_blob_table, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    object->SetCreateBlobTable(use_blob_table);
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    create_options_object->ptr_->SetCreateBlobTable(use_blob_table);
     return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode CreateOptions_AddIndexForDimension(HandleCreateOptions handle, char dimension, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    object->AddIndexForDimension(dimension);
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    create_options_object->ptr_->AddIndexForDimension(dimension);
     return ImgDoc2_ErrorCode_OK;
 }
 
@@ -471,11 +561,18 @@ static ImgDoc2ErrorCode ReturnStringHelper(const tGetString& getString, char* fi
 
 ImgDoc2ErrorCode CreateOptions_GetFilename(HandleCreateOptions handle, char* filename_utf8, size_t* size, ImgDoc2ErrorInformation* error_information)
 {
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     return ReturnStringHelper(
         [=]()->std::string
         {
-            const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-            return object->GetFilename();
+            //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+            return create_options_object->ptr_->GetFilename();
         },
         filename_utf8,
             size,
@@ -484,11 +581,19 @@ ImgDoc2ErrorCode CreateOptions_GetFilename(HandleCreateOptions handle, char* fil
 
 ImgDoc2ErrorCode OpenExistingOptions_GetFilename(HandleOpenExistingOptions handle, char* filename_utf8, size_t* size, ImgDoc2ErrorInformation* error_information)
 {
+    const auto open_existing_options_object = reinterpret_cast<PtrWrapper<IOpenExistingOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!open_existing_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleOpenExistingOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     return ReturnStringHelper(
         [=]()->std::string
         {
-            const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-            return object->GetFilename();
+            //const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+            //return object->GetFilename();
+            return open_existing_options_object->ptr_->GetFilename();
         },
         filename_utf8,
             size,
@@ -503,16 +608,30 @@ ImgDoc2ErrorCode CreateOptions_GetDocumentType(HandleCreateOptions handle, std::
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    const auto document_type = object->GetDocumentType();
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto document_type = create_options_object->ptr_->GetDocumentType();
     *document_type_interop = static_cast<uint8_t>(document_type);
     return ImgDoc2_ErrorCode_OK;
 }
 
 ImgDoc2ErrorCode CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bool* use_spatial_index, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    const bool b = object->GetUseSpatialIndex();
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const bool b = create_options_object->ptr_->GetUseSpatialIndex();
     if (use_spatial_index != nullptr)
     {
         *use_spatial_index = b;
@@ -523,8 +642,15 @@ ImgDoc2ErrorCode CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bo
 
 ImgDoc2ErrorCode CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool* use_blob_table, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    const bool b = object->GetCreateBlobTable();
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const bool b = create_options_object->ptr_->GetCreateBlobTable();
     if (use_blob_table != nullptr)
     {
         *use_blob_table = b;
@@ -535,10 +661,17 @@ ImgDoc2ErrorCode CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool*
 
 ImgDoc2ErrorCode CreateOptions_AddDimension(HandleCreateOptions handle, std::uint8_t dimension, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     try
     {
-        object->AddDimension(gsl::narrow_cast<Dimension>(dimension));
+        create_options_object->ptr_->AddDimension(gsl::narrow_cast<Dimension>(dimension));
     }
     catch (exception& exception)
     {
@@ -551,10 +684,17 @@ ImgDoc2ErrorCode CreateOptions_AddDimension(HandleCreateOptions handle, std::uin
 
 ImgDoc2ErrorCode CreateOptions_AddIndexedDimension(HandleCreateOptions handle, std::uint8_t dimension, ImgDoc2ErrorInformation* error_information)
 {
-    const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
     try
     {
-        object->AddIndexForDimension(gsl::narrow_cast<Dimension>(dimension));
+        create_options_object->ptr_->AddIndexForDimension(gsl::narrow_cast<Dimension>(dimension));
     }
     catch (exception& exception)
     {
@@ -572,8 +712,15 @@ ImgDoc2ErrorCode CreateOptions_GetDimensions(HandleCreateOptions handle, std::ui
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto* const object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    const auto dimensions_from_object = object->GetDimensions();
+    //const auto* const object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto dimensions_from_object = create_options_object->ptr_->GetDimensions();
 
     size_t count = 0;
     for (const auto d : dimensions_from_object)
@@ -598,8 +745,15 @@ ImgDoc2ErrorCode CreateOptions_GetIndexedDimensions(HandleCreateOptions handle, 
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    const auto* const object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-    const auto dimensions_from_object = object->GetIndexedDimensions();
+    //const auto* const object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
+    if (!create_options_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleCreateOptions", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto dimensions_from_object = create_options_object->ptr_->GetIndexedDimensions();
 
     size_t count = 0;
     for (const auto d : dimensions_from_object)
@@ -644,7 +798,15 @@ ImgDoc2ErrorCode IDocWrite2d_AddTile(
     const TileBaseInfo tile_info = Utilities::ConvertTileBaseInfoInteropToImgdoc2(*tile_base_info_interop);
     const DataTypes data_type = Utilities::ConvertDatatypeEnumInterop(data_type_interop);
 
-    const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto write2d_object = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!write2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocWrite2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto writer2d = write2d_object->shared_ptr_;
+    //const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     try
     {
@@ -698,7 +860,15 @@ ImgDoc2ErrorCode IDocWrite3d_AddBrick(
     const BrickBaseInfo tile_info = Utilities::ConvertBrickBaseInfoInteropToImgdoc2(*brick_base_info_interop);
     const DataTypes data_type = Utilities::ConvertDatatypeEnumInterop(data_type_interop);
 
-    const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto write3d_object = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!write3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocWrite3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto writer3d = write3d_object->shared_ptr_;
+    //const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     try
     {
@@ -731,7 +901,15 @@ ImgDoc2ErrorCode IDocRead2d_Query(
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const auto dimension_coordinate_query_clause = dim_coordinate_query_clause_interop != nullptr ?
         Utilities::ConvertDimensionQueryRangeClauseInteropToImgdoc2(dim_coordinate_query_clause_interop) :
@@ -779,7 +957,16 @@ ImgDoc2ErrorCode IDocRead3d_Query(
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    
     const auto dimension_coordinate_query_clause = dim_coordinate_query_clause_interop != nullptr ?
         Utilities::ConvertDimensionQueryRangeClauseInteropToImgdoc2(dim_coordinate_query_clause_interop) :
         CDimCoordinateQueryClause();
@@ -825,7 +1012,15 @@ ImgDoc2ErrorCode IDocRead2d_GetTilesIntersectingRect(
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
         Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
@@ -876,7 +1071,15 @@ ImgDoc2ErrorCode IDocRead3d_GetBricksIntersectingCuboid(
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
         Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
@@ -925,7 +1128,15 @@ ImgDoc2ErrorCode IDocRead3d_GetBricksIntersectingPlane(
     QueryResultInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
         Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
         CTileInfoQueryClause();
@@ -974,7 +1185,15 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileData(
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
 
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     Utilities::BlobOutputOnFunctionsDecorator blob_output_object(blob_output_handle, pfnReserve, pfnSetData);
     try
     {
@@ -999,7 +1218,15 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickData(
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
 
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     Utilities::BlobOutputOnFunctionsDecorator blob_output_object(blob_output_handle, pfnReserve, pfnSetData);
     try
     {
@@ -1024,7 +1251,15 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileInfo(
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
 
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     LogicalPositionInfo logical_position_info;
     TileCoordinate tile_coordinate;
@@ -1075,7 +1310,16 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickInfo(
     ImgDoc2ErrorInformation* error_information)
 {
     static_assert(sizeof(pk) == sizeof(imgdoc2::dbIndex), "Type of the argument 'pk' and the imgdoc2-dbIndex-type must have same size.");
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     LogicalPositionInfo3D logical_position_info3d;
     TileCoordinate tile_coordinate;
     BrickBlobInfo brick_blob_info;
@@ -1144,17 +1388,33 @@ ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileDimensions(reader2d.get(), dimensions, count, error_information);
 }
 
 ImgDoc2ErrorCode IDocInfo3d_GetTileDimensions(
-    HandleDocRead2D handle,
+    HandleDocRead3D handle,
     imgdoc2::Dimension* dimensions,
     std::uint32_t* count,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileDimensions(reader3d.get(), dimensions, count, error_information);
 }
 
@@ -1208,7 +1468,15 @@ ImgDoc2ErrorCode IDocInfo2d_GetMinMaxForTileDimensions(
     MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetMinMaxForTileDimensions(reader2d.get(), dimensions, count, result, error_information);
 }
 
@@ -1219,7 +1487,15 @@ ImgDoc2ErrorCode IDocInfo3d_GetMinMaxForTileDimensions(
     MinMaxForTilePositionsInterop* result,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetMinMaxForTileDimensions(reader3d.get(), dimensions, count, result, error_information);
 }
 
@@ -1231,7 +1507,15 @@ ImgDoc2ErrorCode IDocInfo2d_GetBoundingBoxForTiles(
     double* max_y,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     DoubleInterval interval_x, interval_y;
     DoubleInterval* pointer_interval_x{ nullptr }, * pointer_interval_y{ nullptr };
@@ -1288,7 +1572,15 @@ ImgDoc2ErrorCode IDocInfo3d_GetBoundingBoxForBricks(
     double* max_z,
     ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     DoubleInterval interval_x, interval_y, interval_z;
     DoubleInterval* pointer_interval_x{ nullptr }, * pointer_interval_y{ nullptr }, * pointer_interval_z{ nullptr };
@@ -1380,7 +1672,15 @@ ImgDoc2ErrorCode IDocInfo2d_GetTotalTileCount(
         std::uint64_t* total_tile_count,
         ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTotalTileCount(reader2d.get(), total_tile_count, error_information);
 }
 
@@ -1389,7 +1689,15 @@ ImgDoc2ErrorCode IDocInfo3d_GetTotalTileCount(
         std::uint64_t* total_tile_count,
         ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTotalTileCount(reader3d.get(), total_tile_count, error_information);
 }
 
@@ -1435,7 +1743,15 @@ ImgDoc2ErrorCode IDocInfo2d_GetTileCountPerLayer(
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader2d_object = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader2d = reader2d_object->shared_ptr_;
+    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileCountPerLayer(reader2d.get(), tile_count_per_layer_interop, error_information);
 }
 
@@ -1444,13 +1760,29 @@ ImgDoc2ErrorCode IDocInfo3d_GetTileCountPerLayer(
         TileCountPerLayerInterop* tile_count_per_layer_interop,
         ImgDoc2ErrorInformation* error_information)
 {
-    const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto reader3d_object = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!reader3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto reader3d = reader3d_object->shared_ptr_;
+    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileCountPerLayer(reader3d.get(), tile_count_per_layer_interop, error_information);
 }
 
 static ImgDoc2ErrorCode IDocWriter2d_TransactionCommon(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information, void(IDatabaseTransaction::* mfp)())
 {
-    const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto writer2d_object = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!writer2d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocWrite2D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto writer2d = writer2d_object->shared_ptr_;
+    //const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
         (writer2d.get()->*mfp)();
@@ -1481,7 +1813,15 @@ ImgDoc2ErrorCode IDocWrite2d_RollbackTransaction(HandleDocWrite2D handle, ImgDoc
 
 static ImgDoc2ErrorCode IDocWriter3d_TransactionCommon(HandleDocWrite3D handle, ImgDoc2ErrorInformation* error_information, void(IDatabaseTransaction::* mfp)())
 {
-    const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    const auto writer3d_object = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle); // NOLINT(performance-no-int-to-ptr)
+    if (!writer3d_object->IsValid())
+    {
+        FillOutErrorInformationForInvalidHandle("HandleDocRead3D", "The handle is invalid.", error_information);
+        return ImgDoc2_ErrorCode_InvalidHandle;
+    }
+
+    const auto writer3d = writer3d_object->shared_ptr_;
+    //const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
         (writer3d.get()->*mfp)();
