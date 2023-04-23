@@ -21,13 +21,6 @@ using namespace std;
 
 static ImgDoc2ApiStatistics g_imgdoc2_api_statistics;  ///< Define a static object, which is used to count active instances of objects, which are created by the imgdoc2API.
 
-//template <typename t>
-//struct SharedPtrWrapper
-//{
-//    explicit SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : shared_ptr_(std::move(shared_ptr)) {}
-//    std::shared_ptr<t> shared_ptr_;
-//};
-
 /// This class is used to represent a shared pointer, or this is what the handles we are providing is pointing to. This class
 /// contains a magic value, which is used to check if the handle is still valid. When the handle is created, the magic value
 /// is set to a specific value. When the handle is destroyed, the magic value is set to 0. If the magic value is not the
@@ -50,12 +43,14 @@ struct SharedPtrWrapperBase
 /// SharedPtrWrapper is a generic template class that inherits from SharedPtrWrapperBase.
 /// This uses an invalid magic value of 0 for all types, and we use partial template specialization to set the magic value
 /// for each type of object we want to support.
+/// Note that the constructor is private, so that we can only create partial specialization of this class.
 ///
 /// \typeparam  t   Generic type parameter.
 template <typename t>
 struct SharedPtrWrapper :public SharedPtrWrapperBase<t, 0>
 {
-    SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : SharedPtrWrapperBase<t, 0>(std::move(shared_ptr)) {}
+private:
+    explicit SharedPtrWrapper(std::shared_ptr<t> shared_ptr) : SharedPtrWrapperBase<t, 0>(std::move(shared_ptr)) {}
 };
 
 constexpr uint32_t kMagicIHostingEnvironment = 0xBCFB6C34;
