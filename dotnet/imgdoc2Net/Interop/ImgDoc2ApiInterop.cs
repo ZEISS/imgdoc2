@@ -1840,11 +1840,9 @@ namespace ImgDoc2Net.Interop
 
         private readonly GetStatisticsDelegate getStatistics;
         private readonly VoidAndReturnIntPtrDelegate createCreateOptions;
-        //private readonly IntPtrAndReturnVoidDelegate destroyCreateOptions;
         private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyCreateOptions;
 
         private readonly VoidAndReturnIntPtrDelegate createOpenExistingOptions;
-        //private readonly IntPtrAndReturnVoidDelegate destroyOpenExistingOptions;
         private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyOpenExistingOptions;
 
         private readonly CreateOptions_SetDocumentTypeDelegate createOptionsSetDocumentType;
@@ -1915,10 +1913,7 @@ namespace ImgDoc2Net.Interop
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate IntPtr VoidAndReturnIntPtrDelegate();
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private unsafe delegate int IntPtrAndReturnVoidDelegate(IntPtr handle);
-
+        
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int IntPtrAndErrorInformationReturnErrorCodeDelegate(IntPtr handle, ImgDoc2ErrorInformation* errorInformation);
 

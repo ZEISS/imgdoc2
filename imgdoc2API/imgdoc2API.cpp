@@ -224,7 +224,6 @@ ImgDoc2ErrorCode OpenExistingDocument(
         }
 
         hosting_environment = hosting_environment_object->shared_ptr_;
-        //hosting_environment = reinterpret_cast<SharedPtrWrapper<IHostingEnvironment>*>(handle_environment_object)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     }
 
     try
@@ -237,7 +236,6 @@ ImgDoc2ErrorCode OpenExistingDocument(
         }
 
         imgdoc2 = ClassFactory::OpenExisting(open_existing_options_object->ptr_, hosting_environment);  // NOLINT(performance-no-int-to-ptr)
-        //imgdoc2 = ClassFactory::OpenExisting(reinterpret_cast<IOpenExistingOptions*>(open_existing_options), hosting_environment);  // NOLINT(performance-no-int-to-ptr)
     }
     catch (exception& exception)
     {
@@ -280,11 +278,10 @@ ImgDoc2ErrorCode IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* do
         return ImgDoc2_ErrorCode_InvalidHandle;
     }
 
-    //auto spReader2d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetReader2d();   // NOLINT(performance-no-int-to-ptr)
-    auto spReader2d = document_object->shared_ptr_->GetReader2d();
-    if (spReader2d)
+    auto reader2d = document_object->shared_ptr_->GetReader2d();
+    if (reader2d)
     {
-        auto shared_reader2d_wrapping_object = new SharedPtrWrapper<IDocRead2d>{ spReader2d };
+        auto shared_reader2d_wrapping_object = new SharedPtrWrapper<IDocRead2d>{ reader2d };
         *document_read2d = reinterpret_cast<HandleDocRead2D>(shared_reader2d_wrapping_object);
         ++g_imgdoc2_api_statistics.number_of_reader2d_objects_active;
     }
@@ -370,11 +367,10 @@ ImgDoc2ErrorCode IDoc_GetWriter2d(HandleDoc handle_document, HandleDocWrite2D* d
         return ImgDoc2_ErrorCode_InvalidHandle;
     }
 
-    auto spWriter2d = document_object->shared_ptr_->GetWriter2d();
-    //auto spWriter2d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetWriter2d();   // NOLINT(performance-no-int-to-ptr)
-    if (spWriter2d)
+    auto writer2d = document_object->shared_ptr_->GetWriter2d();
+    if (writer2d)
     {
-        auto shared_writer2d_wrapping_object = new SharedPtrWrapper<IDocWrite2d>{ spWriter2d };
+        auto shared_writer2d_wrapping_object = new SharedPtrWrapper<IDocWrite2d>{ writer2d };
         *document_writer2d = reinterpret_cast<HandleDocWrite2D>(shared_writer2d_wrapping_object);
         ++g_imgdoc2_api_statistics.number_of_writer2d_objects_active;
     }
@@ -415,11 +411,10 @@ ImgDoc2ErrorCode IDoc_GetWriter3d(HandleDoc handle_document, HandleDocWrite3D* d
         return ImgDoc2_ErrorCode_InvalidHandle;
     }
 
-    auto spWriter3d = document_object->shared_ptr_->GetWriter3d();
-    //auto spWriter3d = reinterpret_cast<SharedPtrWrapper<IDoc>*>(handle_document)->shared_ptr_->GetWriter3d();   // NOLINT(performance-no-int-to-ptr)
-    if (spWriter3d)
+    auto writer3d = document_object->shared_ptr_->GetWriter3d();
+    if (writer3d)
     {
-        auto shared_writer3d_wrapping_object = new SharedPtrWrapper<IDocWrite3d>{ spWriter3d };
+        auto shared_writer3d_wrapping_object = new SharedPtrWrapper<IDocWrite3d>{ writer3d };
         *document_writer3d = reinterpret_cast<HandleDocWrite2D>(shared_writer3d_wrapping_object);
         ++g_imgdoc2_api_statistics.number_of_writer3d_objects_active;
     }
@@ -447,7 +442,6 @@ ImgDoc2ErrorCode DestroyWriter3d(HandleDocWrite2D handle, ImgDoc2ErrorInformatio
 
 ImgDoc2ErrorCode CreateOptions_SetFilename(HandleCreateOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -461,7 +455,6 @@ ImgDoc2ErrorCode CreateOptions_SetFilename(HandleCreateOptions handle, const cha
 
 ImgDoc2ErrorCode OpenExistingOptions_SetFilename(HandleOpenExistingOptions handle, const char* filename_utf8, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto open_existing_options_object = reinterpret_cast<PtrWrapper<IOpenExistingOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!open_existing_options_object->IsValid())
     {
@@ -475,7 +468,6 @@ ImgDoc2ErrorCode OpenExistingOptions_SetFilename(HandleOpenExistingOptions handl
 
 ImgDoc2ErrorCode CreateOptions_SetDocumentType(HandleCreateOptions handle, std::uint8_t document_type_interop, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -499,7 +491,6 @@ ImgDoc2ErrorCode CreateOptions_SetDocumentType(HandleCreateOptions handle, std::
 
 ImgDoc2ErrorCode CreateOptions_SetUseSpatialIndex(HandleCreateOptions handle, bool use_spatial_index, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -513,7 +504,6 @@ ImgDoc2ErrorCode CreateOptions_SetUseSpatialIndex(HandleCreateOptions handle, bo
 
 ImgDoc2ErrorCode CreateOptions_SetUseBlobTable(HandleCreateOptions handle, bool use_blob_table, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -527,7 +517,6 @@ ImgDoc2ErrorCode CreateOptions_SetUseBlobTable(HandleCreateOptions handle, bool 
 
 ImgDoc2ErrorCode CreateOptions_AddIndexForDimension(HandleCreateOptions handle, char dimension, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -571,7 +560,6 @@ ImgDoc2ErrorCode CreateOptions_GetFilename(HandleCreateOptions handle, char* fil
     return ReturnStringHelper(
         [=]()->std::string
         {
-            //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
             return create_options_object->ptr_->GetFilename();
         },
         filename_utf8,
@@ -591,8 +579,6 @@ ImgDoc2ErrorCode OpenExistingOptions_GetFilename(HandleOpenExistingOptions handl
     return ReturnStringHelper(
         [=]()->std::string
         {
-            //const auto object = reinterpret_cast<IOpenExistingOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
-            //return object->GetFilename();
             return open_existing_options_object->ptr_->GetFilename();
         },
         filename_utf8,
@@ -615,7 +601,6 @@ ImgDoc2ErrorCode CreateOptions_GetDocumentType(HandleCreateOptions handle, std::
         return ImgDoc2_ErrorCode_InvalidHandle;
     }
 
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto document_type = create_options_object->ptr_->GetDocumentType();
     *document_type_interop = static_cast<uint8_t>(document_type);
     return ImgDoc2_ErrorCode_OK;
@@ -623,7 +608,6 @@ ImgDoc2ErrorCode CreateOptions_GetDocumentType(HandleCreateOptions handle, std::
 
 ImgDoc2ErrorCode CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bool* use_spatial_index, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -642,7 +626,6 @@ ImgDoc2ErrorCode CreateOptions_GetUseSpatialIndex(HandleCreateOptions handle, bo
 
 ImgDoc2ErrorCode CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool* use_blob_table, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -661,7 +644,6 @@ ImgDoc2ErrorCode CreateOptions_GetUseBlobTable(HandleCreateOptions handle, bool*
 
 ImgDoc2ErrorCode CreateOptions_AddDimension(HandleCreateOptions handle, std::uint8_t dimension, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -684,7 +666,6 @@ ImgDoc2ErrorCode CreateOptions_AddDimension(HandleCreateOptions handle, std::uin
 
 ImgDoc2ErrorCode CreateOptions_AddIndexedDimension(HandleCreateOptions handle, std::uint8_t dimension, ImgDoc2ErrorInformation* error_information)
 {
-    //const auto object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -712,7 +693,6 @@ ImgDoc2ErrorCode CreateOptions_GetDimensions(HandleCreateOptions handle, std::ui
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    //const auto* const object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -745,7 +725,6 @@ ImgDoc2ErrorCode CreateOptions_GetIndexedDimensions(HandleCreateOptions handle, 
         return ImgDoc2_ErrorCode_InvalidArgument;
     }
 
-    //const auto* const object = reinterpret_cast<ICreateOptions*>(handle);  // NOLINT(performance-no-int-to-ptr)
     const auto create_options_object = reinterpret_cast<PtrWrapper<ICreateOptions>*>(handle);  // NOLINT(performance-no-int-to-ptr)
     if (!create_options_object->IsValid())
     {
@@ -806,7 +785,6 @@ ImgDoc2ErrorCode IDocWrite2d_AddTile(
     }
 
     const auto writer2d = write2d_object->shared_ptr_;
-    //const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     try
     {
@@ -868,7 +846,6 @@ ImgDoc2ErrorCode IDocWrite3d_AddBrick(
     }
 
     const auto writer3d = write3d_object->shared_ptr_;
-    //const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     try
     {
@@ -909,7 +886,6 @@ ImgDoc2ErrorCode IDocRead2d_Query(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const auto dimension_coordinate_query_clause = dim_coordinate_query_clause_interop != nullptr ?
         Utilities::ConvertDimensionQueryRangeClauseInteropToImgdoc2(dim_coordinate_query_clause_interop) :
@@ -965,7 +941,6 @@ ImgDoc2ErrorCode IDocRead3d_Query(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     
     const auto dimension_coordinate_query_clause = dim_coordinate_query_clause_interop != nullptr ?
         Utilities::ConvertDimensionQueryRangeClauseInteropToImgdoc2(dim_coordinate_query_clause_interop) :
@@ -1020,7 +995,6 @@ ImgDoc2ErrorCode IDocRead2d_GetTilesIntersectingRect(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
         Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
@@ -1079,7 +1053,6 @@ ImgDoc2ErrorCode IDocRead3d_GetBricksIntersectingCuboid(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
         Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
@@ -1136,7 +1109,7 @@ ImgDoc2ErrorCode IDocRead3d_GetBricksIntersectingPlane(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
     const auto tile_info_query_clause = tile_info_query_clause_interop != nullptr ?
         Utilities::ConvertTileInfoQueryClauseInteropToImgdoc2(tile_info_query_clause_interop) :
         CTileInfoQueryClause();
@@ -1193,7 +1166,7 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileData(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    
     Utilities::BlobOutputOnFunctionsDecorator blob_output_object(blob_output_handle, pfnReserve, pfnSetData);
     try
     {
@@ -1226,7 +1199,7 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickData(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+    
     Utilities::BlobOutputOnFunctionsDecorator blob_output_object(blob_output_handle, pfnReserve, pfnSetData);
     try
     {
@@ -1259,7 +1232,6 @@ ImgDoc2ErrorCode IDocRead2d_ReadTileInfo(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     LogicalPositionInfo logical_position_info;
     TileCoordinate tile_coordinate;
@@ -1319,7 +1291,7 @@ ImgDoc2ErrorCode IDocRead3d_ReadBrickInfo(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
+
     LogicalPositionInfo3D logical_position_info3d;
     TileCoordinate tile_coordinate;
     BrickBlobInfo brick_blob_info;
@@ -1396,7 +1368,6 @@ ImgDoc2ErrorCode IDocInfo2d_GetTileDimensions(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileDimensions(reader2d.get(), dimensions, count, error_information);
 }
 
@@ -1414,7 +1385,6 @@ ImgDoc2ErrorCode IDocInfo3d_GetTileDimensions(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileDimensions(reader3d.get(), dimensions, count, error_information);
 }
 
@@ -1476,7 +1446,6 @@ ImgDoc2ErrorCode IDocInfo2d_GetMinMaxForTileDimensions(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetMinMaxForTileDimensions(reader2d.get(), dimensions, count, result, error_information);
 }
 
@@ -1495,7 +1464,6 @@ ImgDoc2ErrorCode IDocInfo3d_GetMinMaxForTileDimensions(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetMinMaxForTileDimensions(reader3d.get(), dimensions, count, result, error_information);
 }
 
@@ -1515,7 +1483,6 @@ ImgDoc2ErrorCode IDocInfo2d_GetBoundingBoxForTiles(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     DoubleInterval interval_x, interval_y;
     DoubleInterval* pointer_interval_x{ nullptr }, * pointer_interval_y{ nullptr };
@@ -1580,7 +1547,6 @@ ImgDoc2ErrorCode IDocInfo3d_GetBoundingBoxForBricks(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
 
     DoubleInterval interval_x, interval_y, interval_z;
     DoubleInterval* pointer_interval_x{ nullptr }, * pointer_interval_y{ nullptr }, * pointer_interval_z{ nullptr };
@@ -1680,7 +1646,6 @@ ImgDoc2ErrorCode IDocInfo2d_GetTotalTileCount(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTotalTileCount(reader2d.get(), total_tile_count, error_information);
 }
 
@@ -1697,7 +1662,6 @@ ImgDoc2ErrorCode IDocInfo3d_GetTotalTileCount(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTotalTileCount(reader3d.get(), total_tile_count, error_information);
 }
 
@@ -1751,7 +1715,6 @@ ImgDoc2ErrorCode IDocInfo2d_GetTileCountPerLayer(
     }
 
     const auto reader2d = reader2d_object->shared_ptr_;
-    //const auto reader2d = reinterpret_cast<SharedPtrWrapper<IDocRead2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileCountPerLayer(reader2d.get(), tile_count_per_layer_interop, error_information);
 }
 
@@ -1768,7 +1731,6 @@ ImgDoc2ErrorCode IDocInfo3d_GetTileCountPerLayer(
     }
 
     const auto reader3d = reader3d_object->shared_ptr_;
-    //const auto reader3d = reinterpret_cast<SharedPtrWrapper<IDocRead3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     return IDocInfo_GetTileCountPerLayer(reader3d.get(), tile_count_per_layer_interop, error_information);
 }
 
@@ -1782,7 +1744,6 @@ static ImgDoc2ErrorCode IDocWriter2d_TransactionCommon(HandleDocWrite2D handle, 
     }
 
     const auto writer2d = writer2d_object->shared_ptr_;
-    //const auto writer2d = reinterpret_cast<SharedPtrWrapper<IDocWrite2d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
         (writer2d.get()->*mfp)();
@@ -1821,7 +1782,6 @@ static ImgDoc2ErrorCode IDocWriter3d_TransactionCommon(HandleDocWrite3D handle, 
     }
 
     const auto writer3d = writer3d_object->shared_ptr_;
-    //const auto writer3d = reinterpret_cast<SharedPtrWrapper<IDocWrite3d>*>(handle)->shared_ptr_; // NOLINT(performance-no-int-to-ptr)
     try
     {
         (writer3d.get()->*mfp)();
