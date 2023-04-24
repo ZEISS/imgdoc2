@@ -68,7 +68,7 @@ jobs:
           directory: ${{github.workspace}}/coverage_libimgdoc2
           files: code_coverage_gcovr_xml.xml
           verbose: true
-          
+
       - name: Upload coverage reports for imgdoc2Net to Codecov
         uses: codecov/codecov-action@v3
         with:
