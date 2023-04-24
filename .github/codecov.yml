@@ -35,5 +35,9 @@ component_management:
       name: libimgdoc2
       paths:
         - "libimgdoc2/"
+    - component_id: "id_imgdoc2net"
+      name: imgdoc2net
+      paths:
+        - "dotnet/imgdoc2Net/"
 comment:
   layout: "header, diff, flags, components"  # show component info in the PR comment
