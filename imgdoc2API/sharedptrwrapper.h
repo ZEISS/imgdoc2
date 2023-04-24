@@ -119,7 +119,7 @@ private:
 template <>
 struct SharedPtrWrapper<imgdoc2::IHostingEnvironment> : SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, kMagicIHostingEnvironment>
 {
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IHostingEnvironment> shared_ptr) :
+    explicit SharedPtrWrapper(std::shared_ptr<imgdoc2::IHostingEnvironment> shared_ptr) :
         SharedPtrWrapperBase<imgdoc2::IHostingEnvironment, kMagicIHostingEnvironment>(std::move(shared_ptr)) {}
 };
 
@@ -127,7 +127,7 @@ struct SharedPtrWrapper<imgdoc2::IHostingEnvironment> : SharedPtrWrapperBase<img
 template <>
 struct SharedPtrWrapper<imgdoc2::IDoc> : SharedPtrWrapperBase<imgdoc2::IDoc, kMagicIDoc>
 {
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDoc> shared_ptr) :
+    explicit SharedPtrWrapper(std::shared_ptr<imgdoc2::IDoc> shared_ptr) :
         SharedPtrWrapperBase<imgdoc2::IDoc, kMagicIDoc>(std::move(shared_ptr)) {}
 };
 
@@ -135,7 +135,7 @@ struct SharedPtrWrapper<imgdoc2::IDoc> : SharedPtrWrapperBase<imgdoc2::IDoc, kMa
 template <>
 struct SharedPtrWrapper<imgdoc2::IDocRead2d> : SharedPtrWrapperBase<imgdoc2::IDocRead2d, kMagicIDocRead2d>
 {
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead2d> shared_ptr) :
+    explicit SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead2d> shared_ptr) :
         SharedPtrWrapperBase<imgdoc2::IDocRead2d, kMagicIDocRead2d>(std::move(shared_ptr)) {}
 };
 
@@ -143,7 +143,7 @@ struct SharedPtrWrapper<imgdoc2::IDocRead2d> : SharedPtrWrapperBase<imgdoc2::IDo
 template <>
 struct SharedPtrWrapper<imgdoc2::IDocRead3d> : SharedPtrWrapperBase<imgdoc2::IDocRead3d, kMagicIDocRead3d>
 {
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead3d> shared_ptr) :
+    explicit SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocRead3d> shared_ptr) :
         SharedPtrWrapperBase<imgdoc2::IDocRead3d, kMagicIDocRead3d>(std::move(shared_ptr)) {}
 };
 
@@ -151,7 +151,7 @@ struct SharedPtrWrapper<imgdoc2::IDocRead3d> : SharedPtrWrapperBase<imgdoc2::IDo
 template <>
 struct SharedPtrWrapper<imgdoc2::IDocWrite2d> : SharedPtrWrapperBase<imgdoc2::IDocWrite2d, kMagicIDocWrite2d>
 {
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite2d> shared_ptr) :
+    explicit SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite2d> shared_ptr) :
         SharedPtrWrapperBase<imgdoc2::IDocWrite2d, kMagicIDocWrite2d>(std::move(shared_ptr)) {}
 };
 
@@ -159,7 +159,7 @@ struct SharedPtrWrapper<imgdoc2::IDocWrite2d> : SharedPtrWrapperBase<imgdoc2::ID
 template <>
 struct SharedPtrWrapper<imgdoc2::IDocWrite3d> : SharedPtrWrapperBase<imgdoc2::IDocWrite3d, kMagicIDocWrite3d>
 {
-    SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite3d> shared_ptr) :
+    explicit SharedPtrWrapper(std::shared_ptr<imgdoc2::IDocWrite3d> shared_ptr) :
         SharedPtrWrapperBase<imgdoc2::IDocWrite3d, kMagicIDocWrite3d>(std::move(shared_ptr)) {}
 };
 
@@ -167,7 +167,7 @@ struct SharedPtrWrapper<imgdoc2::IDocWrite3d> : SharedPtrWrapperBase<imgdoc2::ID
 template <>
 struct PtrWrapper<imgdoc2::IOpenExistingOptions> : PtrWrapperBase<imgdoc2::IOpenExistingOptions, kMagicIOpenExistingOptions>
 {
-    PtrWrapper(imgdoc2::IOpenExistingOptions* ptr) :
+    explicit PtrWrapper(imgdoc2::IOpenExistingOptions* ptr) :
         PtrWrapperBase<imgdoc2::IOpenExistingOptions, kMagicIOpenExistingOptions>(ptr) {}
 };
 
@@ -175,6 +175,6 @@ struct PtrWrapper<imgdoc2::IOpenExistingOptions> : PtrWrapperBase<imgdoc2::IOpen
 template <>
 struct PtrWrapper<imgdoc2::ICreateOptions> : PtrWrapperBase<imgdoc2::ICreateOptions, kMagicICreateOptions>
 {
-    PtrWrapper(imgdoc2::ICreateOptions* ptr) :
+    explicit PtrWrapper(imgdoc2::ICreateOptions* ptr) :
         PtrWrapperBase<imgdoc2::ICreateOptions, kMagicICreateOptions>(ptr) {}
 };
