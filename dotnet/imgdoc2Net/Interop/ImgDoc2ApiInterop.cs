@@ -79,11 +79,11 @@ namespace ImgDoc2Net.Interop
                 this.createCreateOptions =
                     this.GetProcAddressThrowIfNotFound<VoidAndReturnIntPtrDelegate>("CreateCreateOptions");
                 this.destroyCreateOptions =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyCreateOptions");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyCreateOptions");
                 this.createOpenExistingOptions =
                     this.GetProcAddressThrowIfNotFound<VoidAndReturnIntPtrDelegate>("CreateOpenExistingOptions");
                 this.destroyOpenExistingOptions =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyOpenExistingOptions");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyOpenExistingOptions");
                 this.createOptionsSetFilename =
                     this.GetProcAddressThrowIfNotFound<CreateOptionsSetFilenameDelegate>("CreateOptions_SetFilename");
                 this.createOptionsGetFilename =
@@ -119,24 +119,24 @@ namespace ImgDoc2Net.Interop
                 this.openExistingDocument =
                     this.GetProcAddressThrowIfNotFound<OpenExistingDocumentDelegate>("OpenExistingDocument");
                 this.destroyDocument =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyDocument");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyDocument");
 
                 this.documentGetReader2d =
                     this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetReader2d");
                 this.destroyReader2d =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyReader2d");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyReader2d");
                 this.documentGetWriter2d =
                     this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetWriter2d");
                 this.destroyWriter2d =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyWriter2d");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyWriter2d");
                 this.documentGetReader3d =
                     this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetReader3d");
                 this.destroyReader3d =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyReader3d");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyReader3d");
                 this.documentGetWriter3d =
                     this.GetProcAddressThrowIfNotFound<IDoc_GetObjectDelegate>("IDoc_GetWriter3d");
                 this.destroyWriter3d =
-                    this.GetProcAddressThrowIfNotFound<IntPtrAndReturnVoidDelegate>("DestroyWriter3d");
+                    this.GetProcAddressThrowIfNotFound<IntPtrAndErrorInformationReturnErrorCodeDelegate>("DestroyWriter3d");
 
                 this.idocwrite2dAddTile =
                     this.GetProcAddressThrowIfNotFound<IDocWrite2d_AddTileDelegate>("IDocWrite2d_AddTile");
@@ -318,7 +318,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyCreateOptions(IntPtr handleCreateOptions)
         {
             this.ThrowIfNotInitialized();
-            this.destroyCreateOptions(handleCreateOptions);
+
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyCreateOptions(handleCreateOptions, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         /// <summary> Set the filename property of the specified "create-options" object.</summary>
@@ -564,7 +570,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyOpenExistingOptions(IntPtr handleOpenExistingOptions)
         {
             this.ThrowIfNotInitialized();
-            this.destroyOpenExistingOptions(handleOpenExistingOptions);
+
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyOpenExistingOptions(handleOpenExistingOptions, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         /// <summary> Method operating on an OpenExistingOptions-object: set the filename.</summary>
@@ -648,7 +660,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyDocument(IntPtr handleDocument)
         {
             this.ThrowIfNotInitialized();
-            this.destroyDocument(handleDocument);
+
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyDocument(handleDocument, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         public IntPtr DocumentGetReader2d(IntPtr handleDocument)
@@ -670,7 +688,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyReader2d(IntPtr handleReader)
         {
             this.ThrowIfNotInitialized();
-            this.destroyReader2d(handleReader);
+
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyReader2d(handleReader, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         public IntPtr DocumentGetWriter2d(IntPtr handleDocument)
@@ -692,7 +716,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyWriter2d(IntPtr handleWriter)
         {
             this.ThrowIfNotInitialized();
-            this.destroyWriter2d(handleWriter);
+
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyWriter2d(handleWriter, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         /// <summary> Create a document3D-reader-object handle 3D.</summary>
@@ -719,7 +749,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyReader3d(IntPtr handleReader)
         {
             this.ThrowIfNotInitialized();
-            this.destroyReader3d(handleReader);
+            
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyReader3d(handleReader, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         public IntPtr DocumentGetWriter3d(IntPtr handleDocument)
@@ -741,7 +777,13 @@ namespace ImgDoc2Net.Interop
         public void DestroyWriter3d(IntPtr handleWriter)
         {
             this.ThrowIfNotInitialized();
-            this.destroyWriter3d(handleWriter);
+            
+            unsafe
+            {
+                ImgDoc2ErrorInformation errorInformation;
+                int returnCode = this.destroyWriter3d(handleWriter, &errorInformation);
+                this.HandleErrorCases(returnCode, in errorInformation);
+            }
         }
 
         public void Writer2dBeginTransaction(IntPtr handle2dWriter)
@@ -1798,10 +1840,10 @@ namespace ImgDoc2Net.Interop
 
         private readonly GetStatisticsDelegate getStatistics;
         private readonly VoidAndReturnIntPtrDelegate createCreateOptions;
-        private readonly IntPtrAndReturnVoidDelegate destroyCreateOptions;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyCreateOptions;
 
         private readonly VoidAndReturnIntPtrDelegate createOpenExistingOptions;
-        private readonly IntPtrAndReturnVoidDelegate destroyOpenExistingOptions;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyOpenExistingOptions;
 
         private readonly CreateOptions_SetDocumentTypeDelegate createOptionsSetDocumentType;
         private readonly CreateOptions_GetDocumentTypeDelegate createOptionsGetDocumentType;
@@ -1821,17 +1863,17 @@ namespace ImgDoc2Net.Interop
 
         private readonly CreateNewDocumentDelegate createNewDocument;
         private readonly OpenExistingDocumentDelegate openExistingDocument;
-        private readonly IntPtrAndReturnVoidDelegate destroyDocument;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyDocument;
 
         private readonly IDoc_GetObjectDelegate documentGetReader2d;
-        private readonly IntPtrAndReturnVoidDelegate destroyReader2d;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyReader2d;
         private readonly IDoc_GetObjectDelegate documentGetWriter2d;
-        private readonly IntPtrAndReturnVoidDelegate destroyWriter2d;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyWriter2d;
 
         private readonly IDoc_GetObjectDelegate documentGetReader3d;
-        private readonly IntPtrAndReturnVoidDelegate destroyReader3d;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyReader3d;
         private readonly IDoc_GetObjectDelegate documentGetWriter3d;
-        private readonly IntPtrAndReturnVoidDelegate destroyWriter3d;
+        private readonly IntPtrAndErrorInformationReturnErrorCodeDelegate destroyWriter3d;
 
         private readonly IDocWrite2d_AddTileDelegate idocwrite2dAddTile;
         private readonly IDocRead2d3d_QueryDelegate idocread2dQuery;
@@ -1871,9 +1913,9 @@ namespace ImgDoc2Net.Interop
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate IntPtr VoidAndReturnIntPtrDelegate();
-
+        
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private unsafe delegate int IntPtrAndReturnVoidDelegate(IntPtr handle);
+        private unsafe delegate int IntPtrAndErrorInformationReturnErrorCodeDelegate(IntPtr handle, ImgDoc2ErrorInformation* errorInformation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int CreateOptions_SetDocumentTypeDelegate(IntPtr handle, byte documentType, ImgDoc2ErrorInformation* errorInformation);
@@ -2720,7 +2762,7 @@ namespace ImgDoc2Net.Interop
                 ImgDoc2ErrorInformation errorInformation = default(ImgDoc2ErrorInformation);
                 TileCountPerLayerInterop* tileCountPerLayerInterop = (TileCountPerLayerInterop*)tileCountPerLayerInteropData;
                 tileCountPerLayerInterop->ElementCountAllocated = initialArraySize;
-                int returnCode = this.idocinfo2dGetTileCountPerLayer(handle, tileCountPerLayerInterop, &errorInformation);
+                int returnCode = docInfoGetTileCountPerLayerDelegate(handle, tileCountPerLayerInterop, &errorInformation);
                 this.HandleErrorCases(returnCode, errorInformation);
                 if (tileCountPerLayerInterop->ElementCountAvailable > initialArraySize)
                 {
@@ -2731,7 +2773,7 @@ namespace ImgDoc2Net.Interop
                     {
                         tileCountPerLayerInterop = (TileCountPerLayerInterop*)pointerTileCountPerLayerInteropArray;
                         tileCountPerLayerInterop->ElementCountAllocated = (uint)elementCountRequired;
-                        returnCode = this.idocinfo2dGetTileCountPerLayer(handle, tileCountPerLayerInterop, &errorInformation);
+                        returnCode = docInfoGetTileCountPerLayerDelegate(handle, tileCountPerLayerInterop, &errorInformation);
                         this.HandleErrorCases(returnCode, errorInformation);
 
                         // we do not expect that the size was insufficient in this case, and if so we throw an exception

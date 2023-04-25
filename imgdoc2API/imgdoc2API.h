@@ -89,7 +89,9 @@ EXTERNAL_API(HandleEnvironmentObject) CreateEnvironmentObject(
 /// NB: it is the caller's responsibility to ensure that the object is not in use when destroying it.
 ///
 /// \param  handle The environment object handle.
-EXTERNAL_API(void) DestroyEnvironmentObject(HandleEnvironmentObject handle);
+/// \param [out]    error_information         If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyEnvironmentObject(HandleEnvironmentObject handle, ImgDoc2ErrorInformation* error_information);
 
 /// Create a new "CreateOptions" object.
 /// \returns A handle representing the new CreateOptions-object.
@@ -97,7 +99,9 @@ EXTERNAL_API(HandleCreateOptions) CreateCreateOptions();
 
 /// Destroys the CreateOptions-object described by the specified handle.
 /// \param  handle The CreateOptions-object handle.
-EXTERNAL_API(void) DestroyCreateOptions(HandleCreateOptions handle);
+/// \param [out]    error_information         If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyCreateOptions(HandleCreateOptions handle, ImgDoc2ErrorInformation* error_information);
 
 /// Create a new "OpenExistingOptions" object.
 /// \returns A handle representing the new OpenExistingOptions-object.
@@ -105,7 +109,9 @@ EXTERNAL_API(HandleOpenExistingOptions) CreateOpenExistingOptions();
 
 /// Destroys the OpenExistingOptions-object described by the specified handle.
 /// \param  handle The OpenExistingOptions-object handle.
-EXTERNAL_API(void) DestroyOpenExistingOptions(HandleOpenExistingOptions handle);
+/// \param [out]    error_information         If non-null, in case of an error, additional information describing the error are put here.
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyOpenExistingOptions(HandleOpenExistingOptions handle, ImgDoc2ErrorInformation* error_information);
 
 /// Creates a new document object. A handle representing the newly created object (in case of success)
 /// is returned with the 'document'-argument.
@@ -130,8 +136,11 @@ EXTERNAL_API(ImgDoc2ErrorCode) CreateNewDocument(HandleCreateOptions create_opti
 EXTERNAL_API(ImgDoc2ErrorCode) OpenExistingDocument(HandleOpenExistingOptions open_existing_options, HandleEnvironmentObject handle_environment_object, HandleDoc* document, ImgDoc2ErrorInformation* error_information);
 
 /// Destroy the specified document.
-/// \param  handle Handle of a document object (which is to be destroyed).
-EXTERNAL_API(void) DestroyDocument(HandleDoc handle);
+/// \param          handle                    Handle of a document object (which is to be destroyed).
+/// \param [out]    error_information         If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyDocument(HandleDoc handle, ImgDoc2ErrorInformation* error_information);
 
 /// Method operating on a document-object: try to create a reader-2d-object on the document.
 ///
@@ -143,8 +152,11 @@ EXTERNAL_API(void) DestroyDocument(HandleDoc handle);
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader2d(HandleDoc handle_document, HandleDocRead2D* document_read2d, ImgDoc2ErrorInformation* error_information);
 
 /// Destroy the specified reader-2d-object.
-/// \param  handle Handle of a reader-2d-object (which is to be destroyed).
-EXTERNAL_API(void) DestroyReader2d(HandleDocRead2D handle);
+/// \param       handle               Handle of a reader-2d-object (which is to be destroyed).
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyReader2d(HandleDocRead2D handle, ImgDoc2ErrorInformation* error_information);
 
 /// Method operating on a document-object: try to create a reader-3d-object on the document.
 ///
@@ -156,8 +168,11 @@ EXTERNAL_API(void) DestroyReader2d(HandleDocRead2D handle);
 EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetReader3d(HandleDoc handle_document, HandleDocRead2D* document_read3d, ImgDoc2ErrorInformation* error_information);
 
 /// Destroy the specified reader-3d-object.
-/// \param  handle Handle of a reader-3d-object (which is to be destroyed).
-EXTERNAL_API(void) DestroyReader3d(HandleDocRead2D handle);
+/// \param       handle               Handle of a reader-3d-object (which is to be destroyed).
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyReader3d(HandleDocRead2D handle, ImgDoc2ErrorInformation* error_information);
 
 /// Method operating on a document-object: try to create a writer-2d-object on the document.
 ///
@@ -170,7 +185,10 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter2d(HandleDoc handle_document, Handl
 
 /// Destroy the specified reader-2d-object.
 /// \param  handle Handle of a reader-2d-object (which is to be destroyed).
-EXTERNAL_API(void) DestroyWriter2d(HandleDocWrite2D handle);
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyWriter2d(HandleDocWrite2D handle, ImgDoc2ErrorInformation* error_information);
 
 /// Method operating on a document-object: try to create a writer-3d-object on the document.
 ///
@@ -183,7 +201,10 @@ EXTERNAL_API(ImgDoc2ErrorCode) IDoc_GetWriter3d(HandleDoc handle_document, Handl
 
 /// Destroy the specified writer-3d-object.
 /// \param  handle Handle of a writer-3d-object (which is to be destroyed).
-EXTERNAL_API(void) DestroyWriter3d(HandleDocWrite3D handle);
+/// \param [out] error_information    If non-null, in case of an error, additional information describing the error are put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNAL_API(ImgDoc2ErrorCode) DestroyWriter3d(HandleDocWrite3D handle, ImgDoc2ErrorInformation* error_information);
 
 /// Method operating on a CreateOptions-object: Set the document type.
 ///

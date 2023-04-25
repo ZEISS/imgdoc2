@@ -25,7 +25,8 @@ add_library(imgdoc2API  SHARED
                 "brickblobinfointerop.h" 
                 "cuboiddoubleinterop.h" 
                 "planenormalanddistanceinterop.h" 
-                "imgdoc2apistatistics.h")
+                "imgdoc2apistatistics.h" 
+                "sharedptrwrapper.h")
 
 target_link_libraries(imgdoc2API PRIVATE libimgdoc2)
 
