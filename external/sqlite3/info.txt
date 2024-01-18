@@ -1,4 +1,4 @@
-The amalgated sources of SQLite are version 3.41.2 (https://sqlite.org/2023/sqlite-amalgamation-3410200.zip).
+The amalgated sources of SQLite are version 3.45.0 (https://www.sqlite.org/2024/sqlite-amalgamation-3450000.zip).
 
 Check https://www.sqlite.org/download.html for updates.
 
