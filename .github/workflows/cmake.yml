@@ -300,4 +300,4 @@ jobs:
       - name: Deploy to NuGet
         if: steps.check_whether_to_deploy_nuget.outputs.should_deploy == 'true'
         run: |
-          nuget push "*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGETAPI_KEY }}
+          nuget push "${{github.workspace}}/nuget-packaging/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGETAPI_KEY}}
