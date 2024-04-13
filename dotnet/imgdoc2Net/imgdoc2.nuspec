@@ -1,0 +1,39 @@
+﻿<?xml version="1.0"?>
+<package >
+    <metadata>
+        <!-- Required elements -->
+        <id>$id$</id>
+        <version>$version$</version>
+        <description>Experimental Data Management for Multi-Dimensional and Tiled 2D- and 3D-Images.</description>
+        <authors>ZEISS</authors>
+        
+        <!-- Optional elements -->
+        <title>.NET integration for imgdoc2</title>
+        <owners>ZEISS</owners>
+        <license type="expression">MIT</license>
+        <projectUrl>https://github.com/ZEISS/imgdoc2</projectUrl>
+        <icon>$icon$</icon>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <copyright>Copyright 2023-2024 Carl Zeiss Microscopy GmbH</copyright>
+        <tags>microscopy imgdoc2</tags>
+        <summary>.NET integration for imgdoc2 - an experimental data management component for multi-dimensional and tiled 2D- and 3D-images.</summary>
+        <language>en-US</language>
+        <readme>docs\readme.md</readme>
+      
+        <releaseNotes>This is an early alpha version.</releaseNotes>
+        <dependencies>
+            <group targetFramework=".NETStandard2.0">
+                <!-- This is a dependency of ImgDoc2Net, we want >= 4.5.5 -->
+                <dependency id="System.Memory" version="4.5.5" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="./ImgDoc2Net.dll" target="lib/netstandard2.0/" />
+        <file src="images/icon.png" target="images/" />
+        <file src="docs/readme.md" target="docs/" />
+        <!-- Include native libraries - this will include everything under the runtimes directory in our package, 
+             preserving the directory structure. -->
+        <file src="./runtimes/**" target="runtimes" />
+    </files>
+</package>

@@ -9,7 +9,7 @@
 #include <optional>
 #include <IBlobOutput.h>
 
-/// This interface is representing a "prepared/compiled" database-statement. The life-cycle of a data-base statement is:
+/// This interface is representing a "prepared/compiled" database-statement. The life-cycle of a database-statement is:
 /// - an instance is created (-> IDbConnection::PrepareStatement)  
 /// - if the statement is using literals which are to be replaced with parameters, then the appropriate Bind-methods are to be called  
 /// - now the statement is sent to execution (-> IDbConnection::StepStatement)  
@@ -35,7 +35,7 @@ public:
 
     virtual void BindStringView(int index, const std::string_view& value) = 0;
 
-    /// Bind a "static" BLOB. Static means that the pointer MUST remain valid valid until either the prepared statement is 
+    /// Bind a "static" BLOB. Static means that the pointer MUST remain valid until either the prepared statement is 
     /// finalized or the same SQL parameter is bound to something else. 
     ///
     /// \param  index   Index of the parameter to bind.

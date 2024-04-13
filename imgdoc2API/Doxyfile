@@ -909,6 +909,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ./imgdoc2API.h                   \
+                         ./codecsAPI.h                   \
                          ./doc/main_page.md                 
 
 

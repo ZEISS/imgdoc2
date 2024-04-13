@@ -26,12 +26,25 @@ add_library(imgdoc2API  SHARED
                 "cuboiddoubleinterop.h" 
                 "planenormalanddistanceinterop.h" 
                 "imgdoc2apistatistics.h" 
-                "sharedptrwrapper.h")
+                "sharedptrwrapper.h" 
+                "versioninfointerop.h" 
+                "allocationobject.h" 
+                "codecsAPI.h" 
+                "codecsAPI.cpp"
+                "bitmapinfointerop.h"
+                "decodedimageresultinterop.h" 
+                "imgdoc2APIsupport.h" 
+                "imgdoc2APIsupport.cpp")
 
 target_link_libraries(imgdoc2API PRIVATE libimgdoc2)
 
 # Link against the GSL interface library (i.e. header only library)
 target_link_libraries(imgdoc2API PRIVATE GSL)
+
+# link with static libCZI library
+target_compile_definitions(imgdoc2API PRIVATE _LIBCZISTATICLIB)
+target_link_libraries(imgdoc2API PRIVATE libCZIStatic)
+target_include_directories(imgdoc2API PRIVATE ${LIBCZI_INCLUDE_DIR})
 
 target_compile_definitions(imgdoc2API PUBLIC LIBIMGDOC2_EXPORTS)
 

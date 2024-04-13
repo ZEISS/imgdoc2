@@ -95,7 +95,8 @@ namespace ImgDoc2Net.Implementation
     }
 
     /// <content>   
-    /// This part contains the implementation of the factory methods. </content>
+    /// This part contains the implementation of the factory methods. 
+    /// </content>
     public partial class Document
     {
         /// <summary> Creates a new document.</summary>

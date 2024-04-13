@@ -3,11 +3,15 @@
 // SPDX-License-Identifier: MIT
 
 #include "ClassFactory.h"
+
+#include <charconv>
 #include <cstdlib>
 #include "../doc/document.h"
 #include "../src/db/DbFactory.h"
 #include "../src/db/database_creator.h"
 #include "../src/db/database_discovery.h"
+
+#include <libimgdoc2_config.h>
 
 using namespace std;
 using namespace imgdoc2;
@@ -98,6 +102,33 @@ public:
 };
 
 //------------------------------------------------------------------------
+
+static std::uint32_t convert_to_uint32(const char* str)
+{
+    std::uint32_t result = 0;
+    auto [ptr, ec] = std::from_chars(str, str + strlen(str), result);
+    if (ec == std::errc::invalid_argument || ec == std::errc::result_out_of_range || *ptr != '\0')
+    {
+        return (numeric_limits<uint32_t>::max)();
+    }
+
+    return result;
+}
+
+/*static*/VersionInfo imgdoc2::ClassFactory::GetVersionInfo()
+{
+    VersionInfo version_info;
+    version_info.major = convert_to_uint32(LIBIMGDOC2_VERSION_MAJOR);
+    version_info.minor = convert_to_uint32(LIBIMGDOC2_VERSION_MINOR);
+    version_info.patch = convert_to_uint32(LIBIMGDOC2_VERSION_PATCH);
+    version_info.compiler_identification = LIBIMGDOC2_CXX_COMPILER_IDENTIFICATION;
+    version_info.build_type = LIBIMGDOC2_BUILD_TYPE;
+    version_info.repository_url = LIBIMGDOC2_REPOSITORYREMOTEURL;
+    version_info.repository_branch = LIBIMGDOC2_REPOSITORYBRANCH;
+    version_info.repository_tag = LIBIMGDOC2_REPOSITORYHASH;
+
+    return version_info;
+}
 
 /*static*/std::shared_ptr<imgdoc2::IDoc> imgdoc2::ClassFactory::CreateNew(imgdoc2::ICreateOptions* create_options, std::shared_ptr<IHostingEnvironment> environment)
 {

@@ -33,12 +33,12 @@ namespace imgdoc2
 
        /// Query the tiles table. The two query clauses are used to filter the tiles. The first clause is used to filter the tiles by their
        /// coordinates, the second by other "per tile data". The functor is called for each tile which matches the query. If the functor
-       /// returns false, the enumeration is canceled, and no more calls to the functor will occur any more. The two query clauses are
+       /// returns false, the enumeration is canceled, and no more calls to the functor will occur anymore. The two query clauses are
        /// logically ANDed together.
        /// \param clause        The query clause (dealing with dimension indexes).
        /// \param tileInfoQuery The query clause (dealing with other "per tile data").
-       /// \param func          A functor which we will called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
-       ///                      more calls to the functor will occur any more.
+       /// \param func          A functor which we will be called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
+       ///                      more calls to the functor will occur anymore.
         virtual void Query(const imgdoc2::IDimCoordinateQueryClause* clause, const imgdoc2::ITileInfoQueryClause* tileInfoQuery, const std::function<bool(imgdoc2::dbIndex)>& func) = 0;
 
         /// Gets tiles intersecting the specified rectangle (and satisfying the other criteria).

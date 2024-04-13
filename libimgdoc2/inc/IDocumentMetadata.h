@@ -156,7 +156,7 @@ namespace imgdoc2
         /// Enumerate items below the specified path. If recursive is false, then only the direct children of the specified path are enumerated.
         /// If recursive is true, then all descendants of the specified parent are enumerated.
         /// If the path is empty, then all items are enumerated.
-        /// If the specified path does not exists, an exception of type imgdoc2::invalid_path_exception is thrown.
+        /// If the specified path does not exist, an exception of type imgdoc2::invalid_path_exception is thrown.
         ///
         /// \param  path        The path of the parent.
         /// \param  recursive   False to enumerate only the direct children of the specified parent, true to enumerate all descendants of the specified parent.
@@ -185,7 +185,7 @@ namespace imgdoc2
         /// This method updates or creates a node with the name as specified in the parameter 'name'
         /// as a child of the node specified by 'parent'. If 'create_node_if_not_exists' is true, the
         /// node with the name 'name' is created if it does not exist. If 'create_node_if_not_exists' is
-        /// false, the mode is not created if it does not exist. In this case, the method throws an
+        /// false, the mode is not created if it does not exist. In this case, the method throws a
         /// non_existing_item_exception.
         ///
         /// \param  parent                      The parent node. If this is std::nullopt, it identifies the root node.

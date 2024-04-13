@@ -52,3 +52,5 @@ libimgdoc2/doxygen
 cmake-build-debug/
 megalinter-reports/
 imgdoc2API/doxygen
+CMakeSettings.json
+dotnet/imgdoc2cmd/Properties/launchSettings.json

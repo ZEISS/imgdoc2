@@ -84,10 +84,60 @@ set(LibImgDoc2_Srcfiles
          "src/doc/documentMetadataWriter.cpp"
          "src/doc/documentMetadataReader.h"
          "src/doc/documentMetadataReader.cpp" 
-         "src/doc/documentMetadataBase.cpp")
+         "src/doc/documentMetadataBase.cpp"
+         "inc/VersionInfo.h")
 
 add_library(libimgdoc2 STATIC
                 ${LibImgDoc2_Srcfiles})
+
+######################################################################################################
+string(CONCAT libimgdoc2_CompilerIdentification ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION} )
+
+# get the URL of the upstream repository
+execute_process(
+  COMMAND git remote get-url origin
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT_VARIABLE libimgdoc2_REPOSITORYREMOTEURL
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if (NOT DEFINED libimgdoc2_REPOSITORYREMOTEURL OR "${libimgdoc2_REPOSITORYREMOTEURL}" STREQUAL "")
+  set(libCZI_REPOSITORYREMOTEURL "unknown")
+endif()
+
+execute_process(
+  COMMAND git name-rev --name-only HEAD
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT_VARIABLE libimgdoc2_REPOSITORYBRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if (NOT DEFINED libimgdoc2_REPOSITORYBRANCH OR "${libimgdoc2_REPOSITORYBRANCH}" STREQUAL "")
+  set(libimgdoc2_REPOSITORYBRANCH "unknown")
+endif()
+
+execute_process(
+  COMMAND  git log -1 --format=%H
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT_VARIABLE libimgdoc2_REPOSITORYHASH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if (NOT DEFINED libimgdoc2_REPOSITORYHASH OR "${libimgdoc2_REPOSITORYHASH}" STREQUAL "")
+  set(libimgdoc2_REPOSITORYHASH "unknown")
+endif()
+
+string(CONCAT libimgdoc2_COMPILERIDENTIFICATION ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION} )
+
+set(libimgdoc2_VERSION_MAJOR ${imgdoc2_VERSION_MAJOR})
+set(libimgdoc2_VERSION_MINOR ${imgdoc2_VERSION_MAJOR})
+set(libimgdoc2_VERSION_PATCH ${imgdoc2_VERSION_PATCH})
+
+set(libimgdoc2_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
+
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/libimgdoc2_config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/libimgdoc2_config.h"
+  ESCAPE_QUOTES @ONLY)
+
+######################################################################################################
 
 # shared libraries need PIC
 set_property(TARGET libimgdoc2 PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -105,3 +155,6 @@ target_compile_definitions(libimgdoc2 PUBLIC _SQLITEIMGDOCSTATICLIB=1)
 target_include_directories(libimgdoc2 INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> 
   )
+
+  # add the binary tree to the search path for include files so that we will find libimgdoc2_config.h
+target_include_directories(libimgdoc2 PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")

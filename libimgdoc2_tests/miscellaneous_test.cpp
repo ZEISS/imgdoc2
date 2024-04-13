@@ -287,3 +287,12 @@ TEST(Miscellaneous, HostingEnvironmentForFunctionPointers)
     EXPECT_GT(call_count.count_log, 0);
     EXPECT_GT(call_count.count_is_level_active, 0);
 }
+
+TEST(Miscellaneous, GetVersionInfo)
+{
+    const auto version_info = ClassFactory::GetVersionInfo();
+    EXPECT_GE(version_info.major, 0);
+    EXPECT_GE(version_info.minor, 0);
+    EXPECT_GE(version_info.patch, 0);
+    EXPECT_FALSE(version_info.major == 0 && version_info.minor == 0 && version_info.patch == 0);
+}

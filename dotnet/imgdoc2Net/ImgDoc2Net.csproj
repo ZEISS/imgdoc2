@@ -1,42 +1,57 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	  <CodeAnalysisRuleSet>../CustomCodeAnalysisRules.ruleset</CodeAnalysisRuleSet>
-	  <EnableNETAnalyzers>True</EnableNETAnalyzers>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <CodeAnalysisRuleSet>../CustomCodeAnalysisRules.ruleset</CodeAnalysisRuleSet>
+        <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    </PropertyGroup>
 
-  <ItemGroup Condition="Exists('..\native_dlls\imgdoc2API.dll')">
-    <None Include="..\native_dlls\imgdoc2API.dll" Link="imgdoc2API.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <PropertyGroup>
+        <AssemblyTitle>imgdoc2Net</AssemblyTitle>
+        <AssemblyDescription>Experimental Data Management for Multi-Dimensional and Tiled 2D- and 3D-Images.</AssemblyDescription>
+        <Product>imgdoc2</Product>
+        <Company>Carl Zeiss Microscopy GmbH</Company>
+        <Copyright>Copyright 2023-2024 Carl Zeiss Microscopy GmbH</Copyright>
+        <!-- Note: Version number is passed to msbuild ("-p:Version=...") and goes into the assembly's
+                   attributes AssemblyVersion, FileVersion and AssemblyInformationalVersion. The version  
+                   from the msbuild-command-line will overwrite what is given here. So, the version number
+                   given here indicates a local build. -->
+        <AssemblyVersion>99.99.99.99</AssemblyVersion>
+    </PropertyGroup>
 
-  <ItemGroup Condition="Exists('..\native_dlls\libimgdoc2API.so')">
-    <None Include="..\native_dlls\libimgdoc2API.so" Link="libimgdoc2API.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <!-- This has the following purpose: If native DLLs are present in the folder "native_dlls" next to the project file,
+         then they are copied to the output-folder. The idea is that with local development, the unmanaged project
+         will drop its artifacts in this folder, which are then picked up by a build of the managed project. -->
+    <ItemGroup Condition="Exists('..\native_dlls\imgdoc2API.dll')">
+        <None Include="..\native_dlls\imgdoc2API.dll" Link="imgdoc2API.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup Condition="Exists('..\native_dlls\libimgdoc2API.so')">
+        <None Include="..\native_dlls\libimgdoc2API.so" Link="libimgdoc2API.so">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="ImgDoc2Net.csproj.license" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="ImgDoc2Net.csproj.license" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.Memory" Version="4.5.5" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="doc\assets\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="doc\assets\" />
+    </ItemGroup>
 
 </Project>

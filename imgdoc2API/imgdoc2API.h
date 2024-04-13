@@ -23,6 +23,8 @@
 #include "minmaxfortiledimensioninterop.h"
 #include "tilecountperlayerinterop.h"
 #include "planenormalanddistanceinterop.h"
+#include "versioninfointerop.h"
+#include "allocationobject.h"
 
 /** @file imgdoc2API.h
  *  The flat API for the imgdoc2 module.
@@ -62,6 +64,19 @@ typedef bool(LIBIMGDOC2_STDCALL* MemTransferReserveFunctionPointer)(std::intptr_
 
 /// Defines an alias representing a function pointer used for memory transfer operations. This function pointer is used with IDocRead2d_ReadTileData/IDocRead3d_ReadBrickData.
 typedef bool(LIBIMGDOC2_STDCALL* MemTransferSetDataFunctionPointer)(std::intptr_t /*blob_output_handle*/, std::uint64_t /*offset*/, std::uint64_t /*size*/, const void* /*data*/); // NOLINT(readability/casting)
+
+/// Defines an alias representing a function pointer used for memory allocation (on the caller side).
+typedef bool(LIBIMGDOC2_STDCALL* AllocMemoryFunctionPointer)(std::uint64_t size, AllocationObject* allocation_object); // NOLINT(readability/casting)
+
+/// Gets version information. This function is used to retrieve the version information of the library.
+/// Note that the specified allocate_memory_function is used to allocate memory for the strings in the VersionInfoInterop structure.
+/// If the allocate_memory_function is null, then the strings will not be returned.
+///
+/// \param [out]    version_info                Structure where the version information will be placed.
+/// \param          allocate_memory_function    If non-null, this "allocate memory function" will be used to allocate memory for the strings in the VersionInfoInterop structure
+///  
+/// \returns An error-code indicating success or failure of the operation.                                                                                       to be returned.
+EXTERNAL_API(ImgDoc2ErrorCode) GetVersionInfo(VersionInfoInterop* version_info, AllocMemoryFunctionPointer allocate_memory_function);
 
 /// Retrieve the 'ImgDoc2StatisticsInterop' structure, which contains various statistics about
 /// the state of library.In particular, we keep track of how many outstanding object-handles we

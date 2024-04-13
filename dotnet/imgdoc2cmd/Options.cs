@@ -2,8 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Microsoft.VisualBasic.CompilerServices;
+
 namespace Imgdoc2cmd
 {
+    using ImgDoc2Net.Implementation;
     using McMaster.Extensions.CommandLineUtils;
     using System;
     using System.Collections.Generic;
@@ -257,7 +260,7 @@ namespace Imgdoc2cmd
 
         private static string GetExtendedHelpText()
         {
-            return @"
+            string text = @"
 command ""CreateSyntheticDocument"":
  This command will create a new document with the filename as given with the '-o|--output-document' option.
  The bounds for the document is specified with the '-b|--coordinate-bounds' option. The size of the individual
@@ -274,6 +277,21 @@ command ""QueryForTilesAndSaveTiles"":
 command ""PrintInformation"":
  Use this command to print information about the document.
 ";
+
+
+            var versionInfo = ImgDoc2Global.GetVersionInfo();
+
+            text +=
+                $"\n\nversion of native imgdoc2:\nversion: {versionInfo.NativeLibraryVersion.Major}.{versionInfo.NativeLibraryVersion.Minor}.{versionInfo.NativeLibraryVersion.Patch}\n";
+            text += $"compiler: {versionInfo.NativeLibraryVersion.CompilerIdentification}\n";
+            text += $"build type: {versionInfo.NativeLibraryVersion.BuildType}\n";
+            text += $"repository: {versionInfo.NativeLibraryVersion.RepositoryUrl}\n";
+            text += $"branch: {versionInfo.NativeLibraryVersion.RepositoryBranch}\n";
+            text += $"tag: {versionInfo.NativeLibraryVersion.RepositoryTag}\n";
+            text += $"\n\nversion of managed imgdoc2 library:\nversion: {versionInfo.ManagedImgDoc2LibraryVersionInfo.Major}.{versionInfo.ManagedImgDoc2LibraryVersionInfo.Minor}.{versionInfo.ManagedImgDoc2LibraryVersionInfo.Patch}.{versionInfo.ManagedImgDoc2LibraryVersionInfo.Revision}\n";
+            text += $"build type: {versionInfo.ManagedImgDoc2LibraryVersionInfo.BuildType}\n";
+
+            return text;
         }
     }
 }

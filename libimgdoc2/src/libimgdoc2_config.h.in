@@ -1,0 +1,18 @@
+// SPDX-FileCopyrightText: 2024 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
+#pragma once
+
+// those numbers define the version of libimgdoc2
+#define LIBIMGDOC2_VERSION_MAJOR "@libimgdoc2_VERSION_MAJOR@"
+#define LIBIMGDOC2_VERSION_MINOR "@libimgdoc2_VERSION_MINOR@"
+#define LIBIMGDOC2_VERSION_PATCH "@libimgdoc2_VERSION_PATCH@"
+#define LIBIMGDOC2_VERSION_TWEAK "@libimgdoc2_VERSION_TWEAK@"
+
+#define LIBIMGDOC2_REPOSITORYREMOTEURL "@libimgdoc2_REPOSITORYREMOTEURL@"
+#define LIBIMGDOC2_REPOSITORYBRANCH    "@libimgdoc2_REPOSITORYBRANCH@"
+#define LIBIMGDOC2_REPOSITORYHASH      "@libimgdoc2_REPOSITORYHASH@"
+
+#define LIBIMGDOC2_CXX_COMPILER_IDENTIFICATION "@libimgdoc2_COMPILERIDENTIFICATION@"
+#define LIBIMGDOC2_BUILD_TYPE                  "@libimgdoc2_BUILD_TYPE@"
