@@ -301,3 +301,10 @@ jobs:
         if: steps.check_whether_to_deploy_nuget.outputs.should_deploy == 'true'
         run: |
           nuget push "${{github.workspace}}/nuget-packaging/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGETAPI_KEY}}
+
+  build:
+    needs: [package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Final Task
+        run: echo "All build jobs completed successfully"
