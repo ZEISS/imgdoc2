@@ -19,7 +19,7 @@ namespace imgdoc2
     class ClassFactory
     {
     public:
-        /// Gets built-time information about the libimgdoc2 library.
+        /// Gets build-time information about the libimgdoc2 library.
         ///
         /// \returns    The version information.
         static VersionInfo GetVersionInfo();
