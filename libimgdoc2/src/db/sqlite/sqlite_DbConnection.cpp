@@ -105,7 +105,7 @@ SqliteDbConnection::SqliteDbConnection(sqlite3* database, std::shared_ptr<imgdoc
 
     // see https://www.sqlite.org/c3ref/step.html
     // Note that we intend that Execute-methods are used only for commands which do not return data,
-    //  so this means that we do not expect 'SQLITE_ROW" here
+    //  so this means that we do not expect 'SQLITE_ROW' here
     if (return_value != SQLITE_DONE)
     {
         throw database_exception("Error from 'sqlite3_step'", return_value);

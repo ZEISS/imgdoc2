@@ -43,7 +43,7 @@ public:
     /// where the value in 'key_column_name' is equal to 'key'. If successful, the string (from column 'value_common_name') is put
     /// into 'output' (if 'output' is non-null) and true is returned. If the key is not found, the method returns false.
     /// It is not checked whether there are multiple hits, in such case an arbitrary hit is returned.
-    /// Note that in case of an database-error, this method will throw an exception.
+    /// Note that in case of a database-error, this method will throw an exception.
     ///
     /// \param [in]  db_connection       The database connection.
     /// \param       table_name          Name of the table.
@@ -72,7 +72,7 @@ public:
     /// <summary>   
     /// Add the data from the specified 'data_bind_info'-list to the specified Db-statement, starting with the index  given
     /// with 'binding_index'. The method returns the index of the next free binding-index (or - it returns the binding-index
-    /// for the next parameter, in other words "binding-index + data_bind_info.size()).
+    /// for the next parameter, in other words "binding-index + data_bind_info.size()").
     /// </summary>
     /// <param name="data_bind_info">   Information describing the data bind. </param>
     /// <param name="db_statement">     [in] The database statement where the data is to be bound to. </param>

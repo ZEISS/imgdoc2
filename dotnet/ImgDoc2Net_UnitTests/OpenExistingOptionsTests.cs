@@ -25,7 +25,7 @@ namespace ImgDoc2Net_UnitTests
 
             string s = instance.OpenExistingOptionsGetFilename(handle);
 
-            Assert.Equal(s, filename);
+            Assert.Equal(expected: filename, actual: s);
             instance.DestroyOpenExistingOptions(handle);
 
             Assert.True(Utilities.IsActiveObjectCountEqual(statisticsBeforeTest, instance.GetStatistics()), "orphaned native imgdoc2-objects detected");
@@ -43,7 +43,7 @@ namespace ImgDoc2Net_UnitTests
                 filenameFromObject = openExistingOption.Filename;
             }
 
-            Assert.Equal(filenameFromObject, filename);
+            Assert.Equal(expected: filename, actual: filenameFromObject);
         }
     }
 }

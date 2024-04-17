@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using ImgDoc2Net.Implementation;
+
 namespace Imgdoc2cmd
 {
     internal class Program

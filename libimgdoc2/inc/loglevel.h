@@ -17,6 +17,6 @@ namespace imgdoc2
         static constexpr int Trace = 4;
         static constexpr int Debug = 5;
 
-        static const int Sql = 32;  ///< This level will log all SQL-statement sent to the database.
+        static constexpr int Sql = 32;  ///< This level will log all SQL-statement sent to the database.
     };
 }

@@ -20,6 +20,9 @@ static constexpr ImgDoc2ErrorCode ImgDoc2_ErrorCode_InvalidArgument = 1;
 /// An invalid handle was supplied to the function (i.e. a handle which is either a bogus value or a handle which has already been destroyed).
 static constexpr ImgDoc2ErrorCode ImgDoc2_ErrorCode_InvalidHandle = 2;
 
+/// A memory allocation error occurred (this could be in a caller-supplied callback function).
+static constexpr ImgDoc2ErrorCode ImgDoc2_ErrorCode_AllocationError = 3;
+
 /// An invalid id was specified when reading/accessing a tile.
 static constexpr ImgDoc2ErrorCode ImgDoc2_Invalid_TileId = 5;   
 

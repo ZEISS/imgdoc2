@@ -21,7 +21,21 @@ namespace ImgDoc2Net.Interfaces
         /// </summary>
         UncompressedBitmap = 1,
 
+        /// <summary> 
+        /// The binary blob is a JPG-XR compressed bitmap.
+        /// </summary>
         JpgXrCompressedBitmap = 2,
+
+        /// <summary> 
+        /// The binary blob is a bitmap compressed with zstd.
+        /// </summary>
+        Zstd0CcompressedBitmap = 3,
+
+        /// <summary>
+        /// The binary blob is a bitmap compressed with "zstd1"-compression. This is a variant of the zstd-compression which includes a header
+        /// and (optionally) some pre-processing of the data.
+        /// </summary>
+        Zstd1CcompressedBitmap = 4,
 
         UncompressedBrick = 32,
     }

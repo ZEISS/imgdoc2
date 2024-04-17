@@ -85,7 +85,7 @@ namespace Imgdoc2cmd
                 $"TileCoordinate: {Utilities.TileCoordinateToStringRepresentation(tileCoordinate)}\nLogicalPosition: {Utilities.LogicalPositionToStringRepresentation(in logicalPosition)}";
 
             // Measure the text size
-            FontRectangle size = TextMeasurer.Measure(text, new TextOptions(font));
+            FontRectangle size = TextMeasurer.MeasureSize(text, new TextOptions(font));
 
             // Find out how much we need to scale the text to fill the space (up or down)
             float scalingFactor = Math.Min(width / size.Width, height / size.Height);
@@ -93,7 +93,7 @@ namespace Imgdoc2cmd
             // Create a new font
             Font scaledFont = new Font(font, scalingFactor * font.Size);
 
-            var textOptions = new TextOptions(scaledFont)
+            var textOptions = new RichTextOptions(scaledFont)
             {
                 Origin = new PointF(width / 2.0f, height / 2.0f),
                 HorizontalAlignment = HorizontalAlignment.Center,

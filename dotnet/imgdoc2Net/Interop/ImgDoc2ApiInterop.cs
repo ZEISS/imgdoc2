@@ -190,10 +190,19 @@ namespace ImgDoc2Net.Interop
                 this.idocwrite3dCommitTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite3d_CommitTransaction");
                 this.idocwrite3dRollbackTransaction = this.GetProcAddressThrowIfNotFound<IDocWrite2d3d_BeginCommitRollbackTransactionDelegate>("IDocWrite3d_RollbackTransaction");
 
+                this.getVersionInfo =
+                    this.GetProcAddressThrowIfNotFound<GetVersionInfoDelegate>("GetVersionInfo");
+
+                this.decodeImage =
+                    this.GetProcAddressThrowIfNotFound<DecodeImageDelegate>("DecodeImage");
+
+                // Note: make sure that the delegates used below are not (i.e. NEVER) garbage-collected, otherwise the native code will crash
                 this.funcPtrBlobOutputSetSizeForwarder =
                     Marshal.GetFunctionPointerForDelegate<BlobOutputSetSizeDelegate>(ImgDoc2ApiInterop.BlobOutputSetSizeDelegateObj);
                 this.funcPtrBlobOutputSetDataForwarder =
                     Marshal.GetFunctionPointerForDelegate<BlobOutputSetDataDelegate>(ImgDoc2ApiInterop.BlobOutputSetDataDelegateObj);
+                this.funcPtrAllocateMemoryByteArray =
+                    Marshal.GetFunctionPointerForDelegate<AllocateMemoryDelegate>(ImgDoc2ApiInterop.AllocateMemoryByteArrayDelegateObj);
 
                 this.InitializeEnvironmentObject();
             }
@@ -261,17 +270,43 @@ namespace ImgDoc2Net.Interop
 
         private IEnumerable<string> GetFullyQualifiedDllPaths()
         {
+            // Note: We are looking for the native DLL in the following locations:
+            // - in the same directory as the executing assembly
+            // - in the "runtimes/xxx/native" subdirectory of the executing assembly, where "xxx" is the runtime identifier (c.f. https://learn.microsoft.com/en-us/dotnet/core/rid-catalog)
+            //
+            // Currently, we only support linux-x64, win-x64 and win-arm64.
+            // The Nuget-package contains the native DLLs in the "runtimes" directory. Searching in the same directory is used for development purposes.
+            // 
             // TODO(JBL): I'd like to have CPU-architecture-specific suffixes for the filenames ("x86", "x64", "arm32" etc.) and probably a "d" for debug-builds or so
             string pathOfExecutable = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             bool isLinux = Utilities.IsLinux();
 
+            string filenameOfBinary;
             if (!isLinux)
             {
-                yield return Path.Combine(pathOfExecutable, BaseDllNameWindows + ".dll");
+                filenameOfBinary = BaseDllNameWindows + ".dll";
             }
             else
             {
-                yield return Path.Combine(pathOfExecutable, BaseDllNameLinux + ".so");
+                filenameOfBinary = BaseDllNameLinux + ".so";
+            }
+
+            yield return Path.Combine(pathOfExecutable, filenameOfBinary);
+
+            if (isLinux)
+            {
+                yield return Path.Combine(pathOfExecutable, "runtimes/linux-x64/native/" + filenameOfBinary);
+            }
+            else
+            {
+                if (Utilities.IsCpuArchitectureX64())
+                {
+                    yield return Path.Combine(pathOfExecutable, "runtimes/win-x64/native/" + filenameOfBinary);
+                }
+                else if (Utilities.IsCpuArchitectureArm64())
+                {
+                    yield return Path.Combine(pathOfExecutable, "runtimes/win-arm64/native/" + filenameOfBinary);
+                }
             }
         }
     }
@@ -281,6 +316,51 @@ namespace ImgDoc2Net.Interop
     /// </content>
     internal partial class ImgDoc2ApiInterop
     {
+        /// <summary>
+        /// Retrieves the version information of the native library.
+        /// </summary>
+        /// <returns>The version information of the native library.</returns>
+        public ImgDoc2NativeLibraryVersionInfo GetNativeLibraryVersionInfo()
+        {
+            this.ThrowIfNotInitialized();
+
+            unsafe
+            {
+                VersionInfoInterop versionInfoInterop = default(VersionInfoInterop);
+
+                try
+                {
+                    int returnCode = this.getVersionInfo(&versionInfoInterop, this.funcPtrAllocateMemoryByteArray);
+                    if (returnCode != ImgDoc2_ErrorCode_OK)
+                    {
+                        throw new InvalidOperationException($"Error in getVersionInfo: {returnCode}");
+                    }
+
+                    return new ImgDoc2NativeLibraryVersionInfo()
+                    {
+                        Major = versionInfoInterop.Major,
+                        Minor = versionInfoInterop.Minor,
+                        Patch = versionInfoInterop.Patch,
+                        CompilerIdentification = Utilities.ConvertFromUtf8Span(ImgDoc2ApiInterop.ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref versionInfoInterop.CompilerIdentification)),
+                        BuildType = Utilities.ConvertFromUtf8Span(ImgDoc2ApiInterop.ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref versionInfoInterop.BuildType)),
+                        RepositoryUrl = Utilities.ConvertFromUtf8Span(ImgDoc2ApiInterop.ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref versionInfoInterop.RepositoryUrl)),
+                        RepositoryBranch = Utilities.ConvertFromUtf8Span(ImgDoc2ApiInterop.ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref versionInfoInterop.RepositoryBranch)),
+                        RepositoryTag = Utilities.ConvertFromUtf8Span(ImgDoc2ApiInterop.ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref versionInfoInterop.RepositoryTag)),
+                    };
+                }
+                finally
+                {
+                    // Note: The un-pinning of the byte-arrays is done in the ConvertAllocationObjectToByteArrayAndFreeGcHandle-method already,
+                    //        so this under normal circumstances should not be necessary (it is just a safety-net e.g. if an exception is thrown).
+                    ImgDoc2ApiInterop.FreeAllocationObject(ref versionInfoInterop.CompilerIdentification);
+                    ImgDoc2ApiInterop.FreeAllocationObject(ref versionInfoInterop.BuildType);
+                    ImgDoc2ApiInterop.FreeAllocationObject(ref versionInfoInterop.RepositoryUrl);
+                    ImgDoc2ApiInterop.FreeAllocationObject(ref versionInfoInterop.RepositoryBranch);
+                    ImgDoc2ApiInterop.FreeAllocationObject(ref versionInfoInterop.RepositoryTag);
+                }
+            }
+        }
+
         /// <summary>   Gets the "ImgDoc2Statistics" - information about how many active objects exist. </summary>
         /// <returns>   The "ImgDoc2Statistics". </returns>
         public ImgDoc2Statistics GetStatistics()
@@ -749,7 +829,7 @@ namespace ImgDoc2Net.Interop
         public void DestroyReader3d(IntPtr handleReader)
         {
             this.ThrowIfNotInitialized();
-            
+
             unsafe
             {
                 ImgDoc2ErrorInformation errorInformation;
@@ -777,7 +857,7 @@ namespace ImgDoc2Net.Interop
         public void DestroyWriter3d(IntPtr handleWriter)
         {
             this.ThrowIfNotInitialized();
-            
+
             unsafe
             {
                 ImgDoc2ErrorInformation errorInformation;
@@ -1541,6 +1621,60 @@ namespace ImgDoc2Net.Interop
         }
     }
 
+    internal partial class ImgDoc2ApiInterop
+    {
+        public (Memory<byte>, int) DecodeJpgXr(Span<byte> compressedData, PixelType pixelType, int width, int height, int stride = -1)
+        {
+            return this.Decode(compressedData, DataType.JpgXrCompressedBitmap, pixelType, width, height, stride);
+        }
+
+        public (Memory<byte>, int) DecodeZstd0(Span<byte> compressedData, PixelType pixelType, int width, int height, int stride = -1)
+        {
+            return this.Decode(compressedData, DataType.Zstd0CcompressedBitmap, pixelType, width, height, stride);
+        }
+
+        public (Memory<byte>, int) DecodeZstd1(Span<byte> compressedData, PixelType pixelType, int width, int height, int stride = -1)
+        {
+            return this.Decode(compressedData, DataType.Zstd1CcompressedBitmap, pixelType, width, height, stride);
+        }
+
+        public (Memory<byte>, int) Decode(Span<byte> compressedData, DataType dataType, PixelType pixelType, int width, int height, int stride = -1)
+        {
+            this.ThrowIfNotInitialized();
+
+            unsafe
+            {
+                BitmapInfoInterop bitmapInfoInterop = default(BitmapInfoInterop);
+                bitmapInfoInterop.PixelType = (byte)pixelType;
+                bitmapInfoInterop.PixelWidth = (uint)width;
+                bitmapInfoInterop.PixelHeight = (uint)height;
+
+                DecodedImageResultInterop result = default(DecodedImageResultInterop);
+                ImgDoc2ErrorInformation errorInformation;
+
+                fixed (byte* pointerToCompressedData = compressedData)
+                {
+                    int returnCode = this.decodeImage(
+                        &bitmapInfoInterop,
+                        (byte)dataType,
+                        new IntPtr(pointerToCompressedData),
+                        (ulong)compressedData.Length,
+                        stride <= 0 ? 0 : (uint)stride,
+                        this.funcPtrAllocateMemoryByteArray,
+                        &result,
+                        &errorInformation);
+
+                    if (returnCode != ImgDoc2_ErrorCode_OK)
+                    {
+                        throw new Exception("Error from 'DecodeImageJpgXr'.");
+                    }
+                }
+
+                return (ImgDoc2ApiInterop.ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref result.Bitmap), (int)result.Stride);
+            }
+        }
+    }
+
     /// <content> 
     /// Here we gather "simple overloads" of the interface functions.
     /// </content>
@@ -1634,6 +1768,13 @@ namespace ImgDoc2Net.Interop
             ImgDoc2ApiInterop.BlobOutputSetDataFunction;
 
         /// <summary>
+        /// Delegate to the (static) AllocateMemoryFunctionByteArray-function. It is important that this delegate does NOT get
+        /// GCed (which is ensured in case of a static variable of course).
+        /// </summary>
+        private static readonly AllocateMemoryDelegate AllocateMemoryByteArrayDelegateObj =
+            ImgDoc2ApiInterop.AllocateMemoryFunctionByteArray;
+
+        /// <summary>
         /// Function pointer (callable from unmanaged code) to the function "BlobOutputSetSizeFunction".
         /// </summary>
         private readonly IntPtr funcPtrBlobOutputSetSizeForwarder;
@@ -1643,9 +1784,21 @@ namespace ImgDoc2Net.Interop
         /// </summary>
         private readonly IntPtr funcPtrBlobOutputSetDataForwarder;
 
+        /// <summary>
+        /// Function pointer (callable from unmanaged code) to the function "AllocateMemoryFunctionByteArray".
+        /// This function is used for allocating memory as a byte-array.
+        ///  </summary>
+        private readonly IntPtr funcPtrAllocateMemoryByteArray;
+
         private delegate bool BlobOutputSetSizeDelegate(IntPtr blobOutputObjectHandle, ulong size);
 
         private delegate bool BlobOutputSetDataDelegate(IntPtr blobOutputObjectHandle, ulong offset, ulong size, IntPtr pointerToData);
+
+        /// <summary>
+        /// Definition of a delegate for the "AllocateMemoryFunction" function. The argument 'allocationObject' is a pointer 
+        /// to the structure "AllocationObjectInterop".
+        /// </summary>
+        private delegate bool AllocateMemoryDelegate(ulong size, IntPtr allocationObject);
 
         /// <summary>   
         /// This interface is used for "returning data from the unmanaged code". The idea is that the
@@ -1683,6 +1836,22 @@ namespace ImgDoc2Net.Interop
             GCHandle gcHandle = GCHandle.FromIntPtr(blobOutputObjectHandle);
             IBlobOutput blobOutput = gcHandle.Target as IBlobOutput;
             return blobOutput.SetData(offset, size, pointerToData);
+        }
+
+        private static unsafe bool AllocateMemoryFunctionByteArray(ulong size, IntPtr allocationObject)
+        {
+            if (size > int.MaxValue)
+            {
+                // the sanity check failed - we cannot allocate memory with a size exceeding 'int.MaxValue'
+                return false;
+            }
+
+            AllocationObjectInterop* allocationObjectPointer = (AllocationObjectInterop*)allocationObject.ToPointer();
+            byte[] buffer = new byte[size];
+            GCHandle gcHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            allocationObjectPointer->PointerToMemory = gcHandle.AddrOfPinnedObject();
+            allocationObjectPointer->Handle = GCHandle.ToIntPtr(gcHandle);
+            return true;
         }
 
         /// <summary>Simplistic implementation of the <see cref="IBlobOutput"/> interface. The data is stored in a .NET-byte array.</summary>
@@ -1908,12 +2077,16 @@ namespace ImgDoc2Net.Interop
         private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite3dCommitTransaction;
         private readonly IDocWrite2d3d_BeginCommitRollbackTransactionDelegate idocwrite3dRollbackTransaction;
 
+        private readonly GetVersionInfoDelegate getVersionInfo;
+
+        private readonly DecodeImageDelegate decodeImage;
+
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate void GetStatisticsDelegate(ImgDoc2StatisticsInterop* statisticsInterop);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate IntPtr VoidAndReturnIntPtrDelegate();
-        
+
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int IntPtrAndErrorInformationReturnErrorCodeDelegate(IntPtr handle, ImgDoc2ErrorInformation* errorInformation);
 
@@ -2132,6 +2305,11 @@ namespace ImgDoc2Net.Interop
             TileCountPerLayerInterop* tileCountPerLayerInterop,
             ImgDoc2ErrorInformation* errorInformation);
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int GetVersionInfoDelegate(
+            VersionInfoInterop* versionInfoInterop,
+            IntPtr allocMemoryFunctionPtr);
+
         /// <summary> 
         /// This delegate is corresponding the the APIs IDocWrite2d_BeginTransaction/IDocWrite2d_CommitTransaction/IDocWrite2d_RollbackTransaction
         /// and IDocWrite3d_BeginTransaction/IDocWrite3d_CommitTransaction/IDocWrite3d_RollbackTransaction.
@@ -2142,6 +2320,17 @@ namespace ImgDoc2Net.Interop
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private unsafe delegate int IDocWrite2d3d_BeginCommitRollbackTransactionDelegate(
             IntPtr write2d3dHandle,
+            ImgDoc2ErrorInformation* errorInformation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private unsafe delegate int DecodeImageDelegate(
+            BitmapInfoInterop* bitmapInfoInterop,
+            byte dataType,
+            IntPtr pointerToCompressedData,
+            ulong sizeOfCompressedData,
+            uint destinationStride,
+            IntPtr allocMemoryFunctionPtr,
+            DecodedImageResultInterop* result,
             ImgDoc2ErrorInformation* errorInformation);
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -2155,6 +2344,26 @@ namespace ImgDoc2Net.Interop
         {
             public byte Dimension;
             public int Value;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct AllocationObjectInterop
+        {
+            public IntPtr PointerToMemory;
+            public IntPtr Handle;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct VersionInfoInterop
+        {
+            public int Major;
+            public int Minor;
+            public int Patch;
+            public AllocationObjectInterop CompilerIdentification;
+            public AllocationObjectInterop BuildType;
+            public AllocationObjectInterop RepositoryUrl;
+            public AllocationObjectInterop RepositoryBranch;
+            public AllocationObjectInterop RepositoryTag;
         }
 
         /// <summary>   
@@ -2351,6 +2560,21 @@ namespace ImgDoc2Net.Interop
             {
                 return (numberOfElements * Marshal.SizeOf<PerLayerTileCountInterop>()) + (2 * Marshal.SizeOf<uint>());
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct DecodedImageResultInterop
+        {
+            public uint Stride;
+            public AllocationObjectInterop Bitmap;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct BitmapInfoInterop
+        {
+            public byte PixelType;
+            public uint PixelWidth;
+            public uint PixelHeight;
         }
     }
 
@@ -2595,6 +2819,40 @@ namespace ImgDoc2Net.Interop
 
             TileCoordinate tileCoordinate = new TileCoordinate(dimensionValueTuples);
             return tileCoordinate;
+        }
+
+        private static void FreeAllocationObject(ref AllocationObjectInterop allocationObjectInterop)
+        {
+            if (allocationObjectInterop.PointerToMemory != IntPtr.Zero)
+            {
+                GCHandle gcHandle = GCHandle.FromIntPtr(allocationObjectInterop.Handle);
+                gcHandle.Free();
+                allocationObjectInterop.PointerToMemory = IntPtr.Zero;
+            }
+        }
+
+        private static string ConvertAllocationObjectToString(in AllocationObjectInterop allocationObjectInterop)
+        {
+            if (allocationObjectInterop.PointerToMemory == IntPtr.Zero)
+            {
+                return string.Empty;
+            }
+
+            return Utilities.ConvertFromUtf8IntPtrZeroTerminated(allocationObjectInterop.PointerToMemory);
+        }
+
+        private static byte[] ConvertAllocationObjectToByteArrayAndFreeGcHandle(ref AllocationObjectInterop allocationObjectInterop)
+        {
+            if (allocationObjectInterop.PointerToMemory == IntPtr.Zero)
+            {
+                return Array.Empty<byte>();
+            }
+
+            GCHandle gcHandle = GCHandle.FromIntPtr(allocationObjectInterop.Handle);
+            byte[] result = (byte[])gcHandle.Target;
+            gcHandle.Free();
+            allocationObjectInterop.PointerToMemory = IntPtr.Zero;
+            return result;
         }
 
         private QueryResult InternalReaderQuery(IDocRead2d3d_QueryDelegate nativeQueryFunction, IntPtr handle, IDimensionQueryClause clause, ITileInfoQueryClause tileInfoQueryClause, int maxNumberOfResults)

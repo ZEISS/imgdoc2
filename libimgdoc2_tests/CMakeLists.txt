@@ -25,9 +25,9 @@ include(FetchContent)
         set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
         FetchContent_Populate(googletest)
 
-	  	  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
-		    set(GTEST_INCLUDE_DIRS ${googletest_SOURCE_DIR}/googletest/include)
-		    set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)    
+        add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+        set(GTEST_INCLUDE_DIRS ${googletest_SOURCE_DIR}/googletest/include)
+        set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)    
     endif()
 endif() 
 
@@ -90,4 +90,7 @@ endif()
 ]]
 
 add_test( libimgdoc2_tests  libimgdoc2_tests  )
-gtest_discover_tests(libimgdoc2_tests)
+
+if (IMGDOC2_RUNDISCOVER_UNITTESTS)
+  gtest_discover_tests(libimgdoc2_tests)
+endif()

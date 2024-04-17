@@ -12,7 +12,11 @@ cmake_policy(SET CMP0079 NEW) # necessary to make coverage build work, not sure 
 
 include(FetchContent)
 
-project("imgdoc2")
+# we read the version number from a file
+file (STRINGS "VersionNumber.txt" IMGDOC2_VERSION_NUMBER)
+
+project("imgdoc2"
+          VERSION ${IMGDOC2_VERSION_NUMBER})
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -36,6 +40,12 @@ option(IMGDOC2_CODECOV_GCOVRHTML "Build with Code-Coverage (for unit-tests) as a
 option(IMGDOC2_BUILD_CONVCZI "Whether to build the convczi-tool" ON)
 
 option(IMGDOC2_BUILD_NATIVEIMGDOC2CMD "Whether to build the native imgdoc2cmd-tool (currently contains throw-away experiments)" ON)
+
+option(IMGDOC2_BUILD_UNITTESTS "Whether to build the unit-tests" ON)
+
+# this option is only relevant if IMGDOC2_BUILD_UNITTESTS is ON, and it controls whether the unit-tests are run (for unit-test discovery) after building.
+# This is problematic when cross-compiling. In that case, the unit-tests should be run on the target system.
+option(IMGDOC2_RUNDISCOVER_UNITTESTS "Whether to run the unit-tests after building" ON)
 
 
 if (IMGDOC2_BUILD_CLANGTIDY)
@@ -65,6 +75,12 @@ FetchContent_MakeAvailable(GSL)
 
 add_subdirectory(external/sqlite3)
 
+# make libCZI available (currently used by imgdoc2API and convczi))
+include("${CMAKE_SOURCE_DIR}/cmake/libCZI.cmake")
+FetchContent_GetProperties(libCZI)
+set(LIBCZI_INCLUDE_DIR "${libczi_SOURCE_DIR}/Src/libCZI")
+
+
 add_subdirectory(libimgdoc2)
 add_subdirectory(imgdoc2API)
 
@@ -73,18 +89,16 @@ if (IMGDOC2_BUILD_NATIVEIMGDOC2CMD)
 endif()
 
 if (IMGDOC2_BUILD_CONVCZI)
-  include("${CMAKE_SOURCE_DIR}/cmake/libCZI.cmake")
-  FetchContent_GetProperties(libCZI)
-  set(LIBCZI_INCLUDE_DIR "${libczi_SOURCE_DIR}/Src/libCZI")
   add_subdirectory(convczi)
 endif()
 
 include (CTest)
 set(MEMORYCHECK_COMMAND valgrind)
-#set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --track-origins=yes")
-set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=yes")
-enable_testing()
-add_subdirectory(libimgdoc2_tests)
+set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=yes") # check https://valgrind.org/docs/manual/manual-core.html#manual-core.options for more options
+if (IMGDOC2_BUILD_UNITTESTS) 
+  enable_testing()
+  add_subdirectory(libimgdoc2_tests)
+endif()
 
 if (IMGDOC2_CODECOV_GCOVRXML OR IMGDOC2_CODECOV_GCOVRHTML)
   include("${CMAKE_SOURCE_DIR}/cmake/CodeCoverage.cmake")

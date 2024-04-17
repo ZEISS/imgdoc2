@@ -22,10 +22,10 @@ void DbDiscovery::DoDiscovery()
     // first step - find the "GENERAL" table and see if we can make sense of it
     GeneralDataDiscoveryResult general_table_discovery_result = this->DiscoverGeneralTable();
 
-    // now, check whether those tables exists and are useable
+    // now, check whether those tables exist and are usable
     this->Check_Tables_And_Determine_Dimensions(general_table_discovery_result);
 
-    // if we get here, then we determined the database to be 'usable' for us, so we construct an corresponding
+    // if we get here, then we determined the database to be 'usable' for us, so we construct a corresponding
     // "database-configuration"-object here from the data we gathered.
     if (general_table_discovery_result.document_type == DocumentType::kImage2d)
     {

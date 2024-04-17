@@ -209,7 +209,7 @@ namespace ImgDoc2Net_UnitTests
                 using var reader3d = document.Get3dReader();
 
                 var minMax = reader3d.GetMinMaxForTileDimension(reader3d.GetTileDimensions());
-                minMax.Count().Should().Be(2);
+                minMax.Count.Should().Be(2);
 
                 // the min/max should be "indeterminate" or "invalid", which means that min > max.
                 var (min, max) = minMax[new Dimension('v')];

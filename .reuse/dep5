@@ -7,7 +7,7 @@ Files: libimgdoc2/doc/*
 Copyright: 2023 Carl Zeiss Microscopy GmbH
 License: MIT
 
-Files: cla_*.txt CMakeLists.txt CMakeSettings.json CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md THIRD_PARTY_LICENSES.txt .gitignore
+Files: cla_*.txt CMakeLists.txt CMakeSettings.json CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md THIRD_PARTY_LICENSES.txt .gitignore VersionNumber.txt
 Copyright: 2017-2022 Carl Zeiss Microscopy GmbH
 License: MIT
 

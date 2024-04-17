@@ -11,7 +11,7 @@ namespace ImgDoc2Net_UnitTests
     /// C.f. https://tsuyoshiushio.medium.com/controlling-the-serial-and-parallel-test-on-xunit-6174326da196.
     ///  </summary>
     [CollectionDefinition(NonParallelCollectionDefinitionClass.Name, DisableParallelization = true)]
-    internal class NonParallelCollectionDefinitionClass
+    public class NonParallelCollectionDefinitionClass
     {
         /// <summary> The name of the definition class.</summary>
         public const string Name = "Non-Parallel Collection";

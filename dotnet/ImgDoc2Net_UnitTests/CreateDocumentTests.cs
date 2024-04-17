@@ -267,7 +267,7 @@ namespace ImgDoc2Net_UnitTests
                 Assert.True(queryResult.Keys.Count == 1, "We expect to find one tile as result of the query.");
 
                 var blob = instance.Reader2dReadTileData(reader2dHandle, queryResult.Keys[0]);
-                Assert.True(blob.Length == 5);
+                Assert.Equal(5, blob.Length);
                 Assert.True(blob[0] == tileData[0] && blob[1] == tileData[1] && blob[2] == tileData[2] && blob[3] == tileData[3] && blob[4] == tileData[4]);
 
                 instance.DestroyCreateOptions(createOptionsHandle);
@@ -322,7 +322,7 @@ namespace ImgDoc2Net_UnitTests
                 Assert.True(listOfTiles.Count == 1, "We expect to find one tile as result of the query.");
 
                 var tileDataReadFromDocument = reader.ReadTileData(listOfTiles[0]);
-                Assert.True(tileDataReadFromDocument.Length == 5);
+                Assert.Equal(5, tileDataReadFromDocument.Length);
                 Assert.True(tileDataReadFromDocument[0] == tileData[0] &&
                                 tileDataReadFromDocument[1] == tileData[1] &&
                                 tileDataReadFromDocument[2] == tileData[2] &&

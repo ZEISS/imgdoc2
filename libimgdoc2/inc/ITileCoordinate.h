@@ -83,7 +83,7 @@ namespace imgdoc2
             {
                 // Ok, this means that for all dimensions present in a, we have the same value in b (and dimension is also present in b of course).
                 // However, it may be that b has more dimensions than a. So we need to check that as well (but we don't need to check the equality
-                // of the values any more this time).
+                // of the values anymore this time).
                 b->EnumCoordinates(
                    [=, &are_equal](imgdoc2::Dimension dimension, int)->bool
                    {

@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "imgdoc2cmd": {
-      "commandName": "Project",
-      "commandLineArgs": " -c CreateSyntheticDocument -b C0 -t 1024x1024 -r 40x40 --tiles-overlap 100px -o n:\\out/test.db",
-      "nativeDebugging": true
-    }
-  }
-}
