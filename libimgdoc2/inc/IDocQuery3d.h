@@ -36,7 +36,7 @@ namespace imgdoc2
         /// logically ANDed together.
         /// \param clause        The query clause (dealing with dimension indexes).
         /// \param tileInfoQuery The query clause (dealing with other "per tile data").
-        /// \param func          A functor which we will be called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
+        /// \param func          A functor which will be called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
         ///                      more calls to the functor will occur anymore.
         virtual void Query(const imgdoc2::IDimCoordinateQueryClause* clause, const imgdoc2::ITileInfoQueryClause* tileInfoQuery, const std::function<bool(imgdoc2::dbIndex)>& func) = 0;
 
