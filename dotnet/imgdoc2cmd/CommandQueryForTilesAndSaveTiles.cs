@@ -61,7 +61,7 @@ namespace Imgdoc2cmd
             }
         }
 
-        private static Image CreateImageImageSharp(PixelType pixelType, Memory<byte> data,int width,int height)
+        private static Image CreateImageImageSharp(PixelType pixelType, Memory<byte> data, int width, int height)
         {
             switch (pixelType)
             {
