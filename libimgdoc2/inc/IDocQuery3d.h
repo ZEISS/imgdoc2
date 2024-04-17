@@ -44,7 +44,7 @@ namespace imgdoc2
         /// \param  cuboid            The cuboid.
         /// \param  coordinate_clause The coordinate clause.
         /// \param  tileinfo_clause   The tileinfo clause.
-        /// \param  func              A functor which we will be called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
+        /// \param  func              A functor which will be called, passing in the index of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
         ///                           more calls to the functor will occur anymore.
         virtual void GetTilesIntersectingCuboid(const imgdoc2::CuboidD& cuboid, const imgdoc2::IDimCoordinateQueryClause* coordinate_clause, const imgdoc2::ITileInfoQueryClause* tileinfo_clause, const std::function<bool(imgdoc2::dbIndex)>& func) = 0;
 
