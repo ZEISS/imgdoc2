@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-# Note: The scripts in this folder are work-in-progress and contain absolute paths. 
+# Note: The scripts in this folder are work-in-progress and contain absolute paths.
 #       At this point, they are not intended to be used as-is.
 
 # Define the path to the executable
