@@ -10,7 +10,7 @@
 #include "bitmapinfointerop.h"
 #include "decodedimageresultinterop.h"
 
-/// Decodes the specific compressed data into an uncompressed bitmap. This destination bitmap is allocated
+/// Decodes the specified compressed data into an uncompressed bitmap. This destination bitmap is allocated
 /// by a user provided function. The caller may either provide a stride it expects the destination bitmap to be
 /// given, or 0 to let the function determine and choose the stride itself. The function will return the stride it used in
 /// the result structure. The caller is responsible for freeing the memory allocated by the allocate_memory_function.

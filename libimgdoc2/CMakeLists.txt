@@ -156,5 +156,5 @@ target_include_directories(libimgdoc2 INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> 
   )
 
-  # add the binary tree to the search path for include files so that we will find libimgdoc2_config.h
+# add the binary tree to the search path for include files so that we will find libimgdoc2_config.h
 target_include_directories(libimgdoc2 PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")

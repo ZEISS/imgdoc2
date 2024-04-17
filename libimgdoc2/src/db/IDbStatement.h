@@ -29,8 +29,8 @@ public:
     /// So, the string only must be valid for the duration of the execution of this method. However, there is of course a performance penalty
     /// here.
    ///
-   /// \param  index   Index of the parameter to bind.
-   /// \param  value   The null-terminated string to be bound (in UTF8 encoding).
+   /// \param  index    Index of the parameter to bind.
+   /// \param  value    The null-terminated string to be bound (in UTF8 encoding).
     virtual void BindString(int index, const char* value) = 0;
 
     virtual void BindStringView(int index, const std::string_view& value) = 0;
