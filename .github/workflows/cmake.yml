@@ -211,6 +211,9 @@ jobs:
 
       - name: Package NuGet
         run: |
+          sudo apt-get update         # as of Ubuntu24-04, Nuget is not installed by default
+          sudo apt-get install nuget  # -> https://github.com/actions/runner-images/issues/10631
+
           # We organize the native binaries in a way that they can be packed into a NuGet package. We follow this convention for the folder structure:
           # runtimes/<RID>/native, where <RID> is the Runtime Identifier for the target platform.
           mkdir nuget-packaging
