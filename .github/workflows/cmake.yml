@@ -200,7 +200,7 @@ jobs:
 
   package:
     needs: [build-windows-x64, build-linux-x64, build-windows-arm64]
-    runs-on: ubuntu-22.04 # note: nuget is not available in Ubuntu 24.04 any more by default, we should migrate to "dotnet pack" instead of loose .nuspec file I guess
+    runs-on: ubuntu-22.04 # note: nuget is not available in Ubuntu 24.04 any more by default, we should migrate to "dotnet pack" instead of a loose .nuspec file I guess
     steps:
       - uses: actions/checkout@v4
 
